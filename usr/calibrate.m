@@ -8,6 +8,7 @@ TL = {'TickLabelInterpreter','latex'};
 FS = {'FontSize',16,20};
 MS = {'MarkerSize',8};
 LW = {'LineWidth',2};
+CL = {'Color',[0.4660, 0.6740, 0.1880],[0.4940, 0.1840, 0.5560],[0, 0.4470, 0.7410],[0.8500, 0.3250, 0.0980],[0.8,0.8,0.8]};
 TINY = 1e-16;
 
 %% load experimental data from Schmidt & Kraettli (2020), Table 3
@@ -38,75 +39,81 @@ cal_magma6;
 % plot Harker diagrams
 figure(1); clf;
 subplot(2,3,1);
-plot(Temp(fphs(:,olv)>0),fphs(fphs(:,olv)>0,olv),'gd',MS{:},LW{1},1.5); axis xy tight; box on; hold on
-plot(Temp(fphs(:,pxn)>0),fphs(fphs(:,pxn)>0,pxn),'mv',MS{:},LW{1},1.5); axis xy tight; box on; hold on
-plot(Temp(fphs(:,plg)>0),fphs(fphs(:,plg)>0,plg),'bs',MS{:},LW{1},1.5); axis xy tight; box on; hold on
-plot(Temp(fphs(:,mlt)>0),fphs(fphs(:,mlt)>0,mlt),'ro',MS{:},LW{1},1.5); axis xy tight; box on; hold on
+plot(Temp(fphs(:,olv)>0),fphs(fphs(:,olv)>0,olv),'d',CL{[1,2]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+plot(Temp(fphs(:,pxn)>0),fphs(fphs(:,pxn)>0,pxn),'v',CL{[1,3]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+plot(Temp(fphs(:,plg)>0),fphs(fphs(:,plg)>0,plg),'s',CL{[1,4]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+plot(Temp(fphs(:,mlt)>0),fphs(fphs(:,mlt)>0,mlt),'o',CL{[1,5]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+set(gca,TL{:}); xlabel('$T [^\circ$C]',TX{:}); ylabel('$f_\mathrm{phs}$ [wt]',TX{:});
 
 subplot(2,3,2);
-plot(oxds(:,blk,Si),oxds(:,blk,Al),'k.',MS{1},12,LW{1},1); axis xy tight; box on; hold on
-plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Al),'gd',MS{:},LW{1},1);
-plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Al),'mv',MS{:},LW{1},1); 
-plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Al),'bs',MS{:},LW{1},1); 
-plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Al),'ro',MS{:},LW{1},1); 
-plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Al),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Al),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Al),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Al),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Al),'bs',MS{1},12,LW{:});
-plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Al),'bs',MS{1},12,LW{:});
+plot(oxds(:,blk,Si),oxds(:,blk,Al),'k.',MS{1},12,LW{1},1.5); axis xy tight; box on; hold on
+plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Al),'d',CL{[1,2]},MS{:},LW{1},1.5);
+plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Al),'v',CL{[1,3]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Al),'s',CL{[1,4]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Al),'o',CL{[1,5]},MS{:},LW{1},1.5);
+plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Al),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Al),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Al),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Al),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Al),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Al),'s',CL{[1,4]},MS{1},12,LW{:});
+set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('Al$_2$O$_3$ [wt\%]',TX{:});
 
 subplot(2,3,3);
-plot(oxds(:,blk,Si),oxds(:,blk,Fe),'k.',MS{1},12,LW{1},1); axis xy tight; box on; hold on
-plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Fe),'gd',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Fe),'mv',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Fe),'bs',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Fe),'ro',MS{:},LW{1},1.5);
-plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Fe),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Fe),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Fe),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Fe),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Fe),'bs',MS{1},12,LW{:});
-plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Fe),'bs',MS{1},12,LW{:});
+plot(oxds(:,blk,Si),oxds(:,blk,Fe),'k.',MS{1},12,LW{1},1.5); axis xy tight; box on; hold on
+plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Fe),'d',CL{[1,2]},MS{:},LW{1},1.5);
+plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Fe),'v',CL{[1,3]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Fe),'s',CL{[1,4]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Fe),'o',CL{[1,5]},MS{:},LW{1},1.5);
+plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Fe),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Fe),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Fe),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Fe),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Fe),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Fe),'s',CL{[1,4]},MS{1},12,LW{:});
+set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('FeO [wt\%]',TX{:});
 
 subplot(2,3,4);
-plot(oxds(:,blk,Si),oxds(:,blk,Mg),'k.',MS{1},12,LW{1},1); axis xy tight; box on; hold on
-plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Mg),'gd',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Mg),'mv',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Mg),'bs',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Mg),'ro',MS{:},LW{1},1.5);
-plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Mg),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Mg),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Mg),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Mg),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Mg),'bs',MS{1},12,LW{:});
-plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Mg),'bs',MS{1},12,LW{:});
+plot(oxds(:,blk,Si),oxds(:,blk,Mg),'k.',MS{1},12,LW{1},1.5); axis xy tight; box on; hold on
+plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Mg),'d',CL{[1,2]},MS{:},LW{1},1.5);
+plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Mg),'v',CL{[1,3]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Mg),'s',CL{[1,4]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Mg),'o',CL{[1,5]},MS{:},LW{1},1.5);
+plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Mg),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Mg),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Mg),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Mg),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Mg),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Mg),'s',CL{[1,4]},MS{1},12,LW{:});
+set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('MgO [wt\%]',TX{:});
 
 subplot(2,3,5);
-plot(oxds(:,blk,Si),oxds(:,blk,Ca),'k.',MS{1},12,LW{1},1); axis xy tight; box on; hold on
-plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Ca),'gd',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Ca),'mv',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Ca),'bs',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Ca),'ro',MS{:},LW{1},1.5);
-plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Ca),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Ca),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Ca),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Ca),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Ca),'bs',MS{1},12,LW{:});
-plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Ca),'bs',MS{1},12,LW{:});
+plot(oxds(:,blk,Si),oxds(:,blk,Ca),'k.',MS{1},12,LW{1},1.5); axis xy tight; box on; hold on
+plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Ca),'d',CL{[1,2]},MS{:},LW{1},1.5);
+plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Ca),'v',CL{[1,3]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Ca),'s',CL{[1,4]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Ca),'o',CL{[1,5]},MS{:},LW{1},1.5);
+plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Ca),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Ca),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Ca),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Ca),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Ca),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Ca),'s',CL{[1,4]},MS{1},12,LW{:});
+set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('CaO [wt\%]',TX{:});
 
 subplot(2,3,6);
-plot(oxds(:,blk,Si),oxds(:,blk,Na),'k.',MS{1},12,LW{1},1); axis xy tight; box on; hold on
-plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Na),'gd',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Na),'mv',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Na),'bs',MS{:},LW{1},1.5);
-plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Na),'ro',MS{:},LW{1},1.5);
-plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Na),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Na),'gd',MS{1},12,LW{:});
-plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Na),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Na),'mv',MS{1},12,LW{:});
-plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Na),'bs',MS{1},12,LW{:});
-plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Na),'bs',MS{1},12,LW{:});
+plot(oxds(:,blk,Si),oxds(:,blk,Na),'k.',MS{1},12,LW{1},1.5); axis xy tight; box on; hold on
+plot(oxds(fphs(:,olv)>0,olv,Si),oxds(fphs(:,olv)>0,olv,Na),'d',CL{[1,2]},MS{:},LW{1},1.5);
+plot(oxds(fphs(:,pxn)>0,pxn,Si),oxds(fphs(:,pxn)>0,pxn,Na),'v',CL{[1,3]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,plg)>0,plg,Si),oxds(fphs(:,plg)>0,plg,Na),'s',CL{[1,4]},MS{:},LW{1},1.5); 
+plot(oxds(fphs(:,mlt)>0,mlt,Si),oxds(fphs(:,mlt)>0,mlt,Na),'o',CL{[1,5]},MS{:},LW{1},1.5);
+plot(cal.oxds(cal.fo ,Si),cal.oxds(cal.fo ,Na),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.fay,Si),cal.oxds(cal.fay,Na),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.oxds(cal.opx,Si),cal.oxds(cal.opx,Na),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.cpx,Si),cal.oxds(cal.cpx,Na),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.oxds(cal.an ,Si),cal.oxds(cal.an ,Na),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Na),'s',CL{[1,4]},MS{1},12,LW{:});
+set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('Na$_2$O [wt\%]',TX{:});
 
 
 %% calibrate model against experiments
@@ -114,7 +121,7 @@ plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Na),'bs',MS{1},12,LW{:});
 cal0  = cal;
 msft  = 1e3;
 bstft = msft;
-tol   = 0.11;
+tol   = 7.5e-2;
 
 while msft > tol
 
@@ -206,64 +213,70 @@ if msft < 1.01*bstft
     % plot current fit
     figure(2); clf;
     subplot(2,3,1);
-    plot(exp.Temp(hasolv),exp.fphs(hasolv,olv),'kd',MS{:},LW{1},1.5); axis xy tight; box on; hold on
-    plot(exp.Temp(haspxn),exp.fphs(haspxn,pxn),'kv',MS{:},LW{1},1.5);
-    plot(exp.Temp(hasplg),exp.fphs(hasplg,plg),'ks',MS{:},LW{1},1.5);
-    plot(exp.Temp,exp.fphs(:,mlt),'ko',MS{:},LW{1},1.5);
-    plot(exp.Temp(hasolv),mdl.fphs(hasolv,olv),'gd',MS{:},LW{1},1.5);
-    plot(exp.Temp(haspxn),mdl.fphs(haspxn,pxn),'mv',MS{:},LW{1},1.5);
-    plot(exp.Temp(hasplg),mdl.fphs(hasplg,plg),'bs',MS{:},LW{1},1.5);
-    plot(exp.Temp,mdl.fphs(:,mlt),'ro',MS{:},LW{1},1.5);
-    
+    plot(exp.Temp(hasolv),exp.fphs(hasolv,olv),'d',CL{[1,6]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+    plot(exp.Temp(haspxn),exp.fphs(haspxn,pxn),'v',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.Temp(hasplg),exp.fphs(hasplg,plg),'s',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.Temp,exp.fphs(:,mlt),'o',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.Temp(hasolv),mdl.fphs(hasolv,olv),'d',CL{[1,2]},MS{:},LW{1},1.5);
+    plot(exp.Temp(haspxn),mdl.fphs(haspxn,pxn),'v',CL{[1,3]},MS{:},LW{1},1.5);
+    plot(exp.Temp(hasplg),mdl.fphs(hasplg,plg),'s',CL{[1,4]},MS{:},LW{1},1.5);
+    plot(exp.Temp,mdl.fphs(:,mlt),'o',CL{[1,5]},MS{:},LW{1},1.5);
+    set(gca,TL{:}); xlabel('$T [^\circ$C]',TX{:}); ylabel('$f_\mathrm{phs}$ [wt]',TX{:});
+
     subplot(2,3,2);
-    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Al),'kd',MS{:},LW{1},1); axis xy tight; box on; hold on
-    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Al),'kv',MS{:},LW{1},1);
-    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Al),'ks',MS{:},LW{1},1);
-    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Al),'ko',MS{:},LW{1},1);
-    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Al),'gd',MS{:},LW{1},1);
-    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Al),'mv',MS{:},LW{1},1);
-    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Al),'bs',MS{:},LW{1},1);
-    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Al),'ro',MS{:},LW{1},1);
-   
+    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Al),'d',CL{[1,6]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Al),'v',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Al),'s',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Al),'o',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Al),'d',CL{[1,2]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Al),'v',CL{[1,3]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Al),'s',CL{[1,4]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Al),'o',CL{[1,5]},MS{:},LW{1},1.5);
+    set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('Al$_2$O$_3$ [wt\%]',TX{:});
+
     subplot(2,3,3);
-    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Fe),'kd',MS{:},LW{1},1); axis xy tight; box on; hold on
-    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Fe),'kv',MS{:},LW{1},1);
-    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Fe),'ks',MS{:},LW{1},1);
-    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Fe),'ko',MS{:},LW{1},1);
-    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Fe),'gd',MS{:},LW{1},1);
-    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Fe),'mv',MS{:},LW{1},1);
-    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Fe),'bs',MS{:},LW{1},1);
-    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Fe),'ro',MS{:},LW{1},1);
-    
+    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Fe),'d',CL{[1,6]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Fe),'v',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Fe),'s',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Fe),'o',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Fe),'d',CL{[1,2]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Fe),'v',CL{[1,3]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Fe),'s',CL{[1,4]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Fe),'o',CL{[1,5]},MS{:},LW{1},1.5);
+    set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('FeO [wt\%]',TX{:});
+
     subplot(2,3,4);
-    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Mg),'kd',MS{:},LW{1},1); axis xy tight; box on; hold on
-    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Mg),'kv',MS{:},LW{1},1);
-    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Mg),'ks',MS{:},LW{1},1);
-    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Mg),'ko',MS{:},LW{1},1);
-    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Mg),'gd',MS{:},LW{1},1);
-    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Mg),'mv',MS{:},LW{1},1);
-    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Mg),'bs',MS{:},LW{1},1);
-    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Mg),'ro',MS{:},LW{1},1);
-    
+    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Mg),'d',CL{[1,6]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Mg),'v',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Mg),'s',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Mg),'o',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Mg),'d',CL{[1,2]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Mg),'v',CL{[1,3]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Mg),'s',CL{[1,4]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Mg),'o',CL{[1,5]},MS{:},LW{1},1.5);
+    set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('MgO [wt\%]',TX{:});
+
     subplot(2,3,5);
-    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Ca),'kd',MS{:},LW{1},1); axis xy tight; box on; hold on
-    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Ca),'kv',MS{:},LW{1},1);
-    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Ca),'ks',MS{:},LW{1},1);
-    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Ca),'ko',MS{:},LW{1},1);
-    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Ca),'gd',MS{:},LW{1},1);
-    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Ca),'mv',MS{:},LW{1},1);
-    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Ca),'bs',MS{:},LW{1},1);
-    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Ca),'ro',MS{:},LW{1},1);
-    
+    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Ca),'d',CL{[1,6]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Ca),'v',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Ca),'s',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Ca),'o',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Ca),'d',CL{[1,2]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Ca),'v',CL{[1,3]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Ca),'s',CL{[1,4]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Ca),'o',CL{[1,5]},MS{:},LW{1},1.5);
+    set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('CaO [wt\%]',TX{:});
+
     subplot(2,3,6);
-    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Na),'kd',MS{:},LW{1},1); axis xy tight; box on; hold on
-    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Na),'kv',MS{:},LW{1},1);
-    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Na),'ks',MS{:},LW{1},1);
-    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Na),'ko',MS{:},LW{1},1);
-    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Na),'gd',MS{:},LW{1},1);
-    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Na),'mv',MS{:},LW{1},1);
-    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Na),'bs',MS{:},LW{1},1);
-    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Na),'ro',MS{:},LW{1},1);
+    plot(exp.oxds(hasolv,olv,Si),exp.oxds(hasolv,olv,Na),'d',CL{[1,6]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+    plot(exp.oxds(haspxn,pxn,Si),exp.oxds(haspxn,pxn,Na),'v',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(hasplg,plg,Si),exp.oxds(hasplg,plg,Na),'s',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(exp.oxds(:,mlt,Si),exp.oxds(:,mlt,Na),'o',CL{[1,6]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasolv,olv,Si),mdl.oxds(hasolv,olv,Na),'d',CL{[1,2]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(haspxn,pxn,Si),mdl.oxds(haspxn,pxn,Na),'v',CL{[1,3]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(hasplg,plg,Si),mdl.oxds(hasplg,plg,Na),'s',CL{[1,4]},MS{:},LW{1},1.5);
+    plot(mdl.oxds(:,mlt,Si),mdl.oxds(:,mlt,Na),'o',CL{[1,5]},MS{:},LW{1},1.5);
+    set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('Na$_2$O [wt\%]',TX{:});
 
 end
 
@@ -277,7 +290,7 @@ c0 = c0.'./sum(c0);
 % plot partition coefficients (T-dependent)
 var.c = ones(100,1)*c0;
 var.T = linspace(1000,1800,100).';
-var.P = linspace(1,1,100).';
+var.P = linspace(1.5,1.5,100).';
 
 [~,cal]  =  meltmodel(var,cal,'K');
 
@@ -292,7 +305,7 @@ ylabel('log$_{10} \ K$',TX{:},FS{[1,3]})
 % plot partition coefficients (P-dependent)
 var.c = ones(100,1)*c0;
 var.T = linspace(1300,1300,100).';
-var.P = linspace(0,4,100).';
+var.P = linspace(0,3,100).';
 
 [~,cal]  =  meltmodel(var,cal,'K');
 
@@ -306,7 +319,7 @@ ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
 % plot melting points, solidus, liquidus (P-dependent)
 var.c = ones(100,1)*c0;
 var.T = linspace(1300,1300,100).';
-var.P = linspace(0,5,100).';
+var.P = linspace(0,3,100).';
 
 [~,cal]  =  meltmodel(var,cal,'T');
 
@@ -322,7 +335,7 @@ ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
 % plot melt fraction, phase compositions (T-dependent)
 var.c = ones(1000,1)*c0;
 var.T = linspace(1300,1300,1000).';
-var.P = linspace(1,1,1000).';
+var.P = linspace(1.5,1.5,1000).';
 
 [~,cal]  =  meltmodel(var,cal,'T');
 var.T = linspace(mean(cal.Tsol),mean(cal.Tliq),1000).';
