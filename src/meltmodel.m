@@ -26,7 +26,7 @@ end
 end
 
 
-function  [cal]  =  Tsolidus(var,cal)
+function  [cal, flag]  =  Tsolidus(var,cal)
 
 %*****  subroutine to compute solidus temperature at given bulk composition
 
@@ -49,7 +49,8 @@ rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
 rnorm_tol  =  1e-12; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
-eps_T      =  0.1;    % temperature perturbation for finite differencing, degrees
+eps_T      =  0.1;   % temperature perturbation for finite differencing, degrees
+flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
     
@@ -83,7 +84,8 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     n  =  n+1;   %  update iteration count
     
     if (n==its_tol)
-        error(['!!! Newton solver for solidus T has not converged after ',num2str(its_tol),' iterations !!!']);
+        %error(['!!! Newton solver for solidus T has not converged after ',num2str(its_tol),' iterations !!!']);
+        flag = 0; break;
     end
     
 end
@@ -93,7 +95,7 @@ cal.Tsol = Tsol;
 end
 
 
-function  [cal]  =  Tliquidus(var,cal)
+function  [cal, flag]  =  Tliquidus(var,cal)
 
 %*****  subroutine to compute liquidus temperature at given bulk composition
 
@@ -117,6 +119,7 @@ n          =  0;     % initialize iteration count
 rnorm_tol  =  1e-12; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_T      =  0.1;   % temperature perturbation for finite differencing, degrees
+flag       =  1;     % tells us whether the Newton solver converged
 
 while rnorm > rnorm_tol  % iterate down to full accuracy
     
@@ -150,7 +153,8 @@ while rnorm > rnorm_tol  % iterate down to full accuracy
     n  =  n+1;   %  update iteration count
     
     if (n==its_tol)
-        error(['!!! Newton solver for liquidus T has not converged after ',num2str(its_tol),' iterations !!!']);
+        %error(['!!! Newton solver for liquidus T has not converged after ',num2str(its_tol),' iterations !!!']);
+        flag = 0; break;
     end
     
 end
@@ -166,8 +170,8 @@ function  [var]  =  equilibrium(var,cal)
 %       compositions at given bulk composition, pressure and temperature
 
 %***  get Tsol, Tliq at c
-cal  =  Tsolidus( var,cal);
-cal  =  Tliquidus(var,cal);
+[cal,flag]  =  Tsolidus( var,cal); if flag~=1, var.flag = flag; return; end
+[cal,flag]  =  Tliquidus(var,cal); if flag~=1, var.flag = flag; return; end
 
 %***  get T,P-dependent partition coefficients Ki
 cal  =  K(max(cal.Tsol,min(cal.Tliq,var.T)),var.P,cal);
@@ -183,10 +187,11 @@ end
 ff   =  repmat(var.f,1,cal.nc);
 r    =  sum(var.c./(ff+(1-ff).*cal.K),2) - sum(var.c./(ff./cal.K+(1-ff)),2);
 
-rnorm  =  1;       % initialize residual norm for iterations
-n      =  0;       % initialize iteration count
+rnorm     =  1;    % initialize residual norm for iterations
+n         =  0;    % initialize iteration count
 rnorm_tol = 1e-15; % tolerance for Newton residual
 its_tol   = 500;   % maximum number of iterations
+flag      =  1;    % tells us whether the Newton solver converged
 
 ii = var.T > cal.Tsol & var.T < cal.Tliq;
 
@@ -209,10 +214,14 @@ while rnorm > rnorm_tol     % Newton iteration
     
     n  =  n+1;  % update iteration count
     if (n==its_tol)
-        error(['!!! Newton solver for equilibrium f did not converge after ',num2str(its_tol),' iterations !!!']);
+        %error(['!!! Newton solver for equilibrium f did not converge after ',num2str(its_tol),' iterations !!!']);
+        flag = 0; break;
     end
 end
-    
+
+%*** flag tells us whether Newton solver converged 
+var.flag = flag;
+
 %***  get C_s^i, C_l^i as functions of K^i, C^i and f, safeguard bounds
 var.cl  =  max(0,min(1, var.c./(ff + (1-ff).*cal.K) ));
 var.cs  =  max(0,min(1, var.c./(ff./cal.K + (1-ff)) ));
