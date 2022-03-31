@@ -30,7 +30,7 @@ VarVary = diff(xbnds,[],2)>0;
 
 if isempty(x0), x0 = x(1,:); end
 
-figure;
+figure(20);
 
 % plot distributions of the model parameters
 for mi = 1:Nvar
@@ -53,11 +53,19 @@ for mi = 1:Nvar
     if VarVary(mi); xlim(xbnds(mi,:)); end
     title(VarNames{mi});
 end
-sgtitle('Posterior PDFs');
+sgtitle('Posterior PDFs (black: starting model; red: best-fit)');
 
 
 % plot the chain to see if well mixed
-figure; semilogy(P);
+figure(21); 
+semilogy(-P);
+ylimits = ylim;
+hold on; plot(BurnIn*ones(1,2), ylimits, 'Color', 0.8*ones(1,3)); hold off;
+text(BurnIn, ylimits(2), 'burn in', 'FontSize', 16, 'Rotation', 90, 'VerticalAlignment','bottom');
+set(gca,'ydir','reverse');
+yticklabs = get(gca,'YTickLabel');
+set(gca,'YTickLabel',strcat('-',yticklabs));
+xlabel('iteration number'); ylabel('log likelihood');
 title(['Acceptance ratio = ' num2str(100*count/Niter,4)]);
 
 end
