@@ -48,11 +48,13 @@ x_keep = zeros(Nvar,Niter);
 P_keep = zeros(Niter,1);
 Nprint = floor(Niter/100);
 
+progressbar('_start');
+
 %Begin loop to perform MCMC
 for i=1:Niter
     
     % print the progress
-    if mod(i,Nprint)==0, fprintf('Iteration %d of %d.\n', i, Niter); end
+    if mod(i,Nprint)==0, progressbar(i/Niter*100); end
     
     flag = 0;
     
@@ -102,6 +104,7 @@ for i=1:Niter
     end
 end
    
+progressbar('_end')
 x_keep = x_keep';
 
 fprintf('\n\n Acceptance ratio = %.2f percent.\n\n\n', count/length(P_keep)*100);

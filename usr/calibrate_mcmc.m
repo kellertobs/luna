@@ -166,19 +166,15 @@ likefunc  = @( dhat) likelihood(dhat, exp, sig);
 
 % initialize model and step size
 m0    = bnds.mat(:,1) + diff(bnds.mat,[],2).*rand(Nvar,1);
-m0    = [cal0.T0, cal0.A, cal0.B, cal0.r]';
 mstep = mstepfrac*diff(bnds.mat,[],2);
 
 % run the inversion
 [m_mcmc,P_mcmc,count] = mcmc(dhatfunc,priorfunc,likefunc,m0,mstep,bnds.mat,Niter);
 
-% plot histograms and posterior probabilities
-plotmcmc(m_mcmc, P_mcmc, [], bnds.mat, count, BurnIn, vname);
+%% plot mcmc histograms and predicted data from best-fit model
 
-%% plot predicted data from best-fit model
-
-[~,iMAP] = max(P_mcmc(BurnIn:end));
-mMAP = m_mcmc(BurnIn + iMAP, :);
+plotmcmcchain(P_mcmc, BurnIn, count);
+mMAP = plotpdfs(m_mcmc, P_mcmc, vname, bnds.mat, m0, BurnIn); 
 cal  = model2cal(cal0, mMAP)
 mdl  = dhatfunc(mMAP);
 
