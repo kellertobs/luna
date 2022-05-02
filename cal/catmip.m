@@ -1,5 +1,5 @@
-function [models, LLK, dhat, RunTime, allmodels] = catmip (PriorSampFunc, LikeFunc, mbnds, varargin)
-% [models, LLK] = catmip (PriorSampFunc, LikeFunc, varargin)
+function [mdls, pp, dhat, runtime, allmodels] = catmip (priorfunc, priorsampfunc, likefunc, varargin)
+% [models, LLK] = catmip (priorfunc, priorsampfunc, likefunc, varargin)
 %
 % Uses the CATMIP algorithm to derive the posterior distribution for a
 % non-linear inverse problems (tempering, resampling and metropolis)
@@ -8,85 +8,92 @@ function [models, LLK, dhat, RunTime, allmodels] = catmip (PriorSampFunc, LikeFu
 % source models I-theory and algorithm
 %
 % INPUTS
-% PriorSampFunc SAMPLES the prior distribution (output is Nvar x Niter)
-% LikeFunc      Calculates the log-likelihood of one model (output is scalar)
+% priorfunc     calculates the log-prior probability of one model (output is scalar)     
+% priorsampfunc SAMPLES the prior distribution (output is Nvar x Niter)
+% likefunc      calculates the log-likelihood of one model (output is scalar)
 % mbnds         model bnds [Nvar x 2]
 % varargin      name-value pairs given in default_opts
 % 
 % OUTPUTS
-% models    posterior distribution of models
-% LLK       log-likelihood of models
+% mdls      posterior distribution of models
+% pp        posterior probability of models
 % dhat      predicted data
-% RunTime   here i've only figured out how to store the first 1000 runtimes
+% runtime   here i've only figured out how to store the first 1000 runtimes
 % allmodels large array containing all models from each tempering step.
 %
 % YQW Dec 27, 2019. Based on Sarah Minson's mcmc demo code.
+% Major edit 21 April 2022 to allow for different prior distributions
 % 
 
 % parse options
 opts  = default_opts(varargin{:});
 Cmsqr = opts.Cmsqr;
 dbeta = opts.dbeta;
+Nstps = opts.Nsteps;
+
+totaltime = tic;
 
 if (opts.Parallel)
+    delete(gcp('nocreate'));
     ParpoolObj = parpool(min([opts.Ncores,opts.Niter])); 
     NumWorkers = ParpoolObj.NumWorkers;
 else
     NumWorkers = 0;
 end
 
-% preassign some variables to avoid broadcast variables in parfor loop
-Nsteps     = opts.Nsteps;
-Ndatasets  = opts.Ndatasets;
-lowerbound = mbnds(:,1);
-upperbound = mbnds(:,2);
-
 % set initial tempering values
 beta = 0; c = 0; m = 0;
 
 % start by sampling from the prior distribution
-models  = PriorSampFunc(opts.Niter);
+mdls  = priorsampfunc(opts.Niter);
 
 % collect the length of models and data vectors
-Nparam  = size(models,2);
-[~, dhattmp] = LikeFunc(models(1,:));
-Ndata = length(dhattmp);
+Nparam    = size(mdls,2);
+[~, dtmp] = likefunc(mdls(1,:));
+Ndata     = length(dtmp);
 
 % initialize variables
-LLK     = zeros(opts.Niter, 1);      % log likelihood
+pp      = zeros(opts.Niter, 1    );  % posterior probability
 dhat    = zeros(opts.Niter, Ndata);  % predicted data
-RunTime = zeros(opts.Niter, 1);      % collect runtime
+runtime = zeros(opts.Niter, 1    );  % collect runtime
 
 
 % run forward models
 fprintf('Running initial %d models from prior...\n', opts.Niter);
 parfor (mi = 1:opts.Niter, NumWorkers)
     tm = tic;
-    [LLK(mi), dhat(mi,:)] = LikeFunc(models(mi,:));
-    RunTime(mi) = toc(tm);
+    pr = priorfunc(mdls(mi,:));
+    
+    if pr == -inf   
+        % bad params, don't even calculate forward model
+        pp(mi) = pr;
+    else
+        [lk, dhat(mi,:)] = likefunc(mdls(mi,:));
+        pp(mi)           = lk + pr;
+    end
+    
+    runtime(mi)      = toc(tm);
 end
 fprintf('Finished initial %d models from prior. Time taken = %.4f hours.\n\n',...
-    opts.Niter, sum(RunTime)/3600);
+    opts.Niter, sum(runtime)/3600);
 
-fprintf('m\tCm^2\tCOV\tbeta\t\tNaccept\t\tNreject\n');
-fprintf('----------------------------------');
-fprintf('----------------------------------\n');
+fprintf('m\tCm^2\tCOV\tbeta\t\tNaccept\t\tNreject\t\tAcceptRatio(pct)\n');
+fprintf('--------------------------------------------');
+fprintf('--------------------------------------------\n');
 fprintf('%d\t%.4f\t%.4f\t%.2e\t%.4e\t%.4e\n',m,Cmsqr,c,beta,0,0);
 
-if (opts.SaveFile)
-    save(opts.FileName, 'models', 'LLK', 'dhat', 'beta', 'RunTime');
-end
+if (opts.SaveFile), save(opts.FileName, 'mdls','pp','dhat','beta','RunTime');end
 
 % track an array of all models to see transition of posterior during tempering
-allmodels = zeros(opts.Niter, Nparam, 1000);
-allmodels(:,:,1) = models;
+allmodels = zeros(opts.Niter, Nparam, 20);
+allmodels(:,:,1) = mdls;
 
 % start loop for tempering
 while beta<1
     m = m+1; % tempering step
     
     % update temperature
-    [w,beta,dbeta,c] = calc_beta(LLK,beta,dbeta);
+    [w,beta,dbeta,c] = calc_beta(pp,beta,dbeta);
     
     fprintf('%d\t%.4f\t%.4f\t%.2e\t',m,Cmsqr,c,beta);
     
@@ -100,23 +107,27 @@ while beta<1
         ind = [ind; repmat(i,count(i),1)]; 
     end
     
-    models  = models(ind,:);
-    LLK     = LLK(ind);
-    dhat    = dhat(ind,:);
+    % reassign models, pp and dhat according to resampling
+    mdls  = mdls(ind,:);
+    pp    = pp(ind);
+    dhat  = dhat(ind,:);
     
-    % now update samples using a Metropolis chain to explore model space.
+    
+    
+    % now update samples using a Metropolis chain to explore model space
+    % using a Gaussian proposal density with covariance Sm (to make z below)
     % PROCEDURE:
     % 1. Calculate p=w/sum(w)
     % 2. Calculate the expected value: E = sum(p_i*models_i)
     % 3. Calcluate Sm = sum{p_i*models_i*models_i^T} - E*E^T
     % 4. Return Cm^2 * Sm
     p  = w/sum(w);
-    E  = sum(repmat(p,1,Nparam).*models, 1);
+    E  = sum(repmat(p,1,Nparam).*mdls, 1);
     Sm = zeros(Nparam);
-    for i=1:opts.Niter
-        Sm = Sm+p(i)*models(i,:)'*models(i,:); 
+    for i = 1:opts.Niter
+        Sm = Sm + p(i)*mdls(i,:)'*mdls(i,:); 
     end
-    Sm = Sm-E'*E;
+    Sm = Sm - E'*E;
     Sm = Cmsqr*Sm;
     Sm = 0.5*(Sm + Sm'); % Make sure that Sm is symmetric
     
@@ -126,31 +137,40 @@ while beta<1
     % Loop over samples: each sample is the seed for a Markov chain
     parfor (ii = 1:opts.Niter, NumWorkers)
         
-        X       = zeros(Nsteps  , Nparam);
-        Xllk    = zeros(Nsteps  , 1     );
-        Xdhat   = zeros(Nsteps  , Ndata );
-        XIOacc  = zeros(Nsteps-1, 1     );
+        Xmd = zeros(Nstps  , Nparam);      % matrix of models
+        Xpp = zeros(Nstps  , 1     );      % posterior probabilities
+        Xdh = zeros(Nstps  , Ndata );      % store data
+        Xac = zeros(Nstps-1, 1     );      % accepted model? 1 or 0
         
         % Our current sample is the seed for the chain
-        X(1,:)      = models(ii,:);
-        Xllk(1)     = LLK(ii);
-        Xdhat(1,:)  = dhat(ii,:);
-        z           = mvnrnd(zeros(1,Nparam), Sm, Nsteps);
+        Xmd(1,:) = mdls(ii,:);
+        Xpp(1  ) =   pp(ii);
+        Xdh(1,:) = dhat(ii,:);
+        z        = mvnrnd(zeros(1,Nparam), Sm, Nstps);
+        
+        % preset dy for the chain just for initialization
+        dy = Xdh(1,:);
         
         % Run Metropolis
-        for k=1:Nsteps-1 
+        for k=1:Nstps-1 
             % current step
-            x   = X(k,:);
-            px  = Xllk(k);
+            x  = Xmd(k,:);
+            px = Xpp(k  );
+            dx = Xdh(k,:);
             
             % proposed step
-            y   = X(k,:) + z(k,:);
+            y   = Xmd(k,:) + z(k,:);
             
-            if all(y(:)>=lowerbound) && all(y(:)<=upperbound)
-                [py,dy] = LikeFunc(y);
+            % calculate prior probability
+            pr = priorfunc(y);
+            
+            if pr==-inf
+                % bad params, don't even calculate forward model
+                py = pr;
             else
-                py = -1e10;
-                dy = cell(1,Ndatasets);
+                % calc likelihood and prior == posterior probability of y
+                [lk,dy] = likefunc(y);
+                py      = lk + pr;
             end
             
             % compare posterior probabilities
@@ -158,50 +178,57 @@ while beta<1
             u   = log(rand);
             
             if u<=r
-                X(k+1,:)     = y; 
-                Xllk(k+1,:)  = py; 
-                Xdhat(k+1,:) = dy;
-                XIOacc(k)    = 1;
+                Xmd(k+1,:) = y; 
+                Xpp(k+1,:) = py; 
+                Xdh(k+1,:) = dy;
+                Xac(k    ) = 1;
             else
-                X(k+1,:)     = x; 
-                Xllk(k+1,:)  = px; %Nreject=Nreject+1;
-                Xdhat(k+1,:) = Xdhat(k,:);
+                Xmd(k+1,:) = x; 
+                Xpp(k+1,:) = px; 
+                Xdh(k+1,:) = dx;
             end
         end
         
         % Save only the last sample from the Markov chain
         % Now the original sample has been updated by MCMC
-        models(ii,:) = X(end,:); 
-        LLK(ii)      = Xllk(end); 
-        dhat(ii,:)   = Xdhat(end,:);
-        IOacc(ii,:)  = XIOacc';
+        mdls(ii,:)   = Xmd(end,:); 
+        pp(ii)       = Xpp(end  ); 
+        dhat(ii,:)   = Xdh(end,:);
+        IOacc(ii,:)  = Xac';
     end
     
+    allmodels(:,:,m+1) = mdls;
     
-    Naccept = sum(IOacc(:));
-    Nreject = length(IOacc(:))-Naccept;
-    allmodels(:,:,m+1) = models;
-
-    fprintf('%.4e\t%.4e\n',Naccept,Nreject);
+    Nacc     = sum(IOacc(:));
+    Nrej     = length(IOacc(:)) - Nacc;
+    accRatio = Nacc/(Nacc + Nrej);
+    
+    fprintf('%.4e\t%.4e\t%.2f\n', Nacc, Nrej, 100*accRatio);
     
     % Rescale step size by acceptance rate per Matt Muto
-    accRatio = Naccept/(Naccept + Nreject);
     kc = (8*accRatio + 1)/9;
     % //kc = max(kc,0.2);   kc = min(kc,1);
     if (kc < 0.001); kc = 0.001; end
-    if (kc > 1.0); kc = 1.0; end
+    if (kc > 1.000); kc = 1.000; end
     Cmsqr = kc * kc;
     
     if (opts.SaveFile)
         allmodelstmp = allmodels(:,:,1:m+1);
-        save(opts.FileName, 'models', 'allmodelstmp', 'LLK', 'dhat', 'beta', 'RunTime');
+        save(opts.FileName, 'mdls', 'allmodelstmp', 'pp', 'dhat', 'beta', 'RunTime');
     end
     
-    if (1-beta < 0.005); fprintf('mstop=%d\n',m); break; end
+    if (1-beta < 0.005); fprintf('mstop=%d\n\n',m); break; end
     
 end
 
 allmodels(:,:,m+2:end) = [];
+
+% shut down parallel pool
+if (opts.Parallel), delete(ParpoolObj); end
+
+totalrt = toc(totaltime);
+fprintf('Inversion completed. Total time taken = %.4f hours.\n\n',sum(totalrt)/3600);
+
 
 end
 
@@ -209,15 +236,15 @@ function opts = default_opts (varargin)
 
 p = inputParser;
 
-p.addParameter('Niter',     1000,   @isnumeric);
-p.addParameter('Nsteps',    5,      @isnumeric);
-p.addParameter('Cmsqr',     0.1^2,  @isnumeric);
-p.addParameter('dbeta',     1e-5,   @isnumeric);
-p.addParameter('Parallel',  false,  @islogical);
-p.addParameter('Ncores',    6,      @isnumeric);
-p.addParameter('SaveFile',  false,  @islogical);
-p.addParameter('FileName',  '',     @ischar);
-p.addParameter('Ndatasets', 1,      @isnumeric);
+p.addParameter('Niter'   ,  1000    , @isnumeric);
+p.addParameter('Nsteps'  ,  5       , @isnumeric);
+p.addParameter('Cmsqr'   ,  0.1^2   , @isnumeric);
+p.addParameter('dbeta'   ,  1e-5    , @isnumeric);
+p.addParameter('Parallel',  false   , @islogical);
+p.addParameter('Ncores'  ,  6       , @isnumeric);
+p.addParameter('SaveFile',  false   , @islogical);
+p.addParameter('FileName',  ''      , @ischar);
+p.addParameter('Ndatasets', 1       , @isnumeric);
 
 p.parse(varargin{:});
 opts = p.Results;
@@ -236,10 +263,9 @@ catch
 end
 
 % dbeta2  = min([dbeta2, 1-beta]);
-beta    = beta + dbeta2;
-
-w = calc_w(dbeta2, LLK);
-c = std(w,'omitnan')/mean(w,'omitnan');
+beta = beta + dbeta2;
+w    = calc_w(dbeta2, LLK);
+c    = std(w,'omitnan')/mean(w,'omitnan');
 end
 
 function c = calc_c (dbeta, LLK)
@@ -254,5 +280,5 @@ end
 
 function s = logsumexp(x)
 xmax = max(x,[],'omitnan');
-s = xmax + log(sum(exp(x-xmax)));
+s    = xmax + log(sum(exp(x-xmax)));
 end

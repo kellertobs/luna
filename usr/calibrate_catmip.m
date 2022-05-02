@@ -14,7 +14,10 @@ TINY = 1e-16;
 
 %% catmip parameters - adjust this
 
-Niter = 1000;   
+% catmip options
+Niter   = 1e3;              % number of iterations per catmip temperature
+Nstep   = 100;              % number of steps in MCMC in catmip
+pllopt  = 0;                % whether to run in parallel, number of workers
 
 rng(10); % for reproducibility during testing, comment this for actual run
 
@@ -154,15 +157,20 @@ set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('Na$_2$O [wt\%]',TX{:});
 
 cal0 = cal;
 
-priorfunc = @(Ni)    priorsamp(bnds.mat, Ni);
+prsampfunc= @(Ni)    priorsamp(bnds.mat, Ni);
+priorfunc = @(model) prior(model, bnds.mat);
 likefunc  = @(model) likefrommodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig);
 dhatfunc  = @(model) runmodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg);
 
 %% run catmip
 
-[mout, Pout, ~, ~, allmodels] = catmip(priorfunc,likefunc,bnds.mat,'Niter',Niter);
+[mout, Pout, ~, ~, allmodels] = catmip(priorfunc,prsampfunc,likefunc,...
+    'Niter',Niter,'Nsteps',Nstep,'Parallel',logical(pllopt),'Ncores',pllopt);
+
+%% plot catmip results
 
 PlotTemperingSteps(allmodels,bnds.mat,vname);
+[mMAP] = plotcorner(mout, Pout, [], bnds.mat, 1, 1, vname);
 
 %% plot catmip histograms and predicted data from best-fit model
 
