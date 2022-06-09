@@ -19,7 +19,7 @@ elseif strcmp(type,'T')
 
 elseif strcmp(type,'E')
     
-    phs  =  equilibrium(var,cal);
+    [cal,phs]  =  equilibrium(var,cal);
     
 end
 
@@ -164,7 +164,7 @@ cal.Tliq  =  Tliq;
 end
 
 
-function  [var]  =  equilibrium(var,cal)
+function  [cal,var]  =  equilibrium(var,cal)
 
 %*****  subroutine to compute equilibrium melt fraction and phase 
 %       compositions at given bulk composition, pressure and temperature
@@ -189,9 +189,12 @@ r    =  sum(var.c./(ff+(1-ff).*cal.K),2) - sum(var.c./(ff./cal.K+(1-ff)),2);
 
 rnorm     =  1;    % initialize residual norm for iterations
 n         =  0;    % initialize iteration count
-rnorm_tol = 1e-15; % tolerance for Newton residual
-its_tol   = 500;   % maximum number of iterations
+rnorm_tol = 1e-14; % tolerance for Newton residual
+its_tol   = 1e3;   % maximum number of iterations
 flag      =  1;    % tells us whether the Newton solver converged
+
+var.f(var.T <= cal.Tsol) = 0;
+var.f(var.T >= cal.Tliq) = 1;
 
 ii = var.T > cal.Tsol & var.T < cal.Tliq;
 
@@ -214,7 +217,7 @@ while rnorm > rnorm_tol     % Newton iteration
     
     n  =  n+1;  % update iteration count
     if (n==its_tol)
-        %error(['!!! Newton solver for equilibrium f did not converge after ',num2str(its_tol),' iterations !!!']);
+        error(['!!! Newton solver for equilibrium f did not converge after ',num2str(its_tol),' iterations !!!']);
         flag = 0; break;
     end
 end
