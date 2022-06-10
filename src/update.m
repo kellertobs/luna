@@ -1,5 +1,23 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
+% update phase oxide compositions
+oxd  = permute(reshape(reshape(permute(c ,[2,3,1]),Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc),[3,1,2]);
+oxdm = permute(reshape(reshape(permute(cm,[2,3,1]),Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc),[3,1,2]);
+oxdx = permute(reshape(reshape(permute(cx,[2,3,1]),Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc),[3,1,2]);
+
+% update mineral system numbers
+foNo = squeeze(c(1,:,:)./(c(1,:,:) + c(2,:,:)));  % fo# = fo /(fo +fay)
+pxNo = squeeze(c(3,:,:)./(c(3,:,:) + c(4,:,:)));  % px# = opx/(opx+cpx)
+anNo = squeeze(c(5,:,:)./(c(5,:,:) + c(6,:,:)));  % an# = an /(an +ab )
+
+foNom = squeeze(cm(1,:,:)./(cm(1,:,:) + cm(2,:,:)));
+pxNom = squeeze(cm(3,:,:)./(cm(3,:,:) + cm(4,:,:)));
+anNom = squeeze(cm(5,:,:)./(cm(5,:,:) + cm(6,:,:)));
+
+foNox = squeeze(cx(1,:,:)./(cx(1,:,:) + cx(2,:,:)));
+pxNox = squeeze(cx(3,:,:)./(cx(3,:,:) + cx(4,:,:)));
+anNox = squeeze(cx(5,:,:)./(cx(5,:,:) + cx(6,:,:)));
+
 % update phase densities
 rhom = squeeze(1./sum(cm./rhom0.')) .* (1 - aT.*(T-T0-273.15));
 rhox = squeeze(1./sum(cx./rhox0.')) .* (1 - aT.*(T-T0-273.15));

@@ -67,18 +67,24 @@ hist.T(stp,1) = min(min(T(2:end-1,2:end-1)));
 hist.T(stp,2) = mean(mean(T(2:end-1,2:end-1)));
 hist.T(stp,3) = max(max(T(2:end-1,2:end-1)));
 
-for i =1:cal.nc
+for i = 1:cal.nc
     hist.c(i,stp,1) = min(min(c(i,2:end-1,2:end-1)));
     hist.c(i,stp,2) = mean(mean(c(i,2:end-1,2:end-1)));
     hist.c(i,stp,3) = max(max(c(i,2:end-1,2:end-1)));
+    hist.oxd(i,stp,1) = min(min(oxd(i,2:end-1,2:end-1)));
+    hist.oxd(i,stp,2) = mean(mean(oxd(i,2:end-1,2:end-1)));
+    hist.oxd(i,stp,3) = max(max(oxd(i,2:end-1,2:end-1)));
 end
 
 indx = x>1e-6;
 if any(indx(:)>0)
     for i = 1:cal.nc
         hist.cx(i,stp,1) = min(min(cx(i,indx(2:end-1,2:end-1))));
-        hist.cx(i,stp,2) = sum(sum(cx(i,2:end-1,2:end-1).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+        hist.cx(i,stp,2) = sum(sum(squeeze(cx(i,2:end-1,2:end-1)).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
         hist.cx(i,stp,3) = max(max(cx(i,indx(2:end-1,2:end-1))));
+        hist.oxdx(i,stp,1) = min(min(oxdx(i,indx(2:end-1,2:end-1))));
+        hist.oxdx(i,stp,2) = sum(sum(squeeze(oxdx(i,2:end-1,2:end-1)).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+        hist.oxdx(i,stp,3) = max(max(oxdx(i,indx(2:end-1,2:end-1))));
     end
     
     hist.rhox(stp,1) = min(min(rhox(indx(2:end-1,2:end-1))));
@@ -86,6 +92,7 @@ if any(indx(:)>0)
     hist.rhox(stp,3) = max(max(rhox(indx(2:end-1,2:end-1))));
 else
     hist.cx(1:cal.nc,stp,1:3) = NaN;
+    hist.oxdx(1:cal.nc,stp,1:3) = NaN;
     hist.rhox(stp,1:3) = NaN;
 end
 
@@ -93,8 +100,11 @@ indm = m>1e-6;
 if any(indm(:)>0)
     for i = 1:cal.nc
         hist.cm(i,stp,1) = min(min(cm(i,indm(2:end-1,2:end-1))));
-        hist.cm(i,stp,2) = sum(sum(cm(i,2:end-1,2:end-1).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+        hist.cm(i,stp,2) = sum(sum(squeeze(cm(i,2:end-1,2:end-1)).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
         hist.cm(i,stp,3) = max(max(cm(i,indm(2:end-1,2:end-1))));
+        hist.oxdm(i,stp,1) = min(min(oxdm(i,indm(2:end-1,2:end-1))));
+        hist.oxdm(i,stp,2) = sum(sum(squeeze(oxdm(i,2:end-1,2:end-1)).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
+        hist.oxdm(i,stp,3) = max(max(oxdm(i,indm(2:end-1,2:end-1))));
     end
     
     hist.rhom(stp,1) = min(min(rhom(indm(2:end-1,2:end-1))));
@@ -102,6 +112,7 @@ if any(indm(:)>0)
     hist.rhom(stp,3) = max(max(rhom(indm(2:end-1,2:end-1))));
 else
     hist.cm(1:cal.nc,stp,1:3) = NaN;
+    hist.oxdm(1:cal.nc,stp,1:3) = NaN;
     hist.rhom(stp,1:3) = NaN;
 end
 

@@ -6,17 +6,17 @@ addpath('../src');
 runID    =  '0D_luna_6cmp';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  50;                  % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approac
-bnchm    =  0;                   % switch on to run manufactured solution benchmark on flui mechanics solver
+bnchm    =  0;                   % switch on to run manufactured solution benchmark on fluid mechanics solver
 
 % set model domain parameters
-D        =  10;                  % chamber depth [m]
-L        =  10;                  % chamber width [m]
+D        =  100;                 % chamber depth [m]
+L        =  100;                 % chamber width [m]
 N        =  1 + 2;               % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
@@ -39,7 +39,7 @@ T1       =  1400;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component top layer [liquid fraction from catmip16 fig8]
 cl       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component base layer [liquid fraction from catmip16 fig8]
-dc       =  0e-4;                % amplitude of random noise [wt SiO2]
+dc       =  [0,0,0,0,0,0].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
 it0      =  1;                   % incompatible tracer top layer [wt ppm]
