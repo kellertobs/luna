@@ -20,6 +20,7 @@ if plot_op
         subplot(4,1,3)
         for i =1:cal.nc; plot(hist.time/hr,hist.cx(i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
         title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        legend(cal.CompStr,TX{:},FS{:},'location','best');
         subplot(4,1,4)
         for i =1:cal.nc; plot(hist.time/hr,hist.cm(i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
         title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -30,12 +31,13 @@ if plot_op
         plot(hist.time/hr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on;
         title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,2)
-        plot(hist.time/hr,hist.rhom(:,2),'-',CL{[1,3]},LW{:}); axis xy tight; box on; hold on
+        plot(hist.time/hr,hist.rhom(:,2),'-',CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
         plot(hist.time/hr,hist.rhox(:,2),'-',CL{[1,4]},LW{:});
         plot(hist.time/hr,hist.rho (:,2),'-',CL{[1,2]},LW{:});
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,3)
-        semilogy(hist.time/hr,hist.eta(:,2),'k-',LW{:}); axis xy tight; box on;
+        semilogy(hist.time/hr,hist.etam(:,2),'r-',LW{:}); axis xy tight; box on; hold on;
+        semilogy(hist.time/hr,hist.eta (:,2),'k-',LW{:});
         title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,4)
         plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
@@ -49,6 +51,7 @@ if plot_op
         subplot(3,1,2)
         for i =1:cal.nc; plot(hist.time/hr,hist.oxdx(i,:,2),LW{:});  axis xy tight; box on; hold on; end
         title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        legend(cal.oxdStr,TX{:},FS{:},'location','best');
         subplot(3,1,3)
         for i =1:cal.nc; plot(hist.time/hr,hist.oxdm(i,:,2),LW{:});  axis xy tight; box on; hold on; end
         title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -70,6 +73,7 @@ if plot_op
         subplot(1,5,4)
         for i =1:cal.nc; plot(cx(i,2:end-1,2:end-1)*100,Z(2:end-1).',LW{:}); axis ij tight; box on; hold on; end
         title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        legend(cal.CompStr,TX{:},FS{:},'location','best');
         subplot(1,5,5)
         for i =1:cal.nc; plot(cm(i,2:end-1,2:end-1)*100,Z(2:end-1).',LW{:}); axis ij tight; box on; hold on; end
         title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -102,6 +106,7 @@ if plot_op
         subplot(1,3,2)
         for i =1:cal.nc; plot(oxdx(i,2:end-1,2:end-1),Z(2:end-1).',LW{:}); axis ij tight; box on; hold on; end
         title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        legend(cal.oxdStr,TX{:},FS{:},'location','best');
         subplot(1,3,3)
         for i =1:cal.nc; plot(oxdm(i,2:end-1,2:end-1),Z(2:end-1).',LW{:}); axis ij tight; box on; hold on; end
         title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});

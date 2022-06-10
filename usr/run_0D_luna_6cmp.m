@@ -50,8 +50,8 @@ ct0      =  1;                   % compatible tracer top layer [wt ppm]
 ct1      =  1;                   % compatible tracer base layer [wt ppm]
 dct      = -0.00;                % compatible tracer random noise [wt ppm]
 KCT      =  1e+2;                % compatible tracer partition coefficient
-si0      =  1;                   % stable isotope ratio top layer [delta]
-si1      =  1;                   % stable isotope ratio base layer [delta]
+si0      =  0;                   % stable isotope ratio top layer [delta]
+si1      =  0;                   % stable isotope ratio base layer [delta]
 dsi      =  0.00;                % stable isotope ratio random noise [delta]
 ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
 ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
@@ -82,14 +82,11 @@ calID    = 'luna6';
 tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
-etam0    =  300;                 % melt viscosity [Pas]
-etax0    =  1e15;                % crystal viscosity [Pas]
-Fmc      =  1e+5;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.6;                 % volatile component weakening factor of melt viscosity [1]
-Em       =  175e3;               % activation energy melt viscosity [J/mol]
-AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
-BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
-CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
+etam0    =  1e1;                 % melt  reference viscosity [Pas]
+etax0    =  1e16;                % solid reference viscosity [Pas]
+AA       = [ 0.60, 0.25; 0.20, 0.20; ];  % permission slopes
+BB       = [ 0.30, 0.70; 0.98, 0.02; ];  % permission step locations
+CC       = [ 0.20, 0.20; 0.60, 0.60; ];  % permission step widths
 
 % set model buoyancy parameters
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
@@ -107,7 +104,7 @@ atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 alpha    =  0.25;                % iterative lag parameter equilibration
 delta    =  2;                   % smoothness of segregation speed
-etamin   =  1e1;                 % minimum viscosity for stabilisation
+etamin   =  1e-2;                % minimum viscosity for stabilisation
 etamax   =  1e16;                % maximum viscosity for stabilisation
 
 % create output directory

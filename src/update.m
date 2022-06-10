@@ -35,15 +35,22 @@ Ds    = x.*Dsx;
 kT    = mu.*kTm + chi.*kTx;                                                % magma thermal conductivity
 
 % update effective viscosity
-etam  = etam0 .* exp(Em./(8.3145.*T)-Em./(8.3145.*(T0+273.15)));           % variable melt viscosity
+wtm      = zeros(Nz*Nx,12);
+wtm(:,1) = reshape(oxd(1,:,:),Nz*Nx,1); % SiO2
+wtm(:,3) = reshape(oxd(2,:,:),Nz*Nx,1); % Al2O3
+wtm(:,4) = reshape(oxd(3,:,:),Nz*Nx,1); % FeO
+wtm(:,6) = reshape(oxd(4,:,:),Nz*Nx,1); % MgO
+wtm(:,7) = reshape(oxd(5,:,:),Nz*Nx,1); % CaO
+wtm(:,8) = reshape(oxd(6,:,:),Nz*Nx,1); % Na2O
+etam  = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
 
 % get permission weights
-kv = permute(cat(3,etax,etam,etam),[3,1,2]);
-Mv = permute(repmat(kv,1,1,1,3),[4,1,2,3])./permute(repmat(kv,1,1,1,3),[1,4,2,3]);
+kv = permute(cat(3,etax,etam),[3,1,2]);
+Mv = permute(repmat(kv,1,1,1,2),[4,1,2,3])./permute(repmat(kv,1,1,1,2),[1,4,2,3]);
  
-ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu,0.*chi),[3,1,2])));
-FF = permute(repmat(ff,1,1,1,3),[4,1,2,3]);
+ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu),[3,1,2])));
+FF = permute(repmat(ff,1,1,1,2),[4,1,2,3]);
 Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
 
@@ -59,7 +66,7 @@ etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % eff
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
-Csgr = ((1-ff)./[dx;1e-16;1e-16].^2.*kv.*thtv).^-1;
+Csgr = ((1-ff)./[dx;1e-16].^2.*kv.*thtv).^-1;
 
 Csgr_x = squeeze(Csgr(1,:,:)) + 1e-18;  Csgr_x([1 end],:) = Csgr_x([2 end-1],:);  Csgr_x(:,[1 end]) = Csgr_x(:,[2 end-1]);
 

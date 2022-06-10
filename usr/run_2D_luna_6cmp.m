@@ -17,7 +17,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  100;                 % chamber depth [m]
 L        =  100;                 % chamber width [m]
-N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -82,14 +82,11 @@ calID    = 'luna6';
 tau_r    =  60;                  % reaction time [s]
 
 % set model rheology parameters
-etam0    =  300;                 % melt viscosity [Pas]
-etax0    =  1e15;                % crystal viscosity [Pas]
-Fmc      =  1e+5;                % major component weakening factor of melt viscosity [1]
-Fmv      =  0.6;                 % volatile component weakening factor of melt viscosity [1]
-Em       =  175e3;               % activation energy melt viscosity [J/mol]
-AA       = [ 0.60, 0.25, 0.30; 0.20, 0.20, 0.20; 0.20, 0.20, 0.20; ];  % permission slopes
-BB       = [ 0.30, 0.15, 0.55; 0.48, 0.02, 0.50; 0.80, 0.08, 0.12; ];  % permission step locations
-CC       = [ 0.20, 0.20, 0.20; 0.60, 0.60, 0.12; 0.20, 0.25, 0.50; ];  % permission step widths
+etam0    =  1e1;                 % melt  reference viscosity [Pas]
+etax0    =  1e16;                % solid reference viscosity [Pas]
+AA       = [ 0.60, 0.25; 0.20, 0.20; ];  % permission slopes
+BB       = [ 0.30, 0.70; 0.98, 0.02; ];  % permission step locations
+CC       = [ 0.20, 0.20; 0.60, 0.60; ];  % permission step widths
 
 % set model buoyancy parameters
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
