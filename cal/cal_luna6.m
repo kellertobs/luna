@@ -18,36 +18,36 @@ cal.oxds = cal.oxds./sum(cal.oxds,2)*100;
 % specify calibration parameters
 
 % set pure component melting points T_m^i at P=0
-cal.T0(cal.fo )  =  1700;
-cal.T0(cal.fay)  =  1050;
-cal.T0(cal.opx)  =  1300;
-cal.T0(cal.cpx)  =  1000;
-cal.T0(cal.an )  =  1150;
-cal.T0(cal.ab )  =   900;
+cal.T0(cal.fo )  =  1748;
+cal.T0(cal.fay)  =  1058;
+cal.T0(cal.opx)  =  1631;
+cal.T0(cal.cpx)  =   954;
+cal.T0(cal.an )  =  1300;
+cal.T0(cal.ab )  =  1143;
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A(cal.fo )   =  11;
-cal.A(cal.fay)   =   6;
-cal.A(cal.opx)   =   4;
-cal.A(cal.cpx)   =   3;
-cal.A(cal.an )   =   8;
-cal.A(cal.ab )   =   4;
+cal.A(cal.fo )   =  10.4;
+cal.A(cal.fay)   =   5.2;
+cal.A(cal.opx)   =   7.8;
+cal.A(cal.cpx)   =   5.7;
+cal.A(cal.an )   =   6.8;
+cal.A(cal.ab )   =   5.2;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B(cal.fo )   =  1.9;
-cal.B(cal.fay)   =  1.7;
-cal.B(cal.opx)   =  1.9;
-cal.B(cal.cpx)   =  1.9;
-cal.B(cal.an )   =  2.1;
-cal.B(cal.ab )   =  2.0;
+cal.B(cal.fo )   =  1.69;
+cal.B(cal.fay)   =  1.77;
+cal.B(cal.opx)   =  1.64;
+cal.B(cal.cpx)   =  1.78;
+cal.B(cal.an )   =  1.67;
+cal.B(cal.ab )   =  1.66;
 
 % set entropy gain of fusion DeltaS [J/K]
 cal.dS           =  300;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r(cal.fo )   =  64;
-cal.r(cal.fay)   =  51;
-cal.r(cal.opx)   =  18;
-cal.r(cal.cpx)   =  13;
-cal.r(cal.an )   =   5;
-cal.r(cal.ab )   =  19;
+cal.r(cal.fo )   =  145;
+cal.r(cal.fay)   =  92;
+cal.r(cal.opx)   =  98;
+cal.r(cal.cpx)   =  16;
+cal.r(cal.an )   =  93;
+cal.r(cal.ab )   =  31;
