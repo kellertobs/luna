@@ -3,10 +3,10 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '1D_luna';      % run identifier
+runID    =  '1D_luna_6cmp';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  1;                  % output frame plotted/saved every 'nop' time steps
+nop      =  1;                   % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence

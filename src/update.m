@@ -1,8 +1,8 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase densities
-rhom = rhom0 .* (1 - aTm.*(T-T0-273.15));
-rhox = rhox0 .* (1 - aTx.*(T-T0-273.15));
+rhom = squeeze(1./sum(cm./rhom0.')) .* (1 - aT.*(T-T0-273.15));
+rhox = squeeze(1./sum(cx./rhox0.')) .* (1 - aT.*(T-T0-273.15));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox);  

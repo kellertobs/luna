@@ -99,7 +99,7 @@ txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P;
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
 if ~react;  Dsx = 0;  Dsf = 0;  end
-rhoo =  rhom0.*ones(size(T)); rhoref = rhom0;  %#ok<NASGU>
+rhoo =  mean(rhom0).*ones(size(T)); rhoref = mean(rhom0);  %#ok<NASGU>
 etao =  etam0.*ones(size(T));
 dto  =  dt;
 Pt   =  rhoref.*g0.*ZZ + Ptop;  
