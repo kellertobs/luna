@@ -31,13 +31,17 @@ function  [cal, flag]  =  Tsolidus(var,cal)
 %*****  subroutine to compute solidus temperature at given bulk composition
 
 %***  exclude invalid compositions
-ii   =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
+ii   =  sum(var.c(:,sum(var.c,1)>1),2)<=1+1e-14;
 
 %***  get P-dependent pure-component melting Temperature
 cal  =  K(var.T,var.P,cal);
 
 %***  set starting guess for Tsol
-Tsol =  max(min(cal.Tm(:)),min(max(cal.Tm(:)),sum(var.c.*cal.Tm,2)));
+if ~isfield(cal,'Tsol')
+    Tsol =  max(min(cal.Tm(:)),min(max(cal.Tm(:)),sum(var.c.*cal.Tm,2)));
+else
+    Tsol =  cal.Tsol;
+end
 
 %***  get T-dependent partition coefficients Ki
 cal  =  K(Tsol,var.P,cal);
@@ -106,7 +110,11 @@ ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
 cal  =  K(var.T,var.P,cal);
 
 %***  set starting guess for Tliq
-Tliq  =  max(min(min(cal.Tm)),min(max(max(cal.Tm)),sum(var.c.*cal.Tm,2)));
+if ~isfield(cal,'Tliq')
+    Tliq  =  max(min(min(cal.Tm)),min(max(max(cal.Tm)),sum(var.c.*cal.Tm,2)));
+else
+    Tliq =  cal.Tliq;
+end
 
 %***  get T-dependent partition coefficients Ki
 cal  =  K(Tliq,var.P,cal);
@@ -217,7 +225,7 @@ while rnorm > rnorm_tol     % Newton iteration
     
     n  =  n+1;  % update iteration count
     if (n==its_tol)
-        error(['!!! Newton solver for equilibrium f did not converge after ',num2str(its_tol),' iterations !!!']);
+%         error(['!!! Newton solver for equilibrium f did not converge after ',num2str(its_tol),' iterations !!!']);
         flag = 0; break;
     end
 end
