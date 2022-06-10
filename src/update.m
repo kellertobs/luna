@@ -49,7 +49,7 @@ etax  = etax0.* ones(size(x));                                             % con
 kv = permute(cat(3,etax,etam),[3,1,2]);
 Mv = permute(repmat(kv,1,1,1,2),[4,1,2,3])./permute(repmat(kv,1,1,1,2),[1,4,2,3]);
  
-ff = max(1e-6,min(1-1e-6,permute(cat(3,chi,mu),[3,1,2])));
+ff = max(1e-4,min(1-1e-4,permute(cat(3,chi,mu),[3,1,2])));
 FF = permute(repmat(ff,1,1,1,2),[4,1,2,3]);
 Sf = (FF./BB).^(1./CC);  Sf = Sf./sum(Sf,2);
 Xf = sum(AA.*Sf,2).*FF + (1-sum(AA.*Sf,2)).*Sf;
@@ -66,9 +66,10 @@ etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % eff
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
-Csgr = ((1-ff)./[dx;1e-16].^2.*kv.*thtv).^-1;
+Csgr = ((1-ff)./[dx;dx].^2.*kv.*thtv).^-1;
 
 Csgr_x = squeeze(Csgr(1,:,:)) + 1e-18;  Csgr_x([1 end],:) = Csgr_x([2 end-1],:);  Csgr_x(:,[1 end]) = Csgr_x(:,[2 end-1]);
+Csgr_m = squeeze(Csgr(2,:,:)) + 1e-18;  Csgr_m([1 end],:) = Csgr_m([2 end-1],:);  Csgr_m(:,[1 end]) = Csgr_m(:,[2 end-1]);
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -110,9 +111,18 @@ for i = 1:round(delta)
     wx(:,[1 end]) = -sds*wx(:,[2 end-1]);
 end
 
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-rhoref)*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5.*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
+for i = 1:round(delta)
+    wm(2:end-1,2:end-1) = wm(2:end-1,2:end-1) + diff(wm(:,2:end-1),2,1)./8 + diff(wm(2:end-1,:),2,2)./8;
+    wm(1  ,:)     = min(1,1-top).*wm(1  ,:);
+    wm(end,:)     = min(1,1-bot).*wm(end,:);
+    wm(:,[1 end]) = -sds*wm(:,[2 end-1]);
+end
+
 % update volume source
 Div_rhoV =  + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
-            + advection(rho   ,U   ,W ,h,ADVN,'flx');
+            + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
+            + advection(rho   ,   U,W ,h,ADVN,'flx');
 VolSrc  = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho;
 
 UBG    = - 2*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);

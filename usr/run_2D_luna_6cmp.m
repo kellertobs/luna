@@ -6,7 +6,7 @@ addpath('../src');
 runID    =  '2D_luna_6cmp';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  50;                  % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -34,8 +34,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1350;                % temperature top layer [deg C]
-T1       =  1350;                % temperature base layer [deg C]
+T0       =  1425;                % temperature top layer [deg C]
+T1       =  1425;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component top layer [liquid fraction from catmip16 fig8]
 cl       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component base layer [liquid fraction from catmip16 fig8]
@@ -66,7 +66,7 @@ Ptop     =  1e5;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-tau_T    =  8*hr;                % wall cooling/assimilation time [s]
+tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 Ttop     =  100;                 % wall temperature [degC] (nan = insulating)
 Tbot     =  1400;                % wall temperature [degC] (nan = insulating)
 
@@ -84,9 +84,9 @@ tau_r    =  60;                  % reaction time [s]
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
 etax0    =  1e16;                % solid reference viscosity [Pas]
-AA       = [ 0.60, 0.25; 0.20, 0.20; ];  % permission slopes
-BB       = [ 0.30, 0.70; 0.98, 0.02; ];  % permission step locations
-CC       = [ 0.20, 0.20; 0.60, 0.60; ];  % permission step widths
+AA       = [ 0.6907, 0.1853; 0.1311, 0.1644; ];  % permission slopes
+BB       = [ 0.6904, 0.3096; 0.9988, 0.0012; ];  % permission step locations
+CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 
 % set model buoyancy parameters
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)

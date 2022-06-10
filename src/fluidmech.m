@@ -300,7 +300,7 @@ P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ));                      % mat
 % update phase velocities
 Wx   = W + wx;                                                             % xtl z-velocity
 Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + 0.;                                                             % mlt z-velocity
+Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
 Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...

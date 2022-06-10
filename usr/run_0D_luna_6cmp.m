@@ -34,8 +34,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1400;                % temperature top layer [deg C]
-T1       =  1400;                % temperature base layer [deg C]
+T0       =  1475;                % temperature top layer [deg C]
+T1       =  1475;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component top layer [liquid fraction from catmip16 fig8]
 cl       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component base layer [liquid fraction from catmip16 fig8]
@@ -84,9 +84,9 @@ tau_r    =  60;                  % reaction time [s]
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
 etax0    =  1e16;                % solid reference viscosity [Pas]
-AA       = [ 0.60, 0.25; 0.20, 0.20; ];  % permission slopes
-BB       = [ 0.30, 0.70; 0.98, 0.02; ];  % permission step locations
-CC       = [ 0.20, 0.20; 0.60, 0.60; ];  % permission step widths
+AA       = [ 0.6907, 0.1853; 0.1311, 0.1644; ];  % permission slopes
+BB       = [ 0.6904, 0.3096; 0.9988, 0.0012; ];  % permission step locations
+CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 
 % set model buoyancy parameters
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)

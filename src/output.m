@@ -93,7 +93,8 @@ if plot_op
         title('$\Gamma_x/\bar{\rho}$ [wt/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
         plot(-W(:,2:end-1)*hr,Zfc.',CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
-        plot(-(x(1:end-1,2:end-1)+x(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zfc.',CL{[1,4]},LW{:});
+        plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zfc.',CL{[1,4]},LW{:});
+        plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zfc.',CL{[1,3]},LW{:});
         title('$W$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); ylabel('Depth [m]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,5)
         plot(P(2:end-1,2:end-1)/1e3,Z(2:end-1).',CL{[1,2]},LW{:}); axis ij tight; box on;

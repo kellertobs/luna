@@ -60,5 +60,5 @@ BT    =  sum(bb.*bcf,2);
 CT    =  sum(cc.*ccf,2);
 
 TK    =  TC + 273.15;
-eta   =  exp(AT + BT./(TK(:)-CT));
+eta   =  exp(min(40,max(-5,AT + BT./(TK(:)-CT))));
 
