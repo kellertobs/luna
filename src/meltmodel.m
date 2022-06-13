@@ -249,7 +249,7 @@ cal.Tm  =  cal.T0 .* (1 + P./cal.A) .^ (1./cal.B);
 %***  compute T,P-dependence of equilibrium partition coefficients
 %     Parameterization after Rudge, Bercovici, & Spiegelman (2010)
 
-cal.L  = (cal.Tm+273.15).*cal.dS;
+cal.L  = (T+273.15).*cal.dS;
 cal.K  =  exp(cal.L./cal.r.*(1./(T+273.15) - 1./(cal.Tm+273.15)));
         
 end % function
