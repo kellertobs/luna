@@ -178,8 +178,7 @@ iter    =  0;
 hist    = [];
 dsumMdt = 0;
 dsumHdt = 0;
-dsumCdt = 0;
-dsumVdt = 0;
+dsumCdt = zeros(1,cal.nc);
 
 % overwrite fields from file if restarting run
 if restart

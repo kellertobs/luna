@@ -32,7 +32,6 @@ mu    = m.*rho./rhom;
 
 % update thermal properties
 Ds    = x.*Dsx;
-kT    = mu.*kTm + chi.*kTx;                                                % magma thermal conductivity
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);

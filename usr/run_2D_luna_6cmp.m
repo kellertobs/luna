@@ -6,7 +6,7 @@ addpath('../src');
 runID    =  '2D_luna_6cmp';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  50;                  % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -17,7 +17,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  100;                 % chamber depth [m]
 L        =  100;                 % chamber width [m]
-N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -34,11 +34,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1425;                % temperature top layer [deg C]
-T1       =  1425;                % temperature base layer [deg C]
+T0       =  1450;                % temperature top layer [deg C]
+T1       =  1450;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component top layer [liquid fraction from catmip16 fig8]
-cl       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component base layer [liquid fraction from catmip16 fig8]
+c0       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component top layer [liquid fraction from catmip16 fig8]
+cl       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component base layer [liquid fraction from catmip16 fig8]
 dc       =  [1,1,1,-1,-1,-1].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
@@ -68,18 +68,17 @@ bndinit  =  0;                   % switch on (1) to initialise with already esta
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 tau_T    =  4*hr;                % wall cooling/assimilation time [s]
 Ttop     =  100;                 % wall temperature [degC] (nan = insulating)
-Tbot     =  1400;                % wall temperature [degC] (nan = insulating)
+Tbot     =  1500;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
-kc       =  1e-4;                % chemical diffusivity [kg/m/s]
-kTm      =  4;                   % melt thermal conductivity [W/m/K]
-kTx      =  1;                   % xtal thermal conductivity [W/m/K]
+kc       =  1e-3;                % chemical diffusivity [kg/m/s]
+kT       =  3e+1;                % thermal conductivity [W/m/K]
 Cp       =  1300;                % heat capacity [J/kg/K]
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set phase diagram parameters
 calID    = 'luna6';
 tau_r    =  60;                  % reaction time [s]
+Dsx      = -350;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
@@ -92,7 +91,7 @@ CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhom0    =  rhox0 - 300;         % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  3e-5;                % thermal expansivity [1/K]
-dx       =  1e-3;                % crystal size [m]
+dx       =  1e-4;                % crystal size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
@@ -102,10 +101,10 @@ theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.25;                % iterative lag parameter equilibration
+alpha    =  0.5;                 % iterative lag parameter equilibration
 delta    =  2;                   % smoothness of segregation speed
-etamin   =  1e3;                 % minimum viscosity for stabilisation
-etamax   =  1e9;                 % maximum viscosity for stabilisation
+etamin   =  1e4;                 % minimum viscosity for stabilisation
+etamax   =  1e10;                % maximum viscosity for stabilisation
 
 % create output directory
 if ~isfolder([opdir,'/',runID])

@@ -7,8 +7,8 @@ Ti = T; xi = x;
 advn_H = advection(rho.*m.*T.*(Cp + 0  ),Um,Wm,h,ADVN,'flx') ...
        + advection(rho.*x.*T.*(Cp + Dsx),Ux,Wx,h,ADVN,'flx');
                            
-qTz    = - (kT(1:end-1,:)+kT(2:end,:))./2 .* ddz(T,h);                     % heat diffusion z-flux
-qTx    = - (kT(:,1:end-1)+kT(:,2:end))./2 .* ddx(T,h);                     % heat diffusion x-flux
+qTz    = - kT .* ddz(T,h);                     % heat diffusion z-flux
+qTx    = - kT .* ddx(T,h);                     % heat diffusion x-flux
 diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                     % heat diffusion
                            - ddx(qTx(2:end-1,:),h));
     
@@ -23,26 +23,29 @@ H([1 end],:) = H([2 end-1],:);                                             % app
 H(:,[1 end]) = H(:,[2 end-1]);    
     
 % update major component
-for i = 2:cal.nc
+for i = 1:cal.nc
     advn_C = advection(rho.*m.*squeeze(cm(i,:,:)),Um,Wm,h,ADVN,'flx') ...
            + advection(rho.*x.*squeeze(cx(i,:,:)),Ux,Wx,h,ADVN,'flx');
     
-    qcz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(squeeze(c(i,:,:)),h);  % major component diffusion z-flux
-    qcx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(squeeze(c(i,:,:)),h);  % major component diffusion x-flux
+    qcz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(squeeze(c(i,:,:)),h); % major component diffusion z-flux
+    qcx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(squeeze(c(i,:,:)),h); % major component diffusion x-flux
     diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                  % major component diffusion
                               - ddx(qcx(2:end-1,:),h);
     
     dCdt(i,:,:) = - advn_C + diff_c;                                       % total rate of change
     
     C(i,:,:) = Co(i,:,:) + (THETA.*dCdt(i,:,:) + (1-THETA).*dCdto(i,:,:)).*dt;  % explicit update of major component density
+    C(i,:,:) = max(TINY,min(rho-TINY,squeeze(C(i,:,:))));
     C(i,[1 end],:) = C(i,[2 end-1],:);                                     % apply boundary conditions
     C(i,:,[1 end]) = C(i,:,[2 end-1]);
 end
 
 % convert enthalpy and component densities to temperature and concentrations
 T = H./(rho.*(Cp + Ds));
-C(1,:,:) = rho - squeeze(sum(C(2:end,:,:)));
-for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./rho; end
+% C(1,:,:) = max(TINY,min(rho-TINY, rho - squeeze(sum(C(2:end,:,:))) ));
+sumC = squeeze(sum(C));
+for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./sumC; end
+for i = 1:cal.nc; C(i,:,:) = squeeze(c(i,:,:)).*rho; end
 
 
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
@@ -60,12 +63,12 @@ if react
     
     mq = reshape(phs.f ,Nz,Nx); 
     xq = 1-mq;
-    for i = 2:cal.nc
+    for i = 1:cal.nc
         cxq(i,:,:) = reshape(phs.cs(:,i),Nz,Nx);
         cmq(i,:,:) = reshape(phs.cl(:,i),Nz,Nx);
     end
-    cmq(1,:,:) = 1 - squeeze(sum(cmq(2:end,:,:)));
-    cxq(1,:,:) = 1 - squeeze(sum(cxq(2:end,:,:)));
+%     cmq(1,:,:) = 1 - squeeze(sum(cmq(2:end,:,:)));
+%     cxq(1,:,:) = 1 - squeeze(sum(cxq(2:end,:,:)));
 end
 
 % update crystal fraction
@@ -99,12 +102,12 @@ if react && step>0
     
     % major component
     Kc = cxq./cmq;
-    for i = 2:cal.nc
+    for i = 1:cal.nc
         cm(i,:,:) = squeeze(c(i,:,:))./(m + x.*squeeze(Kc(i,:,:)));
         cx(i,:,:) = squeeze(c(i,:,:))./(m./squeeze(Kc(i,:,:)) + x);
     end
-    cm(1,:,:) = 1 - squeeze(sum(cm(2:end,:,:)));
-    cx(1,:,:) = 1 - squeeze(sum(cx(2:end,:,:)));
+%     cm(1,:,:) = 1 - squeeze(sum(cm(2:end,:,:)));
+%     cx(1,:,:) = 1 - squeeze(sum(cx(2:end,:,:)));
 
 end
 

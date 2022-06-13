@@ -24,7 +24,7 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  1e5;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  5*hr;                % end time for simulation [s]
+tend     =  6*hr;                % end time for simulation [s]
 dt       =  30;                  % initial time step [s]
 dtmax    =  30;                  % maximum time step [s]
 
@@ -34,11 +34,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1475;                % temperature top layer [deg C]
-T1       =  1475;                % temperature base layer [deg C]
+T0       =  1500;                % temperature top layer [deg C]
+T1       =  1500;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component top layer [liquid fraction from catmip16 fig8]
-cl       =  [0.36,0.10,0.24,0.13,0.16,0.01]; % major component base layer [liquid fraction from catmip16 fig8]
+c0       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component top layer [liquid fraction from catmip16 fig8]
+cl       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component base layer [liquid fraction from catmip16 fig8]
 dc       =  [0,0,0,0,0,0].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
@@ -71,15 +71,14 @@ Ttop     =  100;                 % wall temperature [degC] (nan = insulating)
 Tbot     =  nan;                 % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
-kc       =  1e-4;                % chemical diffusivity [kg/m/s]
-kTm      =  4;                   % melt thermal conductivity [W/m/K]
-kTx      =  1;                   % xtal thermal conductivity [W/m/K]
+kc       =  1e-3;                % chemical diffusivity [kg/m/s]
+kT       =  3e+1;                % thermal conductivity [W/m/K]
 Cp       =  1300;                % heat capacity [J/kg/K]
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set phase diagram parameters
 calID    = 'luna6';
 tau_r    =  60;                  % reaction time [s]
+Dsx      = -350;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
@@ -92,7 +91,7 @@ CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhom0    =  rhox0 - 300;         % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  3e-5;                % thermal expansivity [1/K]
-dx       =  1e-3;                % crystal size [m]
+dx       =  1e-4;                % crystal size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
@@ -102,7 +101,7 @@ theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
-alpha    =  0.25;                % iterative lag parameter equilibration
+alpha    =  0.5;                 % iterative lag parameter equilibration
 delta    =  2;                   % smoothness of segregation speed
 etamin   =  1e-2;                % minimum viscosity for stabilisation
 etamax   =  1e16;                % maximum viscosity for stabilisation

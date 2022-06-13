@@ -351,33 +351,27 @@ if plot_op
     % plot model history
     if plot_cv
         figure(8); clf;
-        subplot(4,1,1);
+        subplot(3,1,1);
         plot(hist.time/hr,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
         ylabel('consv. $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        subplot(4,1,2);
+        subplot(3,1,2);
         plot(hist.time/hr,hist.DH./hist.sumH,'k-',LW{:}); hold on; axis tight; box on;
         ylabel('consv. $H$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        subplot(4,1,3);
-        plot(hist.time/hr,hist.DC./hist.sumC,'k-',LW{:}); hold on; axis tight; box on;
+        subplot(3,1,3);
+        plot(hist.time/hr,hist.DC./hist.sumC,'-',LW{:}); hold on; axis tight; box on;
         ylabel('consv. $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        subplot(4,1,4);
-        plot(hist.time/hr,hist.DV./hist.sumV,'k-',LW{:}); hold on; axis tight; box on;
-        ylabel('consv. $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
         xlabel('Time [hr]',TX{:},FS{:});
         
         figure(9); clf;
-        subplot(4,1,1);
+        subplot(3,1,1);
         plot(hist.time/hr,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
         ylabel('error $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        subplot(4,1,2);
+        subplot(3,1,2);
         plot(hist.time/hr,hist.EH,'k-',LW{:}); hold on; axis tight; box on;
         ylabel('error $H$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        subplot(4,1,3);
-        plot(hist.time/hr,hist.EC,'k-',LW{:}); hold on; axis tight; box on;
+        subplot(3,1,3);
+        plot(hist.time/hr,hist.EC,'-',LW{:}); hold on; axis tight; box on;
         ylabel('error $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        subplot(4,1,4);
-        plot(hist.time/hr,hist.EV,'k-',LW{:}); hold on; axis tight; box on;
-        ylabel('error $V$',TX{:},FS{:}); set(gca,TL{:},TS{:});
         xlabel('Time [hr]',TX{:},FS{:});
     end
     
