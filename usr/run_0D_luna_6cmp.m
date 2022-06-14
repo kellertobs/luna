@@ -34,11 +34,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1500;                % temperature top layer [deg C]
-T1       =  1500;                % temperature base layer [deg C]
+T0       =  1625;                % temperature top layer [deg C]
+T1       =  1625;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component top layer [liquid fraction from catmip16 fig8]
-cl       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component base layer [liquid fraction from catmip16 fig8]
+c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer [liquid fraction from catmip16 fig8]
+cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer [liquid fraction from catmip16 fig8]
 dc       =  [0,0,0,0,0,0].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters

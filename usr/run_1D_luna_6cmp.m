@@ -34,11 +34,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1450;                % temperature top layer [deg C]
-T1       =  1450;                % temperature base layer [deg C]
+T0       =  1575;                % temperature top layer [deg C]
+T1       =  1575;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component top layer [liquid fraction from catmip16 fig8]
-cl       =  [0.35,0.10,0.24,0.14,0.15,0.02]; % major component base layer [liquid fraction from catmip16 fig8]
+c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer [liquid fraction from catmip16 fig8]
+cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer [liquid fraction from catmip16 fig8]
 dc       =  [0,0,0,0,0,0].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
@@ -91,7 +91,7 @@ CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhom0    =  rhox0 - 300;         % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  3e-5;                % thermal expansivity [1/K]
-dx       =  1e-4;                % crystal size [m]
+dx       =  3e-4;                % crystal size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
