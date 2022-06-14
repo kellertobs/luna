@@ -17,7 +17,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  100;                 % chamber depth [m]
 L        =  100;                 % chamber width [m]
-N        =  200 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  125 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -34,12 +34,12 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1575;                % temperature top layer [deg C]
-T1       =  1575;                % temperature base layer [deg C]
+T0       =  1600;                % temperature top layer [deg C]
+T1       =  1600;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer [liquid fraction from catmip16 fig8]
 cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer [liquid fraction from catmip16 fig8]
-dc       =  [1,1,1,-1,-1,-1].*1e-4; % amplitude of random noise [wt SiO2]
+dc       =  [1,-1,1,-1,0,0].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
 it0      =  1;                   % incompatible tracer top layer [wt ppm]
@@ -66,14 +66,14 @@ Ptop     =  1e5;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-tau_T    =  4*hr;                % wall cooling/assimilation time [s]
+tau_T    =  8*hr;                % wall cooling/assimilation time [s]
 Ttop     =  100;                 % wall temperature [degC] (nan = insulating)
-Tbot     =  1500;                % wall temperature [degC] (nan = insulating)
+Tbot     =  1700;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
-kc       =  1e-3;                % chemical diffusivity [kg/m/s]
-kT       =  3e+1;                % thermal conductivity [W/m/K]
 Cp       =  1300;                % heat capacity [J/kg/K]
+kc0      =  1e-6;                % chemical diffusivity [kg/m/s]
+kT0      =  3;                   % thermal conductivity [W/m/K]
 
 % set phase diagram parameters
 calID    = 'luna6';
@@ -91,20 +91,22 @@ CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhom0    =  rhox0 - 300;         % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  3e-5;                % thermal expansivity [1/K]
-dx       =  3e-4;                % crystal size [m]
+dx       =  1e-3;                % crystal size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
-rtol     =  1e-5;                % outer its relative tolerance
-atol     =  1e-8;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
+maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
-delta    =  2;                   % smoothness of segregation speed
-etamin   =  1e4;                 % minimum viscosity for stabilisation
-etamax   =  1e10;                % maximum viscosity for stabilisation
+delta    =  3;                   % smoothness of segregation speed
+etareg   =  1e3;                 % bounds on viscosity resisting convection for regularisation/stabilisation
+sgrreg   =  1e1;                 % bounds on viscosity resisting convection for regularisation/stabilisation
+kcreg    =  1e2;                 % chemical diffusivity for regularisation [kg/m/s]
+kTreg    =  1e2;                 % thermal conductivity for regularisation [W/m/K]
 
 % create output directory
 if ~isfolder([opdir,'/',runID])

@@ -75,7 +75,7 @@ end
 if diseq || ~react  % disequilibrium approach
     
     if react
-        Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(3.*dt,tau_r);
+        Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(4.*dt,tau_r);
     end
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term

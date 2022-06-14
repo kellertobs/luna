@@ -58,12 +58,15 @@ botshape(:,[1 end]) = botshape(:,[2 end-1]);
 
 bndH = zeros(size(ZZ));
 
-% set specified boundaries to no slip, else to free slip
-                             sds = -1;      % free slip sides for other types
-if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
-else;                        top = -1; end  % free slip for other types
-if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
-else;                        bot = -1; end  % free slip for other types
+% set all boundaries to free slip
+sds = -1;
+top = -1;
+bot = -1;
+%                              sds = -1;      % free slip sides for other types
+% if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
+% else;                        top = -1; end  % free slip for other types
+% if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
+% else;                        bot = -1; end  % free slip for other types
 
 % load calibration
 run(['../cal/cal_',calID,'.m']);
@@ -99,10 +102,9 @@ txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P;
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
 if ~react;  Dsx = 0;  Dsf = 0;  end
-rhoo =  mean(rhom0).*ones(size(T)); rhoref = mean(rhom0);  %#ok<NASGU>
-etao =  etam0.*ones(size(T));
-dto  =  dt;
-Pt   =  rhoref.*g0.*ZZ + Ptop;  
+rhoref = rhom0(1);
+rhoo   = rhoref.*ones(size(T));
+Pt     = rhoref.*g0.*ZZ + Ptop;  
 if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 
 % get volume fractions and bulk density
@@ -132,11 +134,12 @@ while res > tol
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
     if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
-    
+    rhoo  = rho;
+
     res  = norm(x(:)-xi(:),2)./sqrt(length(x(:)));
 end
-rhoo    = rho;
-Pto     = Pt;
+dto   = dt;
+Pto   = Pt;
 
 % get geochemical phase compositions
 itm  = it./(m + x.*KIT); itx = it./(m./KIT + x);

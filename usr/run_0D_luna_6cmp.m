@@ -71,9 +71,9 @@ Ttop     =  100;                 % wall temperature [degC] (nan = insulating)
 Tbot     =  nan;                 % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
-kc       =  1e-3;                % chemical diffusivity [kg/m/s]
-kT       =  3e+1;                % thermal conductivity [W/m/K]
 Cp       =  1300;                % heat capacity [J/kg/K]
+kc0      =  1e-6;                % chemical diffusivity [kg/m/s]
+kT0      =  3;                   % thermal conductivity [W/m/K]
 
 % set phase diagram parameters
 calID    = 'luna6';
@@ -91,7 +91,7 @@ CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 rhox0    =  [3270,4390,3500,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhom0    =  rhox0 - 300;         % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  3e-5;                % thermal expansivity [1/K]
-dx       =  1e-4;                % crystal size [m]
+dx       =  1e-3;                % crystal size [m]
 g0       =  10.;                 % gravity [m/s2]
 
 % set numerical model parameters
@@ -102,9 +102,11 @@ rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
-delta    =  2;                   % smoothness of segregation speed
-etamin   =  1e-2;                % minimum viscosity for stabilisation
-etamax   =  1e16;                % maximum viscosity for stabilisation
+delta    =  0;                   % smoothness of segregation speed
+etareg   =  1e0;                 % bounds on viscosity resisting convection for regularisation/stabilisation
+sgrreg   =  1e0;                 % bounds on viscosity resisting convection for regularisation/stabilisation
+kcreg    =  1e0;                 % chemical diffusivity for regularisation [kg/m/s]
+kTreg    =  1e0;                 % thermal conductivity for regularisation [W/m/K]
 
 % create output directory
 if ~isfolder([opdir,'/',runID])
