@@ -3,7 +3,7 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '2D_luna_6cmp';      % run identifier
+runID    =  '2D_luna_6cmp_eta4';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
@@ -17,7 +17,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  100;                 % chamber depth [m]
 L        =  100;                 % chamber width [m]
-N        =  125 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -103,7 +103,7 @@ atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
 delta    =  3;                   % smoothness of segregation speed
-etareg   =  1e3;                 % bounds on viscosity resisting convection for regularisation/stabilisation
+etareg   =  1e4;                 % bounds on viscosity resisting convection for regularisation/stabilisation
 sgrreg   =  1e1;                 % bounds on viscosity resisting convection for regularisation/stabilisation
 kcreg    =  1e2;                 % chemical diffusivity for regularisation [kg/m/s]
 kTreg    =  1e2;                 % thermal conductivity for regularisation [W/m/K]

@@ -12,14 +12,14 @@ AAR  = [];       % forcing entries for R
 ii = MapW(:,1); jj1 = ii; jj2 = MapW(:,2);
 aa = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+0];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % right boundary
 ii = MapW(:,end); jj1 = ii; jj2 = MapW(:,end-1);
 aa = zeros(size(ii));
 IIL = [IIL; ii(:)]; JJL = [JJL; jj1(:)];   AAL = [AAL; aa(:)+1];
-IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+sds];
+IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+0];
 IIR = [IIR; ii(:)]; AAR = [AAR; aa(:)];
 
 % top boundary
