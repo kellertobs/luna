@@ -4,8 +4,10 @@
 Ti = T; xi = x;
 
 % update temperature
-advn_H = advection(rho.*m.*T.*(Cp + 0  ),Um,Wm,h,ADVN,'flx') ...
-       + advection(rho.*x.*T.*(Cp + Dsx),Ux,Wx,h,ADVN,'flx');
+advn_H =  Cpm         .*advection(rho.*m.*T ,Um,Wm,h,ADVN,'flx') ...
+       + (Cpx + Dsx)  .*advection(rho.*x.*T ,Ux,Wx,h,ADVN,'flx') ...
+       - aTm.*T./rhom .*advection(rho.*m.*Pt,Um,Wm,h,ADVN,'flx') ...
+       - aTx.*T./rhox .*advection(rho.*x.*Pt,Ux,Wx,h,ADVN,'flx');
                            
 qTz    = - kT .* ddz(T,h);                     % heat diffusion z-flux
 qTx    = - kT .* ddx(T,h);                     % heat diffusion x-flux
@@ -13,10 +15,10 @@ diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                     % hea
                            - ddx(qTx(2:end-1,:),h));
     
 bndH = zeros(size(T));
-if ~isnan(Ttop); bndH = bndH + rho.*Cp.*(Ttop+273.15-T)./tau_T .* topshape; end % impose top boundary layer
-if ~isnan(Tbot); bndH = bndH + rho.*Cp.*(Tbot+273.15-T)./tau_T .* botshape; end % impose bot boundary layer
+if ~isnan(Ttop); bndH = bndH + rho.*(x.*Cpx+m.*Cpm).*(Ttop+273.15-T)./tau_T .* topshape; end % impose top boundary layer
+if ~isnan(Tbot); bndH = bndH + rho.*(x.*Cpx+m.*Cpm).*(Tbot+273.15-T)./tau_T .* botshape; end % impose bot boundary layer
 
-dHdt = - advn_H + diff_T + bndH;                                           % total rate of change
+dHdt = - advn_H + diff_T + bndH;                                  % total rate of change
     
 H = Ho + (THETA.*dHdt + (1-THETA).*dHdto).*dt;                             % explicit update of enthalpy
 H([1 end],:) = H([2 end-1],:);                                             % apply boundary conditions
@@ -41,7 +43,7 @@ for i = 1:cal.nc
 end
 
 % convert enthalpy and component densities to temperature and concentrations
-T = H./(rho.*(Cp + Ds));
+T = H./(rho.*(x.*(Cpx + Dsx) + m.*Cpm));
 % C(1,:,:) = max(TINY,min(rho-TINY, rho - squeeze(sum(C(2:end,:,:))) ));
 sumC = squeeze(sum(C));
 for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./sumC; end

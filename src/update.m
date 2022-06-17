@@ -19,8 +19,8 @@ pxNox = squeeze(cx(3,:,:)./(cx(3,:,:) + cx(4,:,:)));
 anNox = squeeze(cx(5,:,:)./(cx(5,:,:) + cx(6,:,:)));
 
 % update phase densities
-rhom = squeeze(1./sum(cm./rhom0.')) .* (1 - aT.*(T-T0-273.15));
-rhox = squeeze(1./sum(cx./rhox0.')) .* (1 - aT.*(T-T0-273.15));
+rhom = squeeze(1./sum(cm./rhom0.')) .* (1 - aTm.*(T-T0-273.15) + bPm.*(Pt-Ptop));
+rhox = squeeze(1./sum(cx./rhox0.')) .* (1 - aTx.*(T-T0-273.15) + bPx.*(Pt-Ptop));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox);  
@@ -31,7 +31,6 @@ chi   = x.*rho./rhox;
 mu    = m.*rho./rhom;
 
 % update thermal properties
-Ds    = x.*Dsx;
 kT    = kT0 .* kTreg;
 kc    = kc0 .* kcreg;
 
@@ -107,7 +106,8 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-rhoref)*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % crystal segregation speed
+% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % crystal segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % crystal segregation speed
 for i = 1:round(delta)
     wx(2:end-1,2:end-1) = wx(2:end-1,2:end-1) + diff(wx(:,2:end-1),2,1)./8 + diff(wx(2:end-1,:),2,2)./8;
     wx(1  ,:)     = 0;
@@ -115,7 +115,8 @@ for i = 1:round(delta)
     wx(:,[1 end]) = wx(:,[2 end-1]);
 end
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-rhoref)*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5.*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
+% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5.*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)).*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
 for i = 1:round(delta)
     wm(2:end-1,2:end-1) = wm(2:end-1,2:end-1) + diff(wm(:,2:end-1),2,1)./8 + diff(wm(2:end-1,:),2,2)./8;
     wm(1  ,:)     = 0;

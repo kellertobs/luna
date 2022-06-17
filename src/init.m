@@ -72,8 +72,8 @@ bot = -1;
 run(['../cal/cal_',calID,'.m']);
 
 % initialise solution fields
-T   =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature [C]
-T   =  T+273.15; % convert to [K]
+Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature [C]
+T   =  (Tp+273.15).*exp(aTm.*g0.*ZZ./Cpm); % convert to [K]
 c   =  zeros(cal.nc,Nz,Nx); cxq = c; cmq = c;
 for i=1:cal.nc
     c(i,:,:)   =  c0(i) + (cl(i)-c0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc(i).*rp;  if bndinit && ~isnan(cwall); c(i,:,:) = c(i,:,:) + (cwall-c(i,:,:)).*bndshape; end % major component
@@ -131,6 +131,9 @@ while res > tol
 
     update;
     
+    T   =  (Tp+273.15).*exp(m.*aTm.*g0.*ZZ./Cpm ...
+                          + x.*aTx.*g0.*ZZ./Cpx); % update T with adiabatic gradient
+
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
     if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
@@ -148,7 +151,7 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-H = rho.*(Cp + Ds).*T;
+H = rho.*(x.*(Cpx + Dsx) + m.*Cpm).*T;
 C = 0.*c;
 for i = 1:cal.nc; C(i,:,:) = rho.*(m.*squeeze(cm(i,:,:)) + x.*squeeze(cx(i,:,:))); end
 
