@@ -295,7 +295,7 @@ S = SS*(LL\RR);  % update solution
 W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
 U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
 P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ));                      % matrix dynamic pressure
-
+Pt = P + rhoref.*g0.*ZZ + Ptop;
 
 % update phase velocities
 Wx   = W + wx;                                                             % xtl z-velocity
@@ -310,6 +310,6 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
 
  
 %% update time step
-dtk = min((h/2)^2./max([kT(:)./rho(:)./Cp;kc./rho(:)]))/2;                    % diffusive time step size
+dtk = min((h/2)^2./max([kT(:)./rho(:)./Cpm;kc./rho(:)]))/2;                    % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
