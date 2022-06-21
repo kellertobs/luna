@@ -18,44 +18,53 @@ if entr_mth  % use entropy equation to evolve heat
                                - ddx(qTx(2:end-1,:),h)) ...
                                ./ T(2:end-1,2:end-1);
     
-    bndS = zeros(size(T));
-    if ~isnan(Ttop); bndS = bndS + rho.*cP.*((Ttop+273.15)-T)./T./tau_T .* topshape; end % impose top boundary layer
-    if ~isnan(Tbot); bndS = bndS + rho.*cP.*((Tbot+273.15)-T)./T./tau_T .* botshape; end % impose bot boundary layer
-    
-    dSdt = advn_S + diff_T + bndS;                                         % total rate of change
-    
-    S = So + (THETA.*dSdt + (1-THETA).*dSdto).*dt;                         % explicit update of entropy
-    S([1 end],:) = S([2 end-1],:);                                         % apply zero flux boundary conditions
-    S(:,[1 end]) = S(:,[2 end-1]);
-
-    T = exp(S./rho./cP - x.*Dsx./cP + aT./rho./cP.*Pt);                    % convert entropy to temperature
-
-else  % use temperature equation to evolve heat
-
-    advn_T = - advection(T,Ubar,Wbar,h,ADVN,'adv');                        % heat advection
-    
-    adbt_h = - aT.*T./rho./cP .* advection(Pt,Ubar,Wbar,h,ADVN,'adv');     % adiabatic heat
-    
-    latn_h = - T.*Dsx./rho./cP .* Gx;                                      % latent heat
-    
-    qTz    = - kT .* ddz(T,h);                                             % heat diffusion z-flux
-    qTx    = - kT .* ddx(T,h);                                             % heat diffusion x-flux
-    diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h)  ...                % heat diffusion
-                               - ddx(qTx(2:end-1,:),h)) ...
-                               ./ rho(2:end-1,2:end-1)/cP;
-    
+    diss_h(2:end-1,2:end-1) = diss ./ T(2:end-1,2:end-1);
+                        
     bndT = zeros(size(T));
     if ~isnan(Ttop); bndT = bndT + ((Ttop+273.15)-T)./tau_T .* topshape; end % impose top boundary layer
     if ~isnan(Tbot); bndT = bndT + ((Tbot+273.15)-T)./tau_T .* botshape; end % impose bot boundary layer
     bndS = rho.*cP.*bndT./T;
     
-    dTdt = advn_T + diff_T + adbt_h + latn_h + bndT;                       % total rate of change
+    dSdt = advn_S + diff_T + diss_h + bndS;                                % total rate of change
+    
+    S = So + (THETA.*dSdt + (1-THETA).*dSdto).*dt;                         % explicit update of entropy
+    S([1 end],:) = S([2 end-1],:);                                         % apply zero flux boundary conditions
+    S(:,[1 end]) = S(:,[2 end-1]);
+
+    T = (T0+273.15)*exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*Pt);              % convert entropy to temperature
+
+%     dTdt = T./rho./cP.*dSdt;
+%     T = To + (THETA.*dTdt + (1-THETA).*dTdto).*dt;                       % explicit update of temperature
+    
+else  % use temperature equation to evolve heat
+
+    advn_T = - advection(T,Ubar,Wbar,h,ADVN,'adv');                        % heat advection
+    
+    adbt_h =   T.*aT./rhoref./cP .* advection(Pt,Ubar,Wbar,h,ADVN,'adv');  % adiabatic heat
+    
+    latn_h = - T.*Dsx./rho./cP .* Gx;                                      % latent heat
+                           
+    qTz    = - kT .* ddz(T,h);                                             % heat diffusion z-flux
+    qTx    = - kT .* ddx(T,h);                                             % heat diffusion x-flux
+    diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h)  ...                % heat diffusion
+                               - ddx(qTx(2:end-1,:),h)) ...
+                               ./ rho(2:end-1,2:end-1)./cP;
+    
+    diss_h(2:end-1,2:end-1) = diss ./ rho(2:end-1,2:end-1)./cP;
+                        
+    bndT = zeros(size(T));
+    if ~isnan(Ttop); bndT = bndT + ((Ttop+273.15)-T)./tau_T .* topshape; end % impose top boundary layer
+    if ~isnan(Tbot); bndT = bndT + ((Tbot+273.15)-T)./tau_T .* botshape; end % impose bot boundary layer
+    bndS = rho.*cP.*bndT./T;
+    
+    dTdt = advn_T + diff_T + adbt_h + latn_h + diss_h + bndT;              % total rate of change
     
     T = To + (THETA.*dTdt + (1-THETA).*dTdto).*dt;                         % explicit update of temperature
     T([1 end],:) = T([2 end-1],:);                                         % apply zero-flux boundary conditions
     T(:,[1 end]) = T(:,[2 end-1]);
 
-    S = rho.*(cP.*log(T) + x.*Dsx - aT./rho.*Pt);                          % convert temperature to entropy
+    S = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*Pt);                    % convert temperature to entropy
+    diss_h(2:end-1,2:end-1) = diss ./ T(2:end-1,2:end-1);                  % convert dissipation rate to entropy units
 
 end
 

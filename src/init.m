@@ -70,7 +70,7 @@ bot = -1;
 run(['../cal/cal_',calID,'.m']);
 
 % initialise solution fields
-Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature [C]
+Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndshape; end % temperature [C]
 c   =  zeros(cal.nc,Nz,Nx); cxq = c; cmq = c;
 for i=1:cal.nc
     c(i,:,:)   =  c0(i) + (cl(i)-c0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc(i).*rp;  if bndinit && ~isnan(cwall); c(i,:,:) = c(i,:,:) + (cwall-c(i,:,:)).*bndshape; end % major component
@@ -103,7 +103,7 @@ rhoref = rhom0(1);
 rhoo   = rhoref.*ones(size(P));
 Pt     = rhoref.*g0.*ZZ + Ptop;  
 if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
-T   =  (Tp+273.15).*exp(aT./rhoref.*Pt./cP); % convert to [K]
+T   =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % convert to [K]
 
 % get volume fractions and bulk density
 ALPHA  =  1.0;
@@ -134,7 +134,7 @@ while res > tol
     if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
     rhoo  = rho;
 
-    T    =  (Tp+273.15).*exp(aT./rho.*Pt./cP);
+    T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 
     res  = norm(x(:)-xi(:),2)./sqrt(length(x(:)));
 end
@@ -148,7 +148,7 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-S = rho.*(cP.*log(T) + x.*Dsx - aT./rho.*Pt);
+S = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*Pt);
 C = 0.*c;
 for i = 1:cal.nc; C(i,:,:) = rho.*(m.*squeeze(cm(i,:,:)) + x.*squeeze(cx(i,:,:))); end
 
@@ -165,7 +165,7 @@ dcy_rip = rho.*rip./HLRIP.*log(2);
 dcy_rid = rho.*rid./HLRID.*log(2);
 
 % initialise auxiliary variables 
-dTdt   = 0.*T;  diff_T = 0.*T; bndS = zeros(size(ZZ));
+dTdt   = 0.*T;  diff_T = 0.*T; diss_h = 0.*T; bndS = zeros(size(ZZ));
 dSdt   = 0.*T;
 dCdt   = 0.*c;  diff_c = 0.*T;
 dxdt   = 0.*x;  diff_x = 0.*x;  

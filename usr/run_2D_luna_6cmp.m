@@ -3,7 +3,7 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '2D_luna_6cmp_T';    % run identifier
+runID    =  '2D_luna_6cmp_S';    % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
@@ -12,7 +12,7 @@ save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approach
-entr_mth =  0;                   % switch on to use entropy equation for heat evolution, else temperature equation used
+entr_mth =  1;                   % switch on to use entropy equation for heat evolution, else temperature equation used
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on fluid mechanics solver
 
 % set model domain parameters
