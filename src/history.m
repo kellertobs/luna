@@ -1,7 +1,7 @@
 % record run history
 
 dsumMdto = dsumMdt;
-dsumHdto = dsumHdt;
+dsumSdto = dsumSdt;
 dsumCdto = dsumCdt;
 
 stp = max(1,step);
@@ -11,28 +11,28 @@ hist.time(stp) = time;
 
 % record total mass, heat, component mass in model (assume hy = 1, unit length in third dimension)
 hist.sumM(stp) = sum(sum(rho(2:end-1,2:end-1)*h*h*1));  % [kg]
-hist.sumH(stp) = sum(sum(  H(2:end-1,2:end-1)*h*h*1));  % [J]
+hist.sumS(stp) = sum(sum(  S(2:end-1,2:end-1)*h*h*1));  % [J]
 for i = 1:cal.nc; hist.sumC(stp,i) = sum(sum(  squeeze(C(i,2:end-1,2:end-1))*h*h*1));  end% [kg]
 
 % record expected rates of change by volume change and imposed boundaries layers
 dsumMdt = sum(rho(2,2:end-1).*W(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
         + sum(rho(2:end-1,2).*U(2:end-1,1)*h*1) - sum(rho(2:end-1,end-1).*U(2:end-1,end)*h*1);  % [kg/s]
-dsumHdt = sum(sum(bndH(2:end-1,2:end-1)*h*h*1)) ...
-        + sum(  H(2,2:end-1).*W(1,2:end-1)*h*1) - sum(  H(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
-        + sum(  H(2:end-1,2).*U(2:end-1,1)*h*1) - sum(  H(2:end-1,end-1).*U(2:end-1,end)*h*1);  % [J /s]
+dsumSdt = sum(sum(bndS(2:end-1,2:end-1)*h*h*1)) ...
+        + sum(  S(2,2:end-1).*W(1,2:end-1)*h*1) - sum(  S(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
+        + sum(  S(2:end-1,2).*U(2:end-1,1)*h*1) - sum(  S(2:end-1,end-1).*U(2:end-1,end)*h*1);  % [J /s]
 for i = 1:cal.nc
     dsumCdt(i) = sum(  squeeze(C(i,2,2:end-1)).'.*W(1,2:end-1)*h*1) - sum(  squeeze(C(i,end-1,2:end-1)).'.*W(end,2:end-1)*h*1) ...
                + sum(  squeeze(C(i,2:end-1,2)).'.*U(2:end-1,1)*h*1) - sum(  squeeze(C(i,2:end-1,end-1)).'.*U(2:end-1,end)*h*1);  % [kg/s]
 end
 
 % if step>1; hist.DM(stp) = hist.DM(stp-1) + (THETA*dsumMdt + (1-THETA)*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [kg]
-if step>1; hist.DM(stp) = hist.DM(stp-1) +        dsumMdt                      .*dt; else; hist.DM(stp) = 0; end  % [kg]
-if step>1; hist.DH(stp) = hist.DH(stp-1) + (THETA*dsumHdt + (1-THETA)*dsumHdto).*dt; else; hist.DH(stp) = 0; end  % [J ]
+if step>1; hist.DM(stp)   = hist.DM(stp-1)   +        dsumMdt                      .*dt; else; hist.DM(stp) = 0; end  % [kg]
+if step>1; hist.DS(stp)   = hist.DS(stp-1)   + (THETA*dsumSdt + (1-THETA)*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J ]
 if step>1; hist.DC(stp,:) = hist.DC(stp-1,:) + (THETA*dsumCdt + (1-THETA)*dsumCdto).*dt; else; hist.DC(stp,:) = zeros(1,cal.nc); end  % [kg]
 
-% record conservation error of mass M, heat H, major component C, volatile component V
+% record conservation error of mass M, heat S, major component C, volatile component V
 hist.EM(stp) = (hist.sumM(stp) - hist.DM(stp))./hist.sumM(1) - 1;  % [kg/kg]
-hist.EH(stp) = (hist.sumH(stp) - hist.DH(stp))./hist.sumH(1) - 1;  % [J /J ]
+hist.ES(stp) = (hist.sumS(stp) - hist.DS(stp))./hist.sumS(1) - 1;  % [J /J ]
 hist.EC(stp,:) = (hist.sumC(stp,:) - hist.DC(stp,:))./hist.sumC(1,:) - 1;  % [kg/kg]
 
 % record variable and coefficient diagnostics

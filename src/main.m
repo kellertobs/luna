@@ -16,7 +16,7 @@ while time <= tend && step <= M
     if step==1; THETA = 1;  else;  THETA = theta; end
     
     % store previous solution
-    Ho      = H;
+    So      = S;
     Co      = C;
     To      = T;
     co      = c;
@@ -30,7 +30,8 @@ while time <= tend && step <= M
     rhoo    = rho;
     Div_rhoVo =  Div_rhoV;
     etao    = eta;
-    dHdto   = dHdt;
+    dTdto   = dTdt;
+    dSdto   = dSdt;
     dCdto   = dCdt;
     dxdto   = dxdt;
     dITdto  = dITdt;

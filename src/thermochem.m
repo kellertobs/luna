@@ -4,28 +4,63 @@
 Ti = T; xi = x;
 
 % update temperature
-advn_H =  Cpm         .*advection(rho.*m.*T ,Um,Wm,h,ADVN,'flx') ...
-       + (Cpx + Dsx)  .*advection(rho.*x.*T ,Ux,Wx,h,ADVN,'flx') ...
-       - aTm.*T./rhom .*advection(rho.*m.*Pt,Um,Wm,h,ADVN,'flx') ...
-       - aTx.*T./rhox .*advection(rho.*x.*Pt,Ux,Wx,h,ADVN,'flx');
-                           
-qTz    = - kT .* ddz(T,h);                     % heat diffusion z-flux
-qTx    = - kT .* ddx(T,h);                     % heat diffusion x-flux
-diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h) ...                     % heat diffusion
-                           - ddx(qTx(2:end-1,:),h));
+if entr_mth  % use entropy equation to evolve heat
     
-bndH = zeros(size(T));
-if ~isnan(Ttop); bndH = bndH + rho.*(x.*Cpx+m.*Cpm).*(Ttop+273.15-T)./tau_T .* topshape; end % impose top boundary layer
-if ~isnan(Tbot); bndH = bndH + rho.*(x.*Cpx+m.*Cpm).*(Tbot+273.15-T)./tau_T .* botshape; end % impose bot boundary layer
+    sm = S./rho - x.*Dsx;                                                  % phase entropies
+    sx = sm + Dsx;
+    
+    advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                % heat advection
+             - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx');
+    
+    qTz    = - kT .* ddz(T,h);                                             % heat diffusion z-flux
+    qTx    = - kT .* ddx(T,h);                                             % heat diffusion x-flux
+    diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h)  ...                % heat diffusion
+                               - ddx(qTx(2:end-1,:),h)) ...
+                               ./ T(2:end-1,2:end-1);
+    
+    bndS = zeros(size(T));
+    if ~isnan(Ttop); bndS = bndS + rho.*cP.*((Ttop+273.15)-T)./T./tau_T .* topshape; end % impose top boundary layer
+    if ~isnan(Tbot); bndS = bndS + rho.*cP.*((Tbot+273.15)-T)./T./tau_T .* botshape; end % impose bot boundary layer
+    
+    dSdt = advn_S + diff_T + bndS;                                         % total rate of change
+    
+    S = So + (THETA.*dSdt + (1-THETA).*dSdto).*dt;                         % explicit update of entropy
+    S([1 end],:) = S([2 end-1],:);                                         % apply zero flux boundary conditions
+    S(:,[1 end]) = S(:,[2 end-1]);
 
-dHdt = - advn_H + diff_T + bndH;                                  % total rate of change
+    T = exp(S./rho./cP - x.*Dsx./cP + aT./rho./cP.*Pt);                    % convert entropy to temperature
+
+else  % use temperature equation to evolve heat
+
+    advn_T = - advection(T,Ubar,Wbar,h,ADVN,'adv');                        % heat advection
     
-H = Ho + (THETA.*dHdt + (1-THETA).*dHdto).*dt;                             % explicit update of enthalpy
-H([1 end],:) = H([2 end-1],:);                                             % apply boundary conditions
-H(:,[1 end]) = H(:,[2 end-1]);    
+    adbt_h = - aT.*T./rho./cP .* advection(Pt,Ubar,Wbar,h,ADVN,'adv');     % adiabatic heat
     
-% update major component
-for i = 1:cal.nc
+    latn_h = - T.*Dsx./rho./cP .* Gx;                                      % latent heat
+    
+    qTz    = - kT .* ddz(T,h);                                             % heat diffusion z-flux
+    qTx    = - kT .* ddx(T,h);                                             % heat diffusion x-flux
+    diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h)  ...                % heat diffusion
+                               - ddx(qTx(2:end-1,:),h)) ...
+                               ./ rho(2:end-1,2:end-1)/cP;
+    
+    bndT = zeros(size(T));
+    if ~isnan(Ttop); bndT = bndT + ((Ttop+273.15)-T)./tau_T .* topshape; end % impose top boundary layer
+    if ~isnan(Tbot); bndT = bndT + ((Tbot+273.15)-T)./tau_T .* botshape; end % impose bot boundary layer
+    bndS = rho.*cP.*bndT./T;
+    
+    dTdt = advn_T + diff_T + adbt_h + latn_h + bndT;                       % total rate of change
+    
+    T = To + (THETA.*dTdt + (1-THETA).*dTdto).*dt;                         % explicit update of temperature
+    T([1 end],:) = T([2 end-1],:);                                         % apply zero-flux boundary conditions
+    T(:,[1 end]) = T(:,[2 end-1]);
+
+    S = rho.*(cP.*log(T) + x.*Dsx - aT./rho.*Pt);                          % convert temperature to entropy
+
+end
+
+% update major component 
+for i = 2:cal.nc
     advn_C = advection(rho.*m.*squeeze(cm(i,:,:)),Um,Wm,h,ADVN,'flx') ...
            + advection(rho.*x.*squeeze(cx(i,:,:)),Ux,Wx,h,ADVN,'flx');
     
@@ -42,12 +77,13 @@ for i = 1:cal.nc
     C(i,:,[1 end]) = C(i,:,[2 end-1]);
 end
 
-% convert enthalpy and component densities to temperature and concentrations
-T = H./(rho.*(x.*(Cpx + Dsx) + m.*Cpm));
-% C(1,:,:) = max(TINY,min(rho-TINY, rho - squeeze(sum(C(2:end,:,:))) ));
-sumC = squeeze(sum(C));
-for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./sumC; end
-for i = 1:cal.nc; C(i,:,:) = squeeze(c(i,:,:)).*rho; end
+% convert component densities to concentrations
+C(1,:,:) = max(TINY,min(rho-TINY, rho - squeeze(sum(C(2:end,:,:))) ));
+for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./rho; end
+
+% sumC = squeeze(sum(C));
+% for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./sumC; end
+% for i = 1:cal.nc; C(i,:,:) = squeeze(c(i,:,:)).*rho; end
 
 
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
@@ -65,12 +101,12 @@ if react
     
     mq = reshape(phs.f ,Nz,Nx); 
     xq = 1-mq;
-    for i = 1:cal.nc
+    for i = 2:cal.nc
         cxq(i,:,:) = reshape(phs.cs(:,i),Nz,Nx);
         cmq(i,:,:) = reshape(phs.cl(:,i),Nz,Nx);
     end
-%     cmq(1,:,:) = 1 - squeeze(sum(cmq(2:end,:,:)));
-%     cxq(1,:,:) = 1 - squeeze(sum(cxq(2:end,:,:)));
+    cmq(1,:,:) = 1 - squeeze(sum(cmq(2:end,:,:)));
+    cxq(1,:,:) = 1 - squeeze(sum(cxq(2:end,:,:)));
 end
 
 % update crystal fraction
@@ -104,12 +140,12 @@ if react && step>0
     
     % major component
     Kc = cxq./cmq;
-    for i = 1:cal.nc
+    for i = 2:cal.nc
         cm(i,:,:) = squeeze(c(i,:,:))./(m + x.*squeeze(Kc(i,:,:)));
         cx(i,:,:) = squeeze(c(i,:,:))./(m./squeeze(Kc(i,:,:)) + x);
     end
-%     cm(1,:,:) = 1 - squeeze(sum(cm(2:end,:,:)));
-%     cx(1,:,:) = 1 - squeeze(sum(cx(2:end,:,:)));
+    cm(1,:,:) = 1 - squeeze(sum(cm(2:end,:,:)));
+    cx(1,:,:) = 1 - squeeze(sum(cx(2:end,:,:)));
 
 end
 

@@ -413,9 +413,9 @@ if save_op
     end
     
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','x','m','chi','mu','H','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx');
+    save(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dTdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','x','m','chi','mu','H','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx');
+    save(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dTdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
     
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];

@@ -19,8 +19,8 @@ pxNox = squeeze(cx(3,:,:)./(cx(3,:,:) + cx(4,:,:)));
 anNox = squeeze(cx(5,:,:)./(cx(5,:,:) + cx(6,:,:)));
 
 % update phase densities
-rhom = squeeze(1./sum(cm./rhom0.')) .* (1 - aTm.*(T-T0-273.15) + bPm.*(Pt-Ptop));
-rhox = squeeze(1./sum(cx./rhox0.')) .* (1 - aTx.*(T-T0-273.15) + bPx.*(Pt-Ptop));
+rhom = squeeze(1./sum(cm./rhom0.')) .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
+rhox = squeeze(1./sum(cx./rhox0.')) .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox);  

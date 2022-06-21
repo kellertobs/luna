@@ -272,7 +272,7 @@ RR = [RV; RP];
 
 %% get residual
 % get non-linear residual
-FF         = LL*S - RR;
+FF         = LL*SS - RR;
 resnorm_VP = norm(FF(:),2)./(norm(RR(:),2)+TINY);
 
 % map residual vector to 2D arrays
@@ -282,20 +282,20 @@ res_P  = full(reshape(FF(MapP(:)+(NW+NU)), Nz   , Nx   ));  % dynamic pressure
         
 
 %% Solve linear system of equations for vx, vz, P
-SS = sqrt(abs(diag(LL)));
-SS = diag(sparse(1./(SS+1)));
+SC = sqrt(abs(diag(LL)));
+SC = diag(sparse(1./(SC+1)));
 
-LL = SS*LL*SS;
-RR = SS*RR;
+LL = SC*LL*SC;
+RR = SC*RR;
 
-S = SS*(LL\RR);  % update solution
+SS = SC*(LL\RR);  % update solution
 
 
 % map solution vector to 2D arrays
-W  = full(reshape(S(MapW(:))        ,(Nz-1), Nx   ));                      % matrix z-velocity
-U  = full(reshape(S(MapU(:))        , Nz   ,(Nx-1)));                      % matrix x-velocity
-P  = full(reshape(S(MapP(:)+(NW+NU)), Nz   , Nx   ));                      % matrix dynamic pressure
-Pt = P + rhoref.*g0.*ZZ + Ptop;
+W  = full(reshape(SS(MapW(:))        ,(Nz-1), Nx   ));                     % z-velocity
+U  = full(reshape(SS(MapU(:))        , Nz   ,(Nx-1)));                     % x-velocity
+P  = full(reshape(SS(MapP(:)+(NW+NU)), Nz   , Nx   ));                     % dynamic pressure
+% Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
 
 % update phase velocities
 Wx   = W + wx;                                                             % xtl z-velocity
@@ -303,13 +303,13 @@ Ux   = U + 0.;                                                             % xtl
 Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
-Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
-     + (chi(1:end-1,:)+chi(2:end,:))/2 .* Wx;
-Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
-     + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux; 
+Wbar = (m(1:end-1,:)+m(2:end,:))/2 .* Wm ...
+     + (x(1:end-1,:)+x(2:end,:))/2 .* Wx;
+Ubar = (m(:,1:end-1)+m(:,2:end))/2 .* Um ...
+     + (x(:,1:end-1)+x(:,2:end))/2 .* Ux; 
 
  
 %% update time step
-dtk = min((h/2)^2./max([kT(:)./rho(:)./Cpm;kc./rho(:)]))/2;                    % diffusive time step size
+dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc./rho(:)]))/2;                    % diffusive time step size
 dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size

@@ -56,8 +56,6 @@ botshape = max(0,min(1,botshape));
 botshape([1 end],:) = botshape([2 end-1],:);
 botshape(:,[1 end]) = botshape(:,[2 end-1]);
 
-bndH = zeros(size(ZZ));
-
 % set all boundaries to free slip
 sds = -1;
 top = -1;
@@ -73,7 +71,6 @@ run(['../cal/cal_',calID,'.m']);
 
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); T = T + (Twall-T).*bndshape; end % temperature [C]
-T   =  (Tp+273.15).*exp(aTm.*g0.*ZZ./Cpm); % convert to [K]
 c   =  zeros(cal.nc,Nz,Nx); cxq = c; cmq = c;
 for i=1:cal.nc
     c(i,:,:)   =  c0(i) + (cl(i)-c0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc(i).*rp;  if bndinit && ~isnan(cwall); c(i,:,:) = c(i,:,:) + (cwall-c(i,:,:)).*bndshape; end % major component
@@ -87,8 +84,8 @@ rid =  rip.*HLRID./HLRIP;                                           % radiogenic
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
-P   =  0.*T;  Pi = P;  res_P = 0.*P;  meanQ = 0;  
-S   = [W(:);U(:);P(:)];
+P   =  zeros(size(XX));  Pi = P;  res_P = 0.*P;  meanQ = 0;  
+SS  = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
 Wf  = W;  Uf  = U; 
@@ -103,9 +100,10 @@ VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
 if ~react;  Dsx = 0;  Dsf = 0;  end
 rhoref = rhom0(1);
-rhoo   = rhoref.*ones(size(T));
+rhoo   = rhoref.*ones(size(P));
 Pt     = rhoref.*g0.*ZZ + Ptop;  
 if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
+T   =  (Tp+273.15).*exp(aT./rhoref.*Pt./cP); % convert to [K]
 
 % get volume fractions and bulk density
 ALPHA  =  1.0;
@@ -131,13 +129,12 @@ while res > tol
 
     update;
     
-    T   =  (Tp+273.15).*exp(m.*aTm.*g0.*ZZ./Cpm ...
-                          + x.*aTx.*g0.*ZZ./Cpx); % update T with adiabatic gradient
-
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
     if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
     rhoo  = rho;
+
+    T    =  (Tp+273.15).*exp(aT./rho.*Pt./cP);
 
     res  = norm(x(:)-xi(:),2)./sqrt(length(x(:)));
 end
@@ -151,7 +148,7 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-H = rho.*(x.*(Cpx + Dsx) + m.*Cpm).*T;
+S = rho.*(cP.*log(T) + x.*Dsx - aT./rho.*Pt);
 C = 0.*c;
 for i = 1:cal.nc; C(i,:,:) = rho.*(m.*squeeze(cm(i,:,:)) + x.*squeeze(cx(i,:,:))); end
 
@@ -168,7 +165,8 @@ dcy_rip = rho.*rip./HLRIP.*log(2);
 dcy_rid = rho.*rid./HLRID.*log(2);
 
 % initialise auxiliary variables 
-dHdt   = 0.*T;  diff_T = 0.*T;
+dTdt   = 0.*T;  diff_T = 0.*T; bndS = zeros(size(ZZ));
+dSdt   = 0.*T;
 dCdt   = 0.*c;  diff_c = 0.*T;
 dxdt   = 0.*x;  diff_x = 0.*x;  
 dSIdt  = 0.*si;  diff_si  = 0.*SI;
@@ -183,7 +181,7 @@ time    =  0;
 iter    =  0;
 hist    = [];
 dsumMdt = 0;
-dsumHdt = 0;
+dsumSdt = 0;
 dsumCdt = zeros(1,cal.nc);
 
 % overwrite fields from file if restarting run
@@ -193,10 +191,10 @@ if restart
     elseif restart > 0  % restart from specified continuation frame
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart)];
     end
-    load(name,'U','W','P','Pt','x','m','chi','mu','H','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dHdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx');
+    load(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dTdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
     
     xq = x; 
-    S = [W(:);U(:);P(:)];
+    SS = [W(:);U(:);P(:)];
     dcy_rip = rho.*rip./HLRIP.*log(2);
     dcy_rid = rho.*rid./HLRID.*log(2);
     Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
