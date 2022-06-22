@@ -6,7 +6,7 @@ Ti = T; xi = x;
 % update temperature
 if entr_mth  % use entropy equation to evolve heat
     
-    sm = S./rho - x.*Dsx;                                                  % phase entropies
+    sm = s - x.*Dsx;                                                       % phase entropies
     sx = sm + Dsx;
     
     advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                % heat advection
@@ -31,7 +31,9 @@ if entr_mth  % use entropy equation to evolve heat
     S([1 end],:) = S([2 end-1],:);                                         % apply zero flux boundary conditions
     S(:,[1 end]) = S(:,[2 end-1]);
 
-    T = (T0+273.15)*exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*Pt);              % convert entropy to temperature
+    s = S./rho;
+    
+    T = (T0+273.15)*exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*Pt);     % convert entropy to temperature
 
 %     dTdt = T./rho./cP.*dSdt;
 %     T = To + (THETA.*dTdt + (1-THETA).*dTdto).*dt;                       % explicit update of temperature

@@ -119,7 +119,7 @@ while res > tol
     var.P = Pt(:)/1e9;    % convert to GPa
     var.f = 1-x(:);       % in wt
     
-    [phs,cal]  =  meltmodel(var,cal,'E'); % cs and cl component prop in each phase VS T 
+    [phs,cal]  =  meltmodel(var,cal,'E');
     
     mq  = reshape(phs.f ,Nz,Nx); xq = 1-mq; x = xq; m = mq;
     for i = 1:cal.nc
@@ -148,8 +148,9 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-S = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*Pt);
-C = 0.*c;
+S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*Pt);
+s  = S./rho;
+C  = 0.*c;
 for i = 1:cal.nc; C(i,:,:) = rho.*(m.*squeeze(cm(i,:,:)) + x.*squeeze(cx(i,:,:))); end
 
 % get geochemical content densities

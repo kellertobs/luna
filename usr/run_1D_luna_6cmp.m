@@ -35,8 +35,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1675;                % temperature top layer [deg C]
-T1       =  1675;                % temperature base layer [deg C]
+T0       =  1700;                % temperature top layer [deg C]
+T1       =  1700;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer [liquid fraction from catmip16 fig8]
 cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer [liquid fraction from catmip16 fig8]
@@ -67,9 +67,9 @@ Ptop     =  1e5;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-tau_T    =  3*yr;                % wall cooling/assimilation time [s]
+tau_T    =  5*yr;                % wall cooling/assimilation time [s]
 Ttop     =  100;                 % wall temperature [degC] (nan = insulating)
-Tbot     =  1800;                % wall temperature [degC] (nan = insulating)
+Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
 cP       =  1300;                % heat capacity [J/kg/K]
@@ -104,7 +104,7 @@ theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implic
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-alpha    =  0.25;                % iterative lag parameter equilibration
+alpha    =  0.5;                 % iterative lag parameter equilibration
 delta    =  5;                   % smoothness of segregation speed
 etareg   =  1e3;                 % bounds on viscosity resisting convection for regularisation/stabilisation
 sgrreg   =  1e0;                 % bounds on viscosity resisting convection for regularisation/stabilisation
