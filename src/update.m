@@ -108,6 +108,9 @@ tII([1 end],:) = tII([2 end-1],:);
 % update phase segregation speeds
 % wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_x(1:end-1,:).*Csgr_x(2:end,:)).^0.5; % crystal segregation speed
 wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % crystal segregation speed
+wx(1  ,:)     = 0;
+wx(end,:)     = 0;
+wx(:,[1 end]) = wx(:,[2 end-1]);
 for i = 1:round(delta)
     wx(2:end-1,2:end-1) = wx(2:end-1,2:end-1) + diff(wx(:,2:end-1),2,1)./8 + diff(wx(2:end-1,:),2,2)./8;
     wx(1  ,:)     = 0;
@@ -117,6 +120,9 @@ end
 
 % wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*(Csgr_m(1:end-1,:).*Csgr_m(2:end,:)).^0.5.*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
 wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)).*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
+wm(1  ,:)     = 0;
+wm(end,:)     = 0;
+wm(:,[1 end]) = wm(:,[2 end-1]);
 for i = 1:round(delta)
     wm(2:end-1,2:end-1) = wm(2:end-1,2:end-1) + diff(wm(:,2:end-1),2,1)./8 + diff(wm(2:end-1,:),2,2)./8;
     wm(1  ,:)     = 0;
