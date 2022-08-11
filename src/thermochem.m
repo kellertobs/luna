@@ -12,11 +12,10 @@ if entr_mth  % use entropy equation to evolve heat
     advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                % heat advection
              - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx');
     
-    qTz    = - kT .* ddz(T,h);                                             % heat diffusion z-flux
-    qTx    = - kT .* ddx(T,h);                                             % heat diffusion x-flux
+    qTz    = - (kT(1:end-1,:)+kT(2:end,:))/2 .* ddz(T,h);                  % heat diffusion z-flux
+    qTx    = - (kT(:,1:end-1)+kT(:,2:end))/2 .* ddx(T,h);                  % heat diffusion x-flux
     diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h)  ...                % heat diffusion
-                               - ddx(qTx(2:end-1,:),h)) ...
-                               ./ T(2:end-1,2:end-1);
+                               - ddx(qTx(2:end-1,:),h));
     
     diss_h(2:end-1,2:end-1) = diss ./ T(2:end-1,2:end-1);
                         
@@ -33,10 +32,7 @@ if entr_mth  % use entropy equation to evolve heat
 
     s = S./rho;
     
-    T = (T0+273.15)*exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*Pt);     % convert entropy to temperature
-
-%     dTdt = T./rho./cP.*dSdt;
-%     T = To + (THETA.*dTdt + (1-THETA).*dTdto).*dt;                       % explicit update of temperature
+    T = (T0+273.15) * exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*Pt);   % convert entropy to temperature
     
 else  % use temperature equation to evolve heat
 
