@@ -96,32 +96,28 @@ for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./rho; end
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
-if react
-    for i = 1:cal.nc
-        var.c(:,i) = reshape(c(i,:,:),Nx*Nz,1);  % in wt
-    end
-    var.T = T(:)-273.15;  % convert to C
-    var.P = Pt(:)/1e9;    % convert to GPa
-    var.f = 1-xq(:);      % in wt
-
-    [phs,cal]  =  meltmodel(var,cal,'E'); % cs and cl component prop in each phase VS T 
-    
-    mq = reshape(phs.f ,Nz,Nx); 
-    xq = 1-mq;
-    for i = 2:cal.nc
-        cxq(i,:,:) = reshape(phs.cs(:,i),Nz,Nx);
-        cmq(i,:,:) = reshape(phs.cl(:,i),Nz,Nx);
-    end
-    cmq(1,:,:) = 1 - squeeze(sum(cmq(2:end,:,:)));
-    cxq(1,:,:) = 1 - squeeze(sum(cxq(2:end,:,:)));
+for i = 1:cal.nc
+    var.c(:,i) = reshape(c(i,:,:),Nx*Nz,1);  % in wt
 end
+var.T = T(:)-273.15;  % convert to C
+var.P = Pt(:)/1e9;    % convert to GPa
+var.f = 1-xq(:);      % in wt
+
+[phs,cal]  =  meltmodel(var,cal,'E'); % cs and cl component prop in each phase VS T
+
+mq = reshape(phs.f ,Nz,Nx);
+xq = 1-mq;
+for i = 2:cal.nc
+    cxq(i,:,:) = reshape(phs.cs(:,i),Nz,Nx);
+    cmq(i,:,:) = reshape(phs.cl(:,i),Nz,Nx);
+end
+cmq(1,:,:) = 1 - squeeze(sum(cmq(2:end,:,:)));
+cxq(1,:,:) = 1 - squeeze(sum(cxq(2:end,:,:)));
 
 % update crystal fraction
-if diseq || ~react  % disequilibrium approach
+if diseq  % disequilibrium approach
     
-    if react
-        Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(4.*dt,tau_r);
-    end
+    Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(4.*dt,tau_r);
     
     advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
     
@@ -143,7 +139,7 @@ end
 m = min(1-TINY,max(TINY,1-x));
 
 % update phase compositions
-if react && step>0
+if step>0
     
     % major component
     Kc = cxq./cmq;
@@ -166,10 +162,8 @@ resnorm_TC = norm( T - Ti,2)./(norm(T,2)+TINY) ...
 % *****  Incompatible Trace Element  **************************************
 
 % update incompatible trace element phase compositions
-if react
-    itm = it./(m + x.*KIT);
-    itx = it./(m./KIT + x);
-end
+itm = it./(m + x.*KIT);
+itx = it./(m./KIT + x);
 
 % update incompatible trace element composition
 advn_IT = advection(rho.*m.*itm,Um,Wm,h,ADVN,'flx') ...
@@ -191,10 +185,8 @@ IT(:,[1 end]) = IT(:,[2 end-1]);
 % *****  COMPATIBLE TRACE ELEMENT  ****************************************
 
 % update compatible trace element phase compositions
-if react
-    ctm = ct./(m + x.*KCT);
-    ctx = ct./(m./KCT + x);
-end
+ctm = ct./(m + x.*KCT);
+ctx = ct./(m./KCT + x);
 
 % update compatible trace element composition
 advn_CT = advection(rho.*m.*ctm,Um,Wm,h,ADVN,'flx') ...
@@ -238,10 +230,8 @@ dcy_rip = rho.*rip./HLRIP.*log(2);
 dcy_rid = rho.*rid./HLRID.*log(2);
 
 % update radiogenic parent isotope phase compositions
-if react
-    ripm = rip./(m + x.*KRIP);
-    ripx = rip./(m./KRIP + x);
-end
+ripm = rip./(m + x.*KRIP);
+ripx = rip./(m./KRIP + x);
 
 % update radiogenic parent isotope composition
 advn_RIP = advection(rho.*m.*ripm,Um,Wm,h,ADVN,'flx') ...
@@ -262,10 +252,8 @@ RIP(:,[1 end]) = RIP(:,[2 end-1]);
 
 
 % update radiogenic daughter isotope phase compositions
-if react
-    ridm = rid./(m + x.*KRID);
-    ridx = rid./(m./KRID + x);
-end
+ridm = rid./(m + x.*KRID);
+ridx = rid./(m./KRID + x);
 
 % update radiogenic daughter isotope composition
 advn_RID = advection(rho.*m.*ridm,Um,Wm,h,ADVN,'flx') ...

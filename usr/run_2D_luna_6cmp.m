@@ -10,7 +10,6 @@ nop      =  50;                  % output frame plotted/saved every 'nop' time s
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
-react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approach
 entr_mth =  1;                   % switch on to use entropy equation for heat evolution, else temperature equation used
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on fluid mechanics solver
@@ -18,7 +17,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
 L        =  1000e3;              % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -35,8 +34,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1700;                % temperature top layer [deg C]
-T1       =  1700;                % temperature base layer [deg C]
+T0       =  1800;                % temperature top layer [deg C]
+T1       =  1800;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer [liquid fraction from catmip16 fig8]
 cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer [liquid fraction from catmip16 fig8]
@@ -101,12 +100,12 @@ g0       =  1.62;                % gravity [m/s2]
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+rtol     =  1e-3;                % outer its relative tolerance
+atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
 delta    =  0;                   % smoothness of segregation speed
-etareg   =  1e12;                % bounds on viscosity resisting convection for regularisation/stabilisation
+etareg   =  1e13;                % bounds on viscosity resisting convection for regularisation/stabilisation
 sgrreg   =  1e0;                 % bounds on viscosity resisting convection for regularisation/stabilisation
 kcreg    =  1e7;                 % chemical diffusivity for regularisation [kg/m/s]
 kTreg    =  1e7;                 % thermal conductivity for regularisation [W/m/K]

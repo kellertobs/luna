@@ -98,7 +98,6 @@ exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
-if ~react;  Dsx = 0;  Dsf = 0;  end
 rhoref = rhom0(1);
 rhoo   = rhoref.*ones(size(P));
 Pt     = rhoref.*g0.*ZZ + Ptop;  
