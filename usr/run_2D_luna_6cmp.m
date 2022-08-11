@@ -3,7 +3,7 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '2D_luna_6cmp_S';    % run identifier
+runID    =  '2D_luna_6cmp';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  50;                  % output frame plotted/saved every 'nop' time steps
