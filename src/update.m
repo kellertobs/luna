@@ -35,7 +35,7 @@ kT    = kT0 .* kTreg ./ T;
 kc    = kc0 .* kcreg;
 
 % determine adaptive max viscosity / min segregation coefficient
-if exist('eta','var'); etamax  = 1e+6.*min(eta (:)); else; etamax = 1e18; end
+if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = 1e18; end
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
