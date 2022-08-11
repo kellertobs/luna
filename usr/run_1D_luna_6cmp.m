@@ -3,12 +3,12 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '1D_luna_6cmp_S';    % run identifier
+runID    =  '1D_luna_6cmp';      % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  1;                   % switch on to save output to file
+save_op  =  0;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 react    =  1;                   % switch on reactive mode
 diseq    =  1;                   % switch on disequilibrium approach
@@ -73,7 +73,7 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
 cP       =  1300;                % heat capacity [J/kg/K]
-kc0      =  1e-6;                % chemical diffusivity [kg/m/s]
+kc0      =  1e-4;                % chemical diffusivity [kg/m/s]
 kT0      =  1;                   % thermal conductivity [W/m/K]
 
 % set phase diagram parameters
@@ -99,17 +99,17 @@ g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.1;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
+ADVN     =  'FLXDIV';            % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
-delta    =  5;                   % smoothness of segregation speed
-etareg   =  1e3;                 % bounds on viscosity resisting convection for regularisation/stabilisation
+delta    =  0;                   % smoothness of segregation speed
+etareg   =  1e12;                % bounds on viscosity resisting convection for regularisation/stabilisation
 sgrreg   =  1e0;                 % bounds on viscosity resisting convection for regularisation/stabilisation
-kcreg    =  1e2;                 % chemical diffusivity for regularisation [kg/m/s]
-kTreg    =  1e2;                 % thermal conductivity for regularisation [W/m/K]
+kcreg    =  1e7;                 % chemical diffusivity for regularisation [kg/m/s]
+kTreg    =  1e7;                 % thermal conductivity for regularisation [W/m/K]
 
 % create output directory
 if ~isfolder([opdir,'/',runID])
