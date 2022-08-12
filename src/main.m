@@ -10,7 +10,7 @@ end
 % physical time stepping loop
 while time <= tend && step <= M
         
-    fprintf(1,'\n\n\n*****  step %d;  dt = %4.4e;  time = %4.4e [hr]\n\n',step,dt./3600,time./3600);
+    fprintf(1,'\n\n\n*****  step %d;  dt = %4.4e;  time = %4.4e [yr]\n\n',step,dt./yr,time./yr);
     tic;
     
     if step==1; THETA = 1;  else;  THETA = theta; end
@@ -54,19 +54,22 @@ while time <= tend && step <= M
 
         % solve thermo-chemical equations
         thermochem;
-                
+        
         % update non-linear parameters and auxiliary variables
         update;
 
         % solve fluid-mechanics equations
         fluidmech;
         
+        % update geochemical evolution
+        geochem;
+        
         % report convergence
         report;
 
         iter = iter+1;
     end
-    
+        
     % record model history
     history;
     

@@ -6,7 +6,7 @@ addpath('../src');
 runID    =  '1D_luna_ref';       % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -16,8 +16,8 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-L        =  1000e3/150;          % chamber width [m]
-N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+L        =  1000e3/400;          % chamber width [m]
+N        =  400 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -34,8 +34,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1800;                % temperature top layer [deg C]
-T1       =  1800;                % temperature base layer [deg C]
+T0       =  1700;                % temperature top layer [deg C]
+T1       =  1700;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
@@ -78,7 +78,7 @@ kT0      =  4;                   % thermal conductivity [W/m/K]
 % set phase diagram parameters
 calID    = 'luna6';
 tau_r    =  60;                  % reaction time [s]
-Dsx      = -350;                 % entropy change of crystallisation [J/kg]
+Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
@@ -91,23 +91,23 @@ CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 rhox0    =  [3270,4390,3000,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 rhom0    =  [2710,3580,2580,2850,2530,2310];  % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  5e-5;                % thermal expansivity [1/K]
-bPx      =  5e-12;               % solid compressibility [1/Pa]
-bPm      =  1e-11;               % melt compressibility [1/Pa]
+bPx      =  1e-11;               % solid compressibility [1/Pa]
+bPm      =  3e-11;               % melt compressibility [1/Pa]
 dx       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.10;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
-etareg   =  1e9;                 % bounds on viscosity resisting convection for regularisation/stabilisation
+etareg   =  1e6;                 % bounds on viscosity resisting convection for regularisation/stabilisation
 sgrreg   =  1e0;                 % bounds on viscosity resisting convection for regularisation/stabilisation
-kcreg    =  1e7;                 % chemical diffusivity for regularisation [kg/m/s]
-kTreg    =  1e7;                 % thermal conductivity for regularisation [W/m/K]
+kcreg    =  1e6;                 % chemical diffusivity for regularisation [kg/m/s]
+kTreg    =  1e6;                 % thermal conductivity for regularisation [W/m/K]
 
 % create output directory
 if ~isfolder([opdir,'/',runID])

@@ -105,6 +105,7 @@ if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
 T   =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % convert to [K]
 
 % get volume fractions and bulk density
+step   =  0;
 ALPHA  =  1.0;
 THETA  =  1.0;
 res = 1;  tol = 1e-15;  x = ones(size(T))./10;
@@ -147,10 +148,19 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
-S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*Pt);
+S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*(Pt-Ptop));  
+S0 = rho.*(cP.*log((T0+273.15)) - aT./rhoref.*(Ptop)); 
 s  = S./rho;
 C  = 0.*c;
 for i = 1:cal.nc; C(i,:,:) = rho.*(m.*squeeze(cm(i,:,:)) + x.*squeeze(cx(i,:,:))); end
+
+sumC = squeeze(sum(C));
+for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./sumC; end
+for i = 1:cal.nc; C(i,:,:) = squeeze(c(i,:,:)).*rho; end
+
+% get phase entropies
+sm = S./rho - x.*Dsx;
+sx = sm + Dsx;
 
 % get geochemical content densities
 IT  = rho.*(m.*itm + x.*itx);
@@ -176,7 +186,6 @@ dRIPdt = 0.*RIP; diff_rip  = 0.*RIP;
 dRIDdt = 0.*RID; diff_rid  = 0.*RID;
 
 % initialise timing and iterative parameters
-step    =  0;
 time    =  0;
 iter    =  0;
 hist    = [];

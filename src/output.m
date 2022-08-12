@@ -11,51 +11,51 @@ if plot_op
             
         fh1 = figure(1); clf;
         subplot(4,1,1)
-        plot(hist.time/hr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
-        plot(hist.time/hr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
+        plot(hist.time/yr,hist.mu (:,2)*100.*(hist.mu (:,2)>1e-9),CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
+        plot(hist.time/yr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
         title(['$\mu$, $\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,2)
-        for i =1:cal.nc; plot(hist.time/hr,hist.c (i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
+        for i =1:cal.nc; plot(hist.time/yr,hist.c (i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
         title('$\bar{c}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,3)
-        for i =1:cal.nc; plot(hist.time/hr,hist.cx(i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
+        for i =1:cal.nc; plot(hist.time/yr,hist.cx(i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
         title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         legend(cal.CompStr,TX{:},FS{:},'location','best');
         subplot(4,1,4)
-        for i =1:cal.nc; plot(hist.time/hr,hist.cm(i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
+        for i =1:cal.nc; plot(hist.time/yr,hist.cm(i,:,2)*100,LW{:});  axis xy tight; box on; hold on; end
         title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        xlabel('Time [hr]',TX{:},FS{:});
+        xlabel('Time [yr]',TX{:},FS{:});
         
         fh2 = figure(2); clf;
         subplot(4,1,1)
-        plot(hist.time/hr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on;
+        plot(hist.time/yr,hist.T(:,2)-273.15,CL{[1,2]},LW{:}); axis xy tight; box on;
         title('$T [^\circ$C]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,2)
-        plot(hist.time/hr,hist.rhom(:,2),'-',CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
-        plot(hist.time/hr,hist.rhox(:,2),'-',CL{[1,4]},LW{:});
-        plot(hist.time/hr,hist.rho (:,2),'-',CL{[1,2]},LW{:});
+        plot(hist.time/yr,hist.rhom(:,2),'-',CL{[1,3]},LW{:}); axis xy tight; box on; hold on;
+        plot(hist.time/yr,hist.rhox(:,2),'-',CL{[1,4]},LW{:});
+        plot(hist.time/yr,hist.rho (:,2),'-',CL{[1,2]},LW{:});
         title('$\bar{\rho}$ [kg/m$^3$]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,3)
-        semilogy(hist.time/hr,hist.etam(:,2),'r-',LW{:}); axis xy tight; box on; hold on;
-        semilogy(hist.time/hr,hist.eta (:,2),'k-',LW{:});
+        semilogy(hist.time/yr,hist.etam(:,2),'r-',LW{:}); axis xy tight; box on; hold on;
+        semilogy(hist.time/yr,hist.eta (:,2),'k-',LW{:});
         title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(4,1,4)
-        plot(hist.time/hr,hist.Gx(:,2)./hist.rho(:,2)*hr*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
-        title('$\Gamma_x/\bar{\rho}$ [wt\%/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        xlabel('Time [hr]',TX{:},FS{:});
+        plot(hist.time/yr,hist.Gx(:,2)./hist.rho(:,2)*yr*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:}); axis xy tight; box on; hold on;
+        title('$\Gamma_x/\bar{\rho}$ [wt\%/yr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        xlabel('Time [yr]',TX{:},FS{:});
         
         fh3 = figure(3); clf;
         subplot(3,1,1)
-        for i =1:cal.nc; plot(hist.time/hr,hist.oxd (i,:,2),LW{:});  axis xy tight; box on; hold on; end
+        for i =1:cal.nc; plot(hist.time/yr,hist.oxd (i,:,2),LW{:});  axis xy tight; box on; hold on; end
         title('$\bar{c}_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(3,1,2)
-        for i =1:cal.nc; plot(hist.time/hr,hist.oxdx(i,:,2),LW{:});  axis xy tight; box on; hold on; end
+        for i =1:cal.nc; plot(hist.time/yr,hist.oxdx(i,:,2),LW{:});  axis xy tight; box on; hold on; end
         title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         legend(cal.oxdStr,TX{:},FS{:},'location','best');
         subplot(3,1,3)
-        for i =1:cal.nc; plot(hist.time/hr,hist.oxdm(i,:,2),LW{:});  axis xy tight; box on; hold on; end
+        for i =1:cal.nc; plot(hist.time/yr,hist.oxdm(i,:,2),LW{:});  axis xy tight; box on; hold on; end
         title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        xlabel('Time [hr]',TX{:},FS{:});
+        xlabel('Time [yr]',TX{:},FS{:});
         
     elseif Nx <= 10  % create 1D plots
         
@@ -73,7 +73,7 @@ if plot_op
         subplot(1,5,4)
         for i =1:cal.nc; plot(cx(i,2:end-1,2:end-1)*100,Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
         title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        legend(cal.CompStr,TX{:},FS{:},'location','best');
+        legend(cal.CompStr,TX{:},FS{:},'location','west');
         subplot(1,5,5)
         for i =1:cal.nc; plot(cm(i,2:end-1,2:end-1)*100,Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
         title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -89,8 +89,8 @@ if plot_op
         semilogx(eta(2:end-1,2:end-1),Z(2:end-1).'./1e3,CL{[1,2]},LW{:});
         title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,3)
-        plot(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*hr*100.*(chi(2:end-1,2:end-1)>1e-9),Z(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-        title('$\Gamma_x/\bar{\rho}$ [wt/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        plot(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9),Z(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+        title('$\Gamma_x/\bar{\rho}$ [wt/yr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
         subplot(1,5,4)
         plot(-W(:,2:end-1)*hr,Zfc.',CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
         plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zfc.',CL{[1,4]},LW{:});
@@ -107,7 +107,7 @@ if plot_op
         subplot(1,3,2)
         for i =1:cal.nc; plot(oxdx(i,2:end-1,2:end-1),Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
         title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-        legend(cal.oxdStr,TX{:},FS{:},'location','best');
+        legend(cal.oxdStr,TX{:},FS{:},'location','west');
         subplot(1,3,3)
         for i =1:cal.nc; plot(oxdm(i,2:end-1,2:end-1),Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
         title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -229,7 +229,7 @@ if plot_op
     
     % plot velocity-pressure solution in Fig. 1
     figure(1);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     axes(ax(11));
     imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,-W(:      ,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$W$ [m/hr]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});  set(gca,'XTickLabel',[]);
@@ -245,7 +245,7 @@ if plot_op
     
     % plot pseudo-component composition in Fig. 2
     figure(2);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     axes(ax(21));
     imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,squeeze(c(1,2:end-1,2:end-1))*100); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.CompStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
@@ -267,7 +267,7 @@ if plot_op
 
     % plot major oxide composition in Fig. 2
     figure(3);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     axes(ax(31));
     imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,squeeze(oxd(1,2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.oxdStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
@@ -289,13 +289,13 @@ if plot_op
     
     % plot phase fractions and reaction rates in Fig. 3
     figure(4);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     axes(ax(41));
     imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,chi(2:end-1,2:end-1).*100.*(chi(2:end-1,2:end-1)>1e-9) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
     axes(ax(42));
-    imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*hr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/hr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/yr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     axes(ax(43));
     imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,      rho(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
@@ -311,7 +311,7 @@ if plot_op
     
     % plot geochemical variables in Fig. 5
     figure(5);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     axes(ax(51));
     imagesc(X(2:end-1)./1e3,Z(2:end-1)./1e3,it(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['incomp. trace'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
@@ -352,27 +352,27 @@ if plot_op
     if plot_cv
         figure(8); clf;
         subplot(3,1,1);
-        plot(hist.time/hr,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
+        plot(hist.time/yr,hist.DM./hist.sumM,'k-',LW{:}); hold on; axis tight; box on;
         ylabel('consv. $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
         subplot(3,1,2);
-        plot(hist.time/hr,hist.DH./hist.sumH,'k-',LW{:}); hold on; axis tight; box on;
-        ylabel('consv. $H$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+        plot(hist.time/yr,hist.DS./hist.sumS,'k-',LW{:}); hold on; axis tight; box on;
+        ylabel('consv. $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
         subplot(3,1,3);
-        plot(hist.time/hr,hist.DC./hist.sumC,'-',LW{:}); hold on; axis tight; box on;
-        ylabel('consv. $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        xlabel('Time [hr]',TX{:},FS{:});
+        plot(hist.time/yr,hist.DC./hist.sumC,'-',LW{:}); hold on; axis tight; box on;
+        ylabel('consv. $C$',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        xlabel('Time [yr]',TX{:},FS{:});
         
         figure(9); clf;
         subplot(3,1,1);
-        plot(hist.time/hr,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
+        plot(hist.time/yr,hist.EM,'k-',LW{:}); hold on; axis tight; box on;
         ylabel('error $M$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
         subplot(3,1,2);
-        plot(hist.time/hr,hist.EH,'k-',LW{:}); hold on; axis tight; box on;
-        ylabel('error $H$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
+        plot(hist.time/yr,hist.ES,'k-',LW{:}); hold on; axis tight; box on;
+        ylabel('error $S$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
         subplot(3,1,3);
-        plot(hist.time/hr,hist.EC,'-',LW{:}); hold on; axis tight; box on;
-        ylabel('error $C$',TX{:},FS{:}); set(gca,TL{:},TS{:},'XTickLabel',[]);
-        xlabel('Time [hr]',TX{:},FS{:});
+        plot(hist.time/yr,hist.EC,'-',LW{:}); hold on; axis tight; box on;
+        ylabel('error $C$',TX{:},FS{:}); set(gca,TL{:},TS{:});
+        xlabel('Time [yr]',TX{:},FS{:});
     end
     
     drawnow
