@@ -19,40 +19,40 @@
 
 % modified and optimised by Tobias Keller, 10. June, 2022
 
-function   [eta] = grdmodel08(wtm,TC)
+function   [eta] = grdmodel08(wt,TC)
 
 AT  =  -4.55;
 bb  =  [159.56  -173.34 72.13 75.69 -38.98 -84.08 141.54 -2.43 -0.91 17.62];
 cc  =  [2.75 15.72 8.32 10.2 -12.29 -99.54 0.3 ];
 
 % Function molefrac_grd: converts wt % oxide basis to mole % oxide basis
-[~,xmf_t]  =  molefrac(wtm);
+[~,mol]  =  molefrac(wt);
 
 % Load composition-basis matrix for multiplication against model-coefficients
 % Result is two matrices bcf[nx by 10] and ccf[nx by 7]
-siti  =  xmf_t(:,1) + xmf_t(:,2);
-tial  =  xmf_t(:,2)+xmf_t(:,3);
-fmm   =  xmf_t(:,4) + xmf_t(:,5) + xmf_t(:,6);
-nak   =  xmf_t(:,8) + xmf_t(:,9);
+siti  =  mol(:,1) + mol(:,2);
+tial  =  mol(:,2)+mol(:,3);
+fmm   =  mol(:,4) + mol(:,5) + mol(:,6);
+nak   =  mol(:,8) + mol(:,9);
 b1    =  siti;
-b2    =  xmf_t(:,3);
-b3    =  xmf_t(:,4) + xmf_t(:,5) + xmf_t(:,10);
-b4    =  xmf_t(:,6);
-b5    =  xmf_t(:,7);
-b6    =  xmf_t(:,8) + xmf_t(:,11) + xmf_t(:,12);
-b7    =  xmf_t(:,11) + xmf_t(:,12) + log(1+xmf_t(:,11));
+b2    =  mol(:,3);
+b3    =  mol(:,4) + mol(:,5) + mol(:,10);
+b4    =  mol(:,6);
+b5    =  mol(:,7);
+b6    =  mol(:,8) + mol(:,11) + mol(:,12);
+b7    =  mol(:,11) + mol(:,12) + log(1+mol(:,11));
 b12   =  siti.*fmm;
-b13   =  (siti + xmf_t(:,3) + xmf_t(:,10)).*( nak + xmf_t(:,11) );
-b14   =  xmf_t(:,3).*nak;
+b13   =  (siti + mol(:,3) + mol(:,10)).*( nak + mol(:,11) );
+b14   =  mol(:,3).*nak;
 
-c1    =  xmf_t(:,1);
+c1    =  mol(:,1);
 c2    =  tial;
 c3    =  fmm;
-c4    =  xmf_t(:,7);
+c4    =  mol(:,7);
 c5    =  nak;
-c6    =  log(1+xmf_t(:,11) + xmf_t(:,12));
-c11   =  xmf_t(:,3) + fmm + xmf_t(:,7) - xmf_t(:,10);
-c11   =  c11.*(nak + xmf_t(:,11) + xmf_t(:,12));
+c6    =  log(1+mol(:,11) + mol(:,12));
+c11   =  mol(:,3) + fmm + mol(:,7) - mol(:,10);
+c11   =  c11.*(nak + mol(:,11) + mol(:,12));
 bcf   =  [b1 b2 b3 b4 b5 b6 b7 b12 b13 b14];
 ccf   =  [c1 c2 c3 c4 c5 c6 c11];
 
@@ -60,5 +60,5 @@ BT    =  sum(bb.*bcf,2);
 CT    =  sum(cc.*ccf,2);
 
 TK    =  TC + 273.15;
-eta   =  exp(min(40,max(-5,AT + BT./(TK(:)-CT))));
+eta   =  10.^(min(18,max(-6,AT + BT./(TK(:)-CT))));
 

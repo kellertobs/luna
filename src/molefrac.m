@@ -14,5 +14,5 @@ mw  = [ 60.0843, 79.8658, 101.961276, 71.8444, 70.937449,40.3044,56.0774, 61.978
 % note all data are normalized on anhydrous components first
 wtn = [wt(:,1:10).*(100-wt(:,11))./(sum(wt(:,1:10),2)+wt(:,12)) wt(:,11) 0.5.*wt(:,12).*(100-wt(:,11))./(sum(wt(:,1:10),2)+wt(:,12))];
 mp  = wtn./mw;
-mf = 100.*(mp./sum(mp,2));
+mf  = 100.*(mp./sum(mp,2));
 
