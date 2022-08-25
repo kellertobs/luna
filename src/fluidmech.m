@@ -295,7 +295,7 @@ SS = SC*(LL\RR);  % update solution
 W  = full(reshape(SS(MapW(:))        ,(Nz-1), Nx   ));                     % z-velocity
 U  = full(reshape(SS(MapU(:))        , Nz   ,(Nx-1)));                     % x-velocity
 P  = full(reshape(SS(MapP(:)+(NW+NU)), Nz   , Nx   ));                     % dynamic pressure
-Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
+% Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
 
 % diffusive phase flux
 qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2./((rho(1:end-1,:)+rho(2:end,:))/2) .* ddz(x,h);
