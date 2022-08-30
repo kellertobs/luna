@@ -296,16 +296,12 @@ W  = full(reshape(SS(MapW(:))        ,(Nz-1), Nx   ));                     % z-v
 U  = full(reshape(SS(MapU(:))        , Nz   ,(Nx-1)));                     % x-velocity
 P  = full(reshape(SS(MapP(:)+(NW+NU)), Nz   , Nx   ));                     % dynamic pressure
 % Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
-
-% diffusive phase flux
-qz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2./((rho(1:end-1,:)+rho(2:end,:))/2) .* ddz(x,h);
-qx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2./((rho(:,1:end-1)+rho(:,2:end))/2) .* ddx(x,h);
                           
 % update phase velocities
-Wx   = W + wx + qz;                                                        % xtl z-velocity
-Ux   = U + 0. + qx;                                                        % xtl x-velocity
-Wm   = W + wm - qz;                                                        % mlt z-velocity
-Um   = U + 0. - qx;                                                        % mlt x-velocity
+Wx   = W + wx;                                                             % xtl z-velocity
+Ux   = U + 0.;                                                             % xtl x-velocity
+Wm   = W + wm;                                                             % mlt z-velocity
+Um   = U + 0.;                                                             % mlt x-velocity
 
 Wbar = (m(1:end-1,:)+m(2:end,:))/2 .* Wm ...
      + (x(1:end-1,:)+x(2:end,:))/2 .* Wx;
@@ -314,6 +310,6 @@ Ubar = (m(:,1:end-1)+m(:,2:end))/2 .* Um ...
 
  
 %% update time step
-dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc./rho(:)]))/2;                    % diffusive time step size
-dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16)))); % advective time step size
+dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc./rho(:)]))/2;      % diffusive time step size
+dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16))));         % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size

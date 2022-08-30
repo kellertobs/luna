@@ -104,10 +104,9 @@ rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
-etareg   =  1e13;                % bounds on viscosity resisting convection for regularisation/stabilisation
-sgrreg   =  1e0;                 % bounds on viscosity resisting convection for regularisation/stabilisation
-kcreg    =  1e6;                 % chemical diffusivity for regularisation [kg/m/s]
-kTreg    =  1e6;                 % thermal conductivity for regularisation [W/m/K]
+etareg   =  1e12;                % regularisation factor for viscosity resisting convection
+sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
+dffreg   =  1e6;                 % regularisation factor for thermal, chemical, phase diffusion
 
 % create output directory
 if ~isfolder([opdir,'/',runID])
