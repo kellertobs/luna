@@ -39,14 +39,14 @@ if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = 1e18; end
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
-wtm(:,1) = reshape(oxd(1,:,:),Nz*Nx,1); % SiO2
-wtm(:,3) = reshape(oxd(2,:,:),Nz*Nx,1); % Al2O3
-wtm(:,4) = reshape(oxd(3,:,:),Nz*Nx,1); % FeO
-wtm(:,6) = reshape(oxd(4,:,:),Nz*Nx,1); % MgO
-wtm(:,7) = reshape(oxd(5,:,:),Nz*Nx,1); % CaO
-wtm(:,8) = reshape(oxd(6,:,:),Nz*Nx,1); % Na2O
+wtm(:,1) = reshape(oxdm(1,:,:),Nz*Nx,1); % SiO2
+wtm(:,3) = reshape(oxdm(2,:,:),Nz*Nx,1); % Al2O3
+wtm(:,4) = reshape(oxdm(3,:,:),Nz*Nx,1); % FeO
+wtm(:,6) = reshape(oxdm(4,:,:),Nz*Nx,1); % MgO
+wtm(:,7) = reshape(oxdm(5,:,:),Nz*Nx,1); % CaO
+wtm(:,8) = reshape(oxdm(6,:,:),Nz*Nx,1); % Na2O
 etam  = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
-etax  = etax0.* ones(size(x));                                             % constant crysta viscosity
+etax  = etax0.* ones(size(x));                                             % constant crystal viscosity
 
 % get permission weights
 kv = permute(cat(3,etax,etam),[3,1,2]);
