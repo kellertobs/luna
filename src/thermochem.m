@@ -9,8 +9,8 @@ if entr_mth  % use entropy equation to evolve heat
     advn_S = - advection(rho.*m.*sm,Um,Wm,h,ADVN,'flx') ...                % heat advection
              - advection(rho.*x.*sx,Ux,Wx,h,ADVN,'flx');
     
-    qTz    = - (kT(1:end-1,:)+kT(2:end,:))/2 .* ddz(T,h);                  % heat diffusion z-flux
-    qTx    = - (kT(:,1:end-1)+kT(:,2:end))/2 .* ddx(T,h);                  % heat diffusion x-flux
+    qTz    = - (ks(1:end-1,:)+ks(2:end,:))/2 .* ddz(T,h);                  % heat diffusion z-flux
+    qTx    = - (ks(:,1:end-1)+ks(:,2:end))/2 .* ddx(T,h);                  % heat diffusion x-flux
     diff_T(2:end-1,2:end-1) = (- ddz(qTz(:,2:end-1),h)  ...                % heat diffusion
                                - ddx(qTx(2:end-1,:),h));
     
