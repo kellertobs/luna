@@ -21,11 +21,11 @@ N        =  1 + 2;               % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  250;                 % number of time steps to take
+M        =  1e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  8*yr;                % end time for simulation [s]
-dt       =  1e4;                 % initial time step [s]
+dt       =  0.016*yr;            % initial time step [s]
 dtmax    =  1e6;                 % maximum time step [s]
 
 % set initial thermo-chemical state
@@ -97,9 +97,8 @@ dx       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.1;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
@@ -108,16 +107,8 @@ etareg   =  1e0;                 % regularisation factor for viscosity resisting
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
 dffreg   =  1e0;                 % regularisation factor for thermal, chemical, phase diffusion
 
-% create output directory
-if ~isfolder([opdir,'/',runID])
-    mkdir([opdir,'/',runID]);
-end
 
-% save input parameters and runtime options (unless restarting)
-if restart == 0 
-    parfile = [opdir,'/',runID,'/',runID,'_par'];
-    save(parfile);
-end
-
-% run code
+%*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
+%**************************************************************************
+

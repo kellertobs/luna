@@ -3,7 +3,7 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '2D_luna_ref';       % run identifier
+runID    =  '2D_luna_ref_reg13';       % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -99,25 +99,16 @@ g0       =  1.62;                % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-theta    =  0.5;                 % time-stepping parameter (1 = 1st-order implicit; 1/2 = 2nd-order semi-implicit)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e12;                % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  1e6;                 % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  sqrt(etareg);        % regularisation factor for thermal, chemical, phase diffusion
 
-% create output directory
-if ~isfolder([opdir,'/',runID])
-    mkdir([opdir,'/',runID]);
-end
 
-% save input parameters and runtime options (unless restarting)
-if restart == 0 
-    parfile = [opdir,'/',runID,'/',runID,'_par'];
-    save(parfile);
-end
-
-% run code
+%*****  RUN NAKHLA MODEL  *************************************************
 run('../src/main')
+%**************************************************************************
+

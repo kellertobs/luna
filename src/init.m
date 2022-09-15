@@ -1,7 +1,25 @@
-load ocean;  % load custom colormap
+% create output directory
+if ~isfolder([opdir,'/',runID])
+    mkdir([opdir,'/',runID]);
+end
+
+% save input parameters and runtime options (unless restarting)
+if restart == 0 
+    parfile = [opdir,'/',runID,'/',runID,'_par'];
+    save(parfile);
+end
+
+fprintf('\n\n')
+fprintf('*************************************************************\n');
+fprintf('*****  RUN LUNA MODEL | %s  ***************\n',datetime('now'));
+fprintf('*************************************************************\n');
+fprintf('\n   run ID: %s \n\n',runID);
+
+load ocean;                  % load custom colormap
+run(['../cal/cal_',calID]);  % load melt model calibration
 
 % minimum cutoff phase, component fractions
-TINY     =  1e-16;               
+TINY     =  1e-16;                
 
 % get coordinate arrays
 X         = -h/2:h:L+h/2;
@@ -88,7 +106,6 @@ P   =  zeros(size(XX));  Pi = P;  res_P = 0.*P;  meanQ = 0;
 SS  = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
-Wf  = W;  Uf  = U; 
 Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
@@ -200,24 +217,19 @@ if restart
     elseif restart > 0  % restart from specified continuation frame
         name = [opdir,'/',runID,'/',runID,'_',num2str(restart)];
     end
-    load(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dTdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
-    
-    xq = x; 
-    SS = [W(:);U(:);P(:)];
-    dcy_rip = rho.*rip./HLRIP.*log(2);
-    dcy_rid = rho.*rid./HLRID.*log(2);
-    Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
-    update; output;
-    time  = time+dt;
-    step  = step+1;
-else
-    % update coefficients and run initial fluidmech solve
-    if ~bnchm
-        update; 
-        fluidmech; 
-        history; 
-        output;
+    if exist(name,'file')
+        fprintf('\n   restart from %s \n\n',name);
+        load(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dTdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
+
+        xq = x;
+        SOL = [W(:);U(:);P(:)];
+        dcy_rip = rho.*rip./HLRIP.*log(2);
+        dcy_rid = rho.*rid./HLRID.*log(2);
+        Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
+        update; output;
+        time  = time+dt;
+        step  = step+1;
+    else % continuation file does not exist, start from scratch
+        fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
     end
-    time  = time+dt;
-    step  = step+1;
 end
