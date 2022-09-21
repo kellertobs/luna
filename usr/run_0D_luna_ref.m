@@ -6,7 +6,7 @@ addpath('../src');
 runID    =  '0D_luna_ref';       % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  50;                  % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -72,7 +72,7 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
 cP       =  1300;                % heat capacity [J/kg/K]
-kc0      =  1e-4;                % chemical diffusivity [kg/m/s]
+kc0      =  4e-4;                % chemical diffusivity [kg/m/s]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 
 % set phase diagram parameters
@@ -97,7 +97,7 @@ dx       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance

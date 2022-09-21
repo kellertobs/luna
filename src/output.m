@@ -78,17 +78,17 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,2)
     plot(mu (2:end-1,2:end-1)*100.*(mu (2:end-1,2:end-1)>1e-9),Z(2:end-1).'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
     plot(chi(2:end-1,2:end-1)*100.*(chi(2:end-1,2:end-1)>1e-9),Z(2:end-1).'./1e3,CL{[1,4]},LW{:});
-    title(['$\mu$, $\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title(['$\mu$, $\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,3)
     for i =1:cal.nc; plot(c(i,2:end-1,2:end-1)*100,Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
-    title('$\bar{c}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$\bar{c}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,4)
     for i =1:cal.nc; plot(cx(i,2:end-1,2:end-1)*100,Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
-    title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     legend(cal.CompStr,TX{:},FS{:},'location','west');
     subplot(1,5,5)
     for i =1:cal.nc; plot(cm(i,2:end-1,2:end-1)*100,Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
-    title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh2); clf;
@@ -101,18 +101,18 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,2)
     semilogx(min(eta(2:end-1,2:end-1),etam(2:end-1,2:end-1)),Z(2:end-1).'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
     semilogx(eta(2:end-1,2:end-1),Z(2:end-1).'./1e3,CL{[1,2]},LW{:});
-    title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,3)
     plot(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9),Z(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
-    title('$\Gamma_x/\bar{\rho}$ [wt/yr]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$\Gamma_x/\bar{\rho}$ [wt/yr]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,4)
-    plot(-W(:,2:end-1)*hr,Zfc.',CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zfc.',CL{[1,4]},LW{:});
-    plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zfc.',CL{[1,3]},LW{:});
-    title('$W$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    plot(-W(:,2:end-1)*hr,Zfc.'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
+    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zfc.'./1e3,CL{[1,4]},LW{:});
+    plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zfc.'./1e3,CL{[1,3]},LW{:});
+    title('$W$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,5)
     plot(P(2:end-1,2:end-1)/1e3,Z(2:end-1).'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;
-    title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
@@ -122,11 +122,11 @@ elseif Nx <= 10  % create 1D plots
     title('$\bar{c}_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,3,2)
     for i =1:cal.nc; plot(oxdx(i,2:end-1,2:end-1),Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
-    title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     legend(cal.oxdStr,TX{:},FS{:},'location','west');
     subplot(1,3,3)
     for i =1:cal.nc; plot(oxdm(i,2:end-1,2:end-1),Z(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on; end
-    title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
 
     if ~exist('fh4','var'); fh4 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh4); clf;
@@ -140,20 +140,20 @@ elseif Nx <= 10  % create 1D plots
     semilogx(max(1e-3,min(1e3,ctx(2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     semilogx(max(1e-3,min(1e3,ctm(2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,3]},LW{:});
     semilogx(max(1e-3,min(1e3,ct (2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,2]},LW{:});
-    title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('comp. trace',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,3)
     plot(si(2:end-1,2:end-1),Z(2:end-1).'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;
-    title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title('stable isotope',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,4)
     semilogx(max(1e-3,min(1e3,ripx(2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     semilogx(max(1e-3,min(1e3,ripm(2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,3]},LW{:});
     semilogx(max(1e-3,min(1e3,rip (2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,2]},LW{:});
-    title(['radiogenic parent'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title(['radiogenic parent'],TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,5)
     semilogx(max(1e-3,min(1e3,ridx(2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     semilogx(max(1e-3,min(1e3,ridm(2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,3]},LW{:});
     semilogx(max(1e-3,min(1e3,rid (2:end-1,2:end-1)))*100,Z(2:end-1).'./1e3,CL{[1,2]},LW{:});
-    title(['radiogenic daughter'],TX{:},FS{:}); set(gca,TL{:},TS{:});
+    title(['radiogenic daughter'],TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
 
 else % create 2D plots
 

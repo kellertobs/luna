@@ -213,9 +213,9 @@ dsumCdt = zeros(1,cal.nc);
 % overwrite fields from file if restarting run
 if restart
     if     restart < 0  % restart from last continuation frame
-        name = [opdir,'/',runID,'/',runID,'_cont'];
+        name = [opdir,'/',runID,'/',runID,'_cont.mat'];
     elseif restart > 0  % restart from specified continuation frame
-        name = [opdir,'/',runID,'/',runID,'_',num2str(restart)];
+        name = [opdir,'/',runID,'/',runID,'_',num2str(restart),'.mat'];
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
@@ -232,4 +232,11 @@ if restart
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
     end
+else
+    % complete, plot, and save initial condition
+    update;
+    fluidmech;
+    history;
+    output;
+    step = step+1;
 end

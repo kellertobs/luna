@@ -3,10 +3,10 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '2D_luna_ref_reg13';       % run identifier
+runID    =  '2D_luna_ref';       % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -21,7 +21,7 @@ N        =  200 + 2;             % number of grid points in z-direction (incl. 2
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  1e5;                 % number of time steps to take
+M        =  1e6;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1e3*yr;              % end time for simulation [s]
@@ -39,7 +39,7 @@ T1       =  1700;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
-dc       =  [1,-1,1,-1,1,-1].*1e-4; % amplitude of random noise [wt SiO2]
+dc       =  [1,-1,1,-1,1,-1].*1e-3; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
 it0      =  1;                   % incompatible tracer top layer [wt ppm]
@@ -72,7 +72,7 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
 cP       =  1300;                % heat capacity [J/kg/K]
-kc0      =  1e-4;                % chemical diffusivity [kg/m/s]
+kc0      =  4e-4;                % chemical diffusivity [kg/m/s]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 
 % set phase diagram parameters
@@ -97,13 +97,13 @@ dx       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 alpha    =  0.5;                 % iterative lag parameter equilibration
-etareg   =  1e12;                % regularisation factor for viscosity resisting convection
+etareg   =  1e13;                % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
 dffreg   =  sqrt(etareg);        % regularisation factor for thermal, chemical, phase diffusion
 
