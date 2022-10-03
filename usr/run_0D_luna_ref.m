@@ -72,12 +72,8 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
 cP       =  1300;                % heat capacity [J/kg/K]
-kc0      =  4e-4;                % chemical diffusivity [kg/m/s]
 kT0      =  4;                   % thermal conductivity [W/m/K]
-
-% set phase diagram parameters
-calID    = 'luna6';
-tau_r    =  60;                  % reaction time [s]
+calID    = 'luna6';              % calibration ID
 Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
@@ -102,10 +98,10 @@ ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-alpha    =  0.5;                 % iterative lag parameter equilibration
+lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e0;                 % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  1e0;                 % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  etareg^0.5;          % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

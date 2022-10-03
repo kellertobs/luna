@@ -30,10 +30,11 @@ rho(:,[1 end]) = rho(:,[2 end-1]);
 chi   = x.*rho./rhox;
 mu    = m.*rho./rhom;
 
-% update thermal properties
-kT    = kT0 .* dffreg;
-ks    = kT0 .* dffreg ./ T;
-kc    = kc0 .* dffreg;
+% diffusion parameters
+kT = kT0 * dffreg;
+ks = kT./T;
+kc = kT./cP./10.*mu.^0.5;
+kx = kT./cP./10.*mu.^0.5.*x;
 
 % determine adaptive max viscosity / min segregation coefficient
 if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = 1e18; end
@@ -74,6 +75,7 @@ Csgr = ((1-ff)./[dx;dx].^2.*(sgrreg.*kv.*thtv)).^-1 + 1e-18;
 
 Csgr_x = squeeze(Csgr(1,:,:));  Csgr_x([1 end],:) = Csgr_x([2 end-1],:);  Csgr_x(:,[1 end]) = Csgr_x(:,[2 end-1]);
 Csgr_m = squeeze(Csgr(2,:,:));  Csgr_m([1 end],:) = Csgr_m([2 end-1],:);  Csgr_m(:,[1 end]) = Csgr_m(:,[2 end-1]);
+Csgr_m = Csgr_m.*max(TINY,chi).^2; % dampen melt segregation at low crystallinity
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -91,8 +93,8 @@ ezz(:,[1 end]) = ezz(:,[2 end-1]);
 exz            = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                     % shear strain rate
 
 % update stresses
-txx = eta .* exx;                                                        % x-normal stress
-tzz = eta .* ezz;                                                        % z-normal stress
+txx = eta .* exx;                                                          % x-normal stress
+tzz = eta .* ezz;                                                          % z-normal stress
 txz = etaco .* exz;                                                        % xz-shear stress
 
 % update tensor magnitudes
@@ -107,12 +109,16 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_x(1:end-1,:),Csgr_x(2:end,:)); % crystal segregation speed
+wx = (rhox-rho).*g0.*Csgr_x;
+wx = sign((wx(1:end-1,:)+wx(2:end,:))/2).*min(abs(wx(1:end-1,:)),abs(wx(2:end,:)));
+% wx = (((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % crystal segregation speed
 wx(1  ,:)     = 0;
 wx(end,:)     = 0;
 wx(:,[1 end]) = wx(:,[2 end-1]);
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_m(1:end-1,:),Csgr_m(2:end,:)).*((chi(1:end-1,:)+chi(2:end,:))./2).^2; % melt segregation speed
+wm = (rhom-rho).*g0.*Csgr_m;
+wm = sign((wm(1:end-1,:)+wm(2:end,:))/2).*min(abs(wm(1:end-1,:)),abs(wm(2:end,:)));
+% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = 0;
 wm(end,:)     = 0;
 wm(:,[1 end]) = wm(:,[2 end-1]);

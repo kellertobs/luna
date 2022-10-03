@@ -23,7 +23,7 @@ if entr_mth  % use entropy equation to evolve heat
     
     dSdt = advn_S + diff_T + diss_h + bndS;                                % total rate of change
     
-    S = So + (THETA.*dSdt + (1-THETA).*dSdto).*dt;                         % explicit update of entropy
+    S = So + (theta.*dSdt + (1-theta).*dSdto).*dt;                         % explicit update of entropy
     S([1 end],:) = S([2 end-1],:);                                         % apply zero flux boundary conditions
     S(:,[1 end]) = S(:,[2 end-1]);
 
@@ -54,7 +54,7 @@ else  % use temperature equation to evolve heat
     
     dTdt = advn_T + diff_T + adbt_h + latn_h + diss_h + bndT;              % total rate of change
     
-    T = To + (THETA.*dTdt + (1-THETA).*dTdto).*dt;                         % explicit update of temperature
+    T = To + (theta.*dTdt + (1-theta).*dTdto).*dt;                         % explicit update of temperature
     T([1 end],:) = T([2 end-1],:);                                         % apply zero-flux boundary conditions
     T(:,[1 end]) = T(:,[2 end-1]);
 
@@ -68,14 +68,14 @@ for i = 2:cal.nc
     advn_C = advection(rho.*m.*squeeze(cm(i,:,:)),Um,Wm,h,ADVN,'flx') ...
            + advection(rho.*x.*squeeze(cx(i,:,:)),Ux,Wx,h,ADVN,'flx');
     
-    qcz   = - kc.*(m(1:end-1,:)+m(2:end,:))/2 .* ddz(squeeze(c(i,:,:)),h); % major component diffusion z-flux
-    qcx   = - kc.*(m(:,1:end-1)+m(:,2:end))/2 .* ddx(squeeze(c(i,:,:)),h); % major component diffusion x-flux
+    qcz   = - (kc(1:end-1,:)+kc(2:end,:))/2 .* ddz(squeeze(c(i,:,:)),h);   % major component diffusion z-flux
+    qcx   = - (kc(:,1:end-1)+kc(:,2:end))/2 .* ddx(squeeze(c(i,:,:)),h);   % major component diffusion x-flux
     diff_c(2:end-1,2:end-1) = - ddz(qcz(:,2:end-1),h) ...                  % major component diffusion
                               - ddx(qcx(2:end-1,:),h);
     
     dCdt(i,:,:) = - advn_C + diff_c;                                       % total rate of change
     
-    C(i,:,:) = Co(i,:,:) + (THETA.*dCdt(i,:,:) + (1-THETA).*dCdto(i,:,:)).*dt;  % explicit update of major component density
+    C(i,:,:) = Co(i,:,:) + (theta.*dCdt(i,:,:) + (1-theta).*dCdto(i,:,:)).*dt;  % explicit update of major component density
     C(i,:,:) = max(TINY,min(rho-TINY,squeeze(C(i,:,:))));
     C(i,[1 end],:) = C(i,[2 end-1],:);                                     % apply boundary conditions
     C(i,:,[1 end]) = C(i,:,[2 end-1]);
@@ -102,7 +102,7 @@ var.f = 1-xq(:);      % in wt
 
 [phs,cal]  =  meltmodel(var,cal,'E'); % cs and cl component prop in each phase VS T
 
-mq = reshape(phs.f ,Nz,Nx);
+mq = max(TINY,min(1-TINY,reshape(phs.f ,Nz,Nx)));
 xq = 1-mq;
 for i = 2:cal.nc
     cxq(i,:,:) = reshape(phs.cs(:,i),Nz,Nx);
@@ -114,22 +114,29 @@ cmq(1,:,:) = 1 - squeeze(sum(cmq(2:end,:,:)));
 cxq(1,:,:) = 1 - squeeze(sum(cxq(2:end,:,:)));
 
 % update crystal fraction
-if diseq  % disequilibrium approach
+if diseq  % quasi-equilibrium approach
     
-    Gx = ALPHA.*Gx + (1-ALPHA) .* (xq-x).*rho./max(5.*dt,tau_r);
+    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(4*dt);
+        
+    advn_X = - advection(rho.*x,Ux,Wx,h,ADVN,'flx');
+
+    qxz   = - (kx(1:end-1,:)+kx(2:end,:))/2 .* ddz(x,h);                   % crystal fraction diffusion z-flux
+    qxx   = - (kx(:,1:end-1)+kx(:,2:end))/2 .* ddx(x,h);                   % crystal fraction diffusion x-flux
+    diff_x(2:end-1,2:end-1) = - ddz(qxz(:,2:end-1),h) ...                  % crystal fraction diffusion
+                              - ddx(qxx(2:end-1,:),h);
+
+    dXdt   = advn_X + diff_x + Gx;                                         % total rate of change
     
-    advn_x = advection(rho.*x,Ux,Wx,h,ADVN,'flx');                         % get advection term
+    X = Xo + (theta.*dXdt + (1-theta).*dXdto).*dt;                         % explicit update of crystal fraction
+    X = min(rho.*(1-TINY),max(rho.*TINY,X));                               % enforce [0,1] limit
+    X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
+    X(:,[1 end]) = X(:,[2 end-1]);
     
-    dxdt   = - advn_x + Gx;                                                % total rate of change
-    
-    x = (rhoo.*xo + (THETA.*dxdt + (1-THETA).*dxdto).*dt)./rho;            % explicit update of crystal fraction
-    x = min(1-TINY,max(TINY,x));                                         % enforce [0,1] limit
-    x([1 end],:) = x([2 end-1],:);                                         % apply boundary conditions
-    x(:,[1 end]) = x(:,[2 end-1]);
+    x  = X./rho;
     
 else  % equilibrium approach
     
-    x  =  ALPHA.*x + (1-ALPHA).*xq;
+    x  =  lambda.*x + (1-lambda).*xq;
     Gx = (rho.*x-rhoo.*xo)./dt + advection(rho.*x,Ux,Wx,h,ADVN,'flx');     % reconstruct crystallisation rate
     
 end

@@ -17,21 +17,79 @@ fprintf('\n   run ID: %s \n\n',runID);
 
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
+calibrt =  0;                % not in calibrate mode
+TINY    =  1e-12;            % minimum cutoff phase, component fractions
 
-% minimum cutoff phase, component fractions
-TINY     =  1e-16;                
+% calculate dimensionless numbers characterising the system dynamics
+var0.c = c0;          % in wt
+var0.T = T0;          % convert to C
+var0.P = Ptop/1e9;    % convert to GPa
+var0.f = 1;           % in wt
+
+[phs0,cal0]  =  meltmodel(var0,cal,'E');
+
+m0  = phs0.f; x0 = 1-m0;
+cm0 = phs0.cl;
+
+% update phase oxide compositions
+oxdm0 = cm0*cal.oxds;
+
+wtm([1 3 4 6 7 8 11 12]) = [oxdm0,0,0]; % SiO2
+eta0 = grdmodel08(wtm,T0);
+rho0 = sum(cm0./rhom0).^-1;
+
+DrhoT = aT*rho0*abs(Ttop-Tbot);
+Drhoc = 0.1*max(abs(rhom0-rho0)); 
+Drhox = 0.1*mean(abs(rhox0-rhom0));
+Drho0 = DrhoT + Drhoc + Drhox;
+
+uT    = DrhoT*g0*(D/10)^2/eta0/etareg;
+uc    = Drhoc*g0*(D/10)^2/eta0/etareg;
+ux    = Drhox*g0*(D/10)^2/eta0/etareg;
+u0    = Drho0*g0*(D/10)^2/eta0/etareg;
+
+wx0   = mean(abs(rhox0-rhom0))*g0*dx^2/eta0;
+
+ud0   = kT0*dffreg/rho0/cP/(D/10);
+
+uwT   = dw/tau_T; 
+
+RaT   = uT/ud0;
+Rac   = uc/ud0;
+Rax   = ux/ud0;
+Ra    = u0/ud0;
+
+Rux   = wx0/u0;
+
+RwT   = uwT/u0;
+
+Re    = u0*rho0*(D/10)/eta0/etareg;
+Rex   = wx0*rho0*dx/eta0;
+
+fprintf('    crystal Re: %1.3e \n'  ,Rex);
+fprintf('     system Re: %1.3e \n\n',Re );
+
+fprintf('    thermal Ra: %1.3e \n'  ,RaT);
+fprintf('   chemical Ra: %1.3e \n'  ,Rac);
+fprintf('    crystal Ra: %1.3e \n'  ,Rax);
+fprintf('   combined Ra: %1.3e \n\n',Ra );
+
+fprintf('    crystal Ru: %1.3e \n\n',Rux);
+
+fprintf('    thermal Rw: %1.3e \n\n',RwT);
+
 
 % get coordinate arrays
-X         = -h/2:h:L+h/2;
-Z         = -h/2:h:D+h/2;
-[XX,ZZ]   = meshgrid(X,Z);
-Xfc       = (X(1:end-1)+X(2:end))./2;
-Zfc       = (Z(1:end-1)+Z(2:end))./2;
-[XXu,ZZu] = meshgrid(Xfc,Z);
-[XXw,ZZw] = meshgrid(X,Zfc);
+Xc        = -h/2:h:L+h/2;
+Zc        = -h/2:h:D+h/2;
+[XX,ZZ]   = meshgrid(Xc,Zc);
+Xf        = (Xc(1:end-1)+Xc(2:end))./2;
+Zf        = (Zc(1:end-1)+Zc(2:end))./2;
+[XXu,ZZu] = meshgrid(Xf,Zc);
+[XXw,ZZw] = meshgrid(Xc,Zf);
 
-Nx = length(X);
-Nz = length(Z);
+Nx = length(Xc);
+Nz = length(Zc);
 
 % get smoothed initialisation field
 rng(seed);
@@ -123,8 +181,7 @@ T   =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % convert to [K]
 
 % get volume fractions and bulk density
 step   =  0;
-ALPHA  =  1.0;
-THETA  =  1.0;
+theta  =  1.0;
 res = 1;  tol = 1e-15;  x = ones(size(T))./10;
 while res > tol
     xi = x;
@@ -138,7 +195,7 @@ while res > tol
     
     [phs,cal]  =  meltmodel(var,cal,'E');
     
-    mq  = reshape(phs.f ,Nz,Nx); xq = 1-mq; x = xq; m = mq;
+    mq  = max(TINY,min(1-TINY,reshape(phs.f ,Nz,Nx))); xq = 1-mq; x = xq; m = mq;
     for i = 1:cal.nc
         cxq(i,:,:) = reshape(phs.cs(:,i),Nz,Nx); cx = cxq;
         cmq(i,:,:) = reshape(phs.cl(:,i),Nz,Nx); cm = cmq;
@@ -165,6 +222,7 @@ ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
 ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
+X  = rho.*x;
 S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*(Pt-Ptop));  
 S0 = rho.*(cP.*log((T0+273.15)) - aT./rhoref.*(Ptop)); 
 s  = S./rho;
@@ -195,7 +253,7 @@ dcy_rid = rho.*rid./HLRID.*log(2);
 dTdt   = 0.*T;  diff_T = 0.*T; diss_h = 0.*T; bndS = zeros(size(ZZ));
 dSdt   = 0.*T;
 dCdt   = 0.*c;  diff_c = 0.*T;
-dxdt   = 0.*x;  diff_x = 0.*x;  
+dXdt   = 0.*x;  diff_x = 0.*x;  
 dSIdt  = 0.*si;  diff_si  = 0.*SI;
 dITdt  = 0.*IT;  diff_it  = 0.*IT;
 dCTdt  = 0.*CT;  diff_ct  = 0.*CT;
@@ -219,7 +277,7 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dTdt','dCdt','dITdt','dCTdt','dSIdt','dxdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
+        load(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','X','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dXdt','dITdt','dCTdt','dSIdt','dRIDdt','dRIPdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
 
         xq = x;
         SOL = [W(:);U(:);P(:)];
@@ -229,6 +287,7 @@ if restart
         update; output;
         time  = time+dt;
         step  = step+1;
+        theta = 0.5;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
     end

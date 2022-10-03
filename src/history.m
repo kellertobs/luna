@@ -26,8 +26,8 @@ for i = 1:cal.nc
 end
 
 if stp>1; hist.DM(stp)   = hist.DM(stp-1)   +        dsumMdt                      .*dt; else; hist.DM(stp) = 0; end  % [kg]
-if stp>1; hist.DS(stp)   = hist.DS(stp-1)   + (THETA*dsumSdt + (1-THETA)*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J/K]
-if stp>1; hist.DC(stp,:) = hist.DC(stp-1,:) + (THETA*dsumCdt + (1-THETA)*dsumCdto).*dt; else; hist.DC(stp,:) = zeros(1,cal.nc); end  % [kg]
+if stp>1; hist.DS(stp)   = hist.DS(stp-1)   + (theta*dsumSdt + (1-theta)*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J/K]
+if stp>1; hist.DC(stp,:) = hist.DC(stp-1,:) + (theta*dsumCdt + (1-theta)*dsumCdto).*dt; else; hist.DC(stp,:) = zeros(1,cal.nc); end  % [kg]
 
 % record conservation error of mass M, heat S, major component C, volatile component V
 hist.EM(stp)   = (hist.sumM(stp)   - hist.DM(stp))  ./hist.sumM(1)   - 1;  % [kg/kg]

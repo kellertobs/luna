@@ -13,12 +13,13 @@ while time <= tend && step <= M
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [yr]\n\n',step,dt./yr,time./yr);
     tic;
 
-    if step==1; THETA = 1; else; THETA = 0.5; end
+    if step==1; theta = 1; else; theta = 0.5; end
     
     % store previous solution
     So      = S;
     Co      = C;
     To      = T;
+    Xo      = X;
     co      = c;
     xo      = x;
     mo      = m;
@@ -33,7 +34,7 @@ while time <= tend && step <= M
     dTdto   = dTdt;
     dSdto   = dSdt;
     dCdto   = dCdt;
-    dxdto   = dxdt;
+    dXdto   = dXdt;
     dITdto  = dITdt;
     dCTdto  = dCTdt;
     dSIdto  = dSIdt;
@@ -50,8 +51,6 @@ while time <= tend && step <= M
     % non-linear iteration loop
     while resnorm/resnorm0 >= rtol && resnorm >= atol && iter <= maxit || iter < 2
         
-        if step==1;  ALPHA = max(alpha,1-iter/50); else;  ALPHA = alpha; end
-
         % solve thermo-chemical equations
         thermochem;
         
