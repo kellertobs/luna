@@ -38,28 +38,17 @@ T0       =  1700;                % temperature top layer [deg C]
 T1       =  1700;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
-cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
+c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
 dc       =  [1,-1,1,-1,0,0].*0e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
-it0      =  1;                   % incompatible tracer top layer [wt ppm]
-it1      =  1;                   % incompatible tracer base layer [wt ppm]
-dit      =  0.00;                % incompatible tracer random noise [wt ppm]
-KIT      =  1e-2;                % incompatible tracer partition coefficient
-ct0      =  1;                   % compatible tracer top layer [wt ppm]
-ct1      =  1;                   % compatible tracer base layer [wt ppm]
-dct      = -0.00;                % compatible tracer random noise [wt ppm]
-KCT      =  1e+2;                % compatible tracer partition coefficient
-si0      =  0;                   % stable isotope ratio top layer [delta]
-si1      =  0;                   % stable isotope ratio base layer [delta]
-dsi      =  0.00;                % stable isotope ratio random noise [delta]
-ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
-ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
-dri      = -0.00;                % radiogenic isotope random noise [wt ppm]
-KRIP     =  10.;                 % radiogenic parent isotope partition coefficient
-KRID     =  0.1;                 % radiogenic daughter isotope partition coefficient
-HLRIP    =  1e3*yr;              % radiogenic parent isotope half-life [s]
-HLRID    =  1e2*yr;              % radiogenic daughter isotope half-life [s]
+te0      =  [0.1,0.3,2,3];       % trace elements top layer [wt ppm]
+te1      =  [0.1,0.3,2,3];       % trace elements base layer [wt ppm]
+dte      =  0e-3.*[1,1,-1,-1];   % trace elements random noise [wt ppm]
+Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
+ir0      =  [5,0.76];            % isotope ratios top layer [delta]
+ir1      =  [5,0.76];            % isotope ratios base layer [delta]
+dir      =  [0,0.0];             % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e5;                 % top pressure [Pa]
@@ -94,7 +83,8 @@ g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
 CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
+ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its

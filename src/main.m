@@ -12,8 +12,6 @@ while time <= tend && step <= M
         
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [yr]\n\n',step,dt./yr,time./yr);
     tic;
-
-    if step==1; theta = 1; else; theta = 0.5; end
     
     % store previous solution
     So      = S;
@@ -23,24 +21,16 @@ while time <= tend && step <= M
     co      = c;
     xo      = x;
     mo      = m;
-    ITo     = IT;
-    CTo     = CT;
-    SIo     = SI;
-    RIPo    = RIP;
-    RIDo    = RID;
+    TEo     = TE;
+    IRo     = IR;
     rhoo    = rho;
     Div_rhoVo =  Div_rhoV;
     etao    = eta;
-    dTdto   = dTdt;
     dSdto   = dSdt;
     dCdto   = dCdt;
     dXdto   = dXdt;
-    dITdto  = dITdt;
-    dCTdto  = dCTdt;
-    dSIdto  = dSIdt;
-    dRIPdto = dRIPdt;
-    dRIDdto = dRIDdt;
-    Pto     = Pt;
+    dTEdto  = dTEdt;
+    dIRdto  = dIRdt;
     dto     = dt;
     
     % reset residuals and iteration count

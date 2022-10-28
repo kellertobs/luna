@@ -1,26 +1,13 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase oxide compositions
-oxd  = permute(reshape(reshape(permute(c ,[2,3,1]),Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc),[3,1,2]);
-oxdm = permute(reshape(reshape(permute(cm,[2,3,1]),Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc),[3,1,2]);
-oxdx = permute(reshape(reshape(permute(cx,[2,3,1]),Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc),[3,1,2]);
-
-% update mineral system numbers
-foNo = squeeze(c(1,:,:)./(c(1,:,:) + c(2,:,:)));  % fo# = fo /(fo +fay)
-pxNo = squeeze(c(3,:,:)./(c(3,:,:) + c(4,:,:)));  % px# = opx/(opx+cpx)
-anNo = squeeze(c(5,:,:)./(c(5,:,:) + c(6,:,:)));  % an# = an /(an +ab )
-
-foNom = squeeze(cm(1,:,:)./(cm(1,:,:) + cm(2,:,:)));
-pxNom = squeeze(cm(3,:,:)./(cm(3,:,:) + cm(4,:,:)));
-anNom = squeeze(cm(5,:,:)./(cm(5,:,:) + cm(6,:,:)));
-
-foNox = squeeze(cx(1,:,:)./(cx(1,:,:) + cx(2,:,:)));
-pxNox = squeeze(cx(3,:,:)./(cx(3,:,:) + cx(4,:,:)));
-anNox = squeeze(cx(5,:,:)./(cx(5,:,:) + cx(6,:,:)));
+c_oxds  = reshape(reshape(c ,Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc);
+cm_oxds = reshape(reshape(cm,Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc);
+cx_oxds = reshape(reshape(cx,Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc);
 
 % update phase densities
-rhom = squeeze(1./sum(cm./rhom0.')) .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
-rhox = squeeze(1./sum(cx./rhox0.')) .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
+rhom = squeeze(sum(permute(cm,[3,1,2])./rhom0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
+rhox = squeeze(sum(permute(cx,[3,1,2])./rhox0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox);  
@@ -33,20 +20,18 @@ mu    = m.*rho./rhom;
 % diffusion parameters
 kT = kT0 * dffreg;
 ks = kT./T;
-kc = kT./cP./10.*mu.^0.5;
-kx = kT./cP./10.*mu.^0.5.*x;
 
 % determine adaptive max viscosity / min segregation coefficient
 if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = 1e18; end
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
-wtm(:,1) = reshape(oxdm(1,:,:),Nz*Nx,1); % SiO2
-wtm(:,3) = reshape(oxdm(2,:,:),Nz*Nx,1); % Al2O3
-wtm(:,4) = reshape(oxdm(3,:,:),Nz*Nx,1); % FeO
-wtm(:,6) = reshape(oxdm(4,:,:),Nz*Nx,1); % MgO
-wtm(:,7) = reshape(oxdm(5,:,:),Nz*Nx,1); % CaO
-wtm(:,8) = reshape(oxdm(6,:,:),Nz*Nx,1); % Na2O
+wtm(:,1) = reshape(cm_oxds(:,:,1),Nz*Nx,1); % SiO2
+wtm(:,3) = reshape(cm_oxds(:,:,2),Nz*Nx,1); % Al2O3
+wtm(:,4) = reshape(cm_oxds(:,:,3),Nz*Nx,1); % FeO
+wtm(:,6) = reshape(cm_oxds(:,:,4),Nz*Nx,1); % MgO
+wtm(:,7) = reshape(cm_oxds(:,:,5),Nz*Nx,1); % CaO
+wtm(:,8) = reshape(cm_oxds(:,:,6),Nz*Nx,1); % Na2O
 etam  = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 etax  = etax0.* ones(size(x));                                             % constant crystal viscosity
 
@@ -109,16 +94,12 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wx = (rhox-rho).*g0.*Csgr_x;
-wx = sign((wx(1:end-1,:)+wx(2:end,:))/2).*min(abs(wx(1:end-1,:)),abs(wx(2:end,:)));
-% wx = (((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2)*g0).*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % crystal segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % melt segregation speed
 wx(1  ,:)     = 0;
 wx(end,:)     = 0;
 wx(:,[1 end]) = wx(:,[2 end-1]);
 
-wm = (rhom-rho).*g0.*Csgr_m;
-wm = sign((wm(1:end-1,:)+wm(2:end,:))/2).*min(abs(wm(1:end-1,:)),abs(wm(2:end,:)));
-% wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = 0;
 wm(end,:)     = 0;
 wm(:,[1 end]) = wm(:,[2 end-1]);
@@ -134,10 +115,11 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
                         
 % update volume source
-Div_rhoV =  + advection(rho.*x,0.*U,wx,h,ADVN,'flx') ...
-            + advection(rho.*m,0.*U,wm,h,ADVN,'flx') ...
-            + advection(rho   ,   U,W ,h,ADVN,'flx');
-if step>0;  VolSrc = -((rho-rhoo)./dt + Div_rhoV - rho.*Div_V)./rho; end
+Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*Um(inz,:),wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
+            + advect(rho(inz,inx).*x(inz,inx),0.*Ux(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+            + advect(rho(inz,inx)            ,   U (inz,:),W (:,inx),h,{ADVN,'vdf'},[1,2],BCA);
+% if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx)*; end
+if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 
-UBG    = - 2*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (L/2-XXu);
-WBG    = - 0*mean(mean(VolSrc(2:end-1,2:end-1)))./2 .* (D/2-ZZw);
+UBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (L/2-XXu);
+WBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (D/2-ZZw);

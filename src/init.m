@@ -91,6 +91,9 @@ Zf        = (Zc(1:end-1)+Zc(2:end))./2;
 Nx = length(Xc);
 Nz = length(Zc);
 
+inz = 2:Nz-1;
+inx = 2:Nx-1;
+
 % get smoothed initialisation field
 rng(seed);
 rp = randn(Nz,Nx);
@@ -112,25 +115,20 @@ MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
 switch bndmode
     case 0  % none
-        topshape = zeros(size(ZZ));
-        botshape = zeros(size(ZZ));
+        topshape = zeros(size(ZZ(inz,inx)));
+        botshape = zeros(size(ZZ(inz,inx)));
     case 1  % top only
-        topshape = exp( ( -ZZ+h/2)/dw);
-        botshape = zeros(size(ZZ));
+        topshape = exp( ( -ZZ(inz,inx)+h/2)/dw);
+        botshape = zeros(size(ZZ(inz,inx)));
     case 2  % bot only
-        topshape = zeros(size(ZZ));
-        botshape = exp(-(D-ZZ-h/2)/dw);
+        topshape = zeros(size(ZZ(inz,inx)));
+        botshape = exp(-(D-ZZ(inz,inx)-h/2)/dw);
     case 3  % top/bot only
-        topshape = exp( ( -ZZ+h/2)/dw);
-        botshape = exp(-(D-ZZ-h/2)/dw);
+        topshape = exp( ( -ZZ(inz,inx)+h/2)/dw);
+        botshape = exp(-(D-ZZ(inz,inx)-h/2)/dw);
 end
 topshape = max(0,min(1,topshape));
-topshape([1 end],:) = topshape([2 end-1],:);
-topshape(:,[1 end]) = topshape(:,[2 end-1]);
-
 botshape = max(0,min(1,botshape));
-botshape([1 end],:) = botshape([2 end-1],:);
-botshape(:,[1 end]) = botshape(:,[2 end-1]);
 
 % set all boundaries to free slip
 sds = -1;
@@ -147,16 +145,23 @@ run(['../cal/cal_',calID,'.m']);
 
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndshape; end % temperature [C]
-c   =  zeros(cal.nc,Nz,Nx); cxq = c; cmq = c;
+c   =  zeros(Nz,Nx,cal.nc); cxq = c; cmq = c;
+c0 = c0./sum(c0);  c1 = c1./sum(c1);
 for i=1:cal.nc
-    c(i,:,:)   =  c0(i) + (cl(i)-c0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc(i).*rp;  if bndinit && ~isnan(cwall); c(i,:,:) = c(i,:,:) + (cwall-c(i,:,:)).*bndshape; end % major component
+    c(:,:,i)   =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc(i).*rp;  
+    if bndinit && ~isnan(cwall); c(inz,inx,i) = c(inz,inx,i) + (cwall-c(inz,inx,i)).*bndshape; end % major component
 end
 
-it  =  it0 + (it1-it0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dit.*rp;  if bndinit && ~isnan(itwall); it  = it  + (itwall-it ).*bndshape; end % incompatible trace element
-ct  =  ct0 + (ct1-ct0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dct.*rp;  if bndinit && ~isnan(ctwall); ct  = ct  + (ctwall-ct ).*bndshape; end % compatible trace element
-si  =  si0 + (si1-si0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dsi.*rp;  if bndinit && ~isnan(siwall); si  = si  + (siwall-si ).*bndshape; end % stable isotope ratio
-rip =  ri0 + (ri1-ri0) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dri.*rp;  if bndinit && ~isnan(riwall); rip = rip + (riwall-rip).*bndshape; end % radiogenic isotope parent
-rid =  rip.*HLRID./HLRIP;                                           % radiogenic isotope daughter
+te = zeros(Nz,Nx,length(te0));
+for i = 1:length(te0)
+    te(:,:,i)  =  te0(i) + (te1(i)-te0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dte(i).*rp;  % trace elements
+    if any(bndinit(:)) && ~isnan(tewall(i)); te(inz,inx,i)  = te(inz,inx,i) + (tewall(i)-te(inz,inx,i)).*bndshape; end 
+end
+ir = zeros(Nz,Nx,length(ir0));
+for i = 1:length(ir0)
+    ir(:,:,i)  =  ir0(i) + (ir1(i)-ir0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dir(i).*rp;  % isotope ratios
+    if any(bndinit(:)) && ~isnan(irwall(i)); ir(inz,inx,i)  = ir(inz,inx,i) + (irwall(i)-ir(inz,inx,i)).*bndshape; end 
+end
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
@@ -181,13 +186,13 @@ T   =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % convert to [K]
 
 % get volume fractions and bulk density
 step   =  0;
-theta  =  1.0;
+theta  = 1/2;
 res = 1;  tol = 1e-15;  x = ones(size(T))./10;
 while res > tol
     xi = x;
     
     for i = 1:cal.nc
-        var.c(:,i) = reshape(c(i,:,:),Nx*Nz,1);  % in wt
+        var.c(:,i) = reshape(c(:,:,i),Nx*Nz,1);  % in wt
     end
     var.T = T(:)-273.15;  % convert to C
     var.P = Pt(:)/1e9;    % convert to GPa
@@ -197,15 +202,15 @@ while res > tol
     
     mq  = max(TINY,min(1-TINY,reshape(phs.f ,Nz,Nx))); xq = 1-mq; x = xq; m = mq;
     for i = 1:cal.nc
-        cxq(i,:,:) = reshape(phs.cs(:,i),Nz,Nx); cx = cxq;
-        cmq(i,:,:) = reshape(phs.cl(:,i),Nz,Nx); cm = cmq;
+        cxq(:,:,i) = reshape(phs.cs(:,i),Nz,Nx); cx = cxq;
+        cmq(:,:,i) = reshape(phs.cl(:,i),Nz,Nx); cm = cmq;
     end
 
     update;
     
     rhoref  = mean(mean(rho(2:end-1,2:end-1)));
     Pt      = Ptop + rhoref.*g0.*ZZ;
-    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))); end
+    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(T)); end
     rhoo  = rho;
 
     T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
@@ -214,12 +219,6 @@ while res > tol
 end
 dto   = dt;
 Pto   = Pt;
-
-% get geochemical phase compositions
-itm  = it./(m + x.*KIT); itx = it./(m./KIT + x);
-ctm  = ct./(m + x.*KCT); ctx = ct./(m./KCT + x);
-ripm = rip./(m + x.*KRIP); ripx = rip./(m./KRIP + x);
-ridm = rid./(m + x.*KRID); ridx = rid./(m./KRID + x);
   
 % get bulk enthalpy, silica, volatile content densities
 X  = rho.*x;
@@ -227,38 +226,35 @@ S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*(Pt-Ptop));
 S0 = rho.*(cP.*log((T0+273.15)) - aT./rhoref.*(Ptop)); 
 s  = S./rho;
 C  = 0.*c;
-for i = 1:cal.nc; C(i,:,:) = rho.*(m.*squeeze(cm(i,:,:)) + x.*squeeze(cx(i,:,:))); end
-
-sumC = squeeze(sum(C));
-for i = 1:cal.nc; c(i,:,:) = squeeze(C(i,:,:))./sumC; end
-for i = 1:cal.nc; C(i,:,:) = squeeze(c(i,:,:)).*rho; end
+for i = 1:cal.nc; C(:,:,i) = rho.*(m.*cm(:,:,i) + x.*cx(:,:,i)); end
 
 % get phase entropies
 sm = S./rho - x.*Dsx;
 sx = sm + Dsx;
 
-% get geochemical content densities
-IT  = rho.*(m.*itm + x.*itx);
-CT  = rho.*(m.*ctm + x.*ctx);
-SI  = rho.*(m.*si  + x.*si);
-RIP = rho.*(m.*ripm + x.*ripx);
-RID = rho.*(m.*ridm + x.*ridx);
+% get trace element phase compositions
+for k = 1:length(te0)
+    tem(:,:,k)  = te(:,:,k)./(m + x.*Kte(k) );
+    tex(:,:,k)  = te(:,:,k)./(m./Kte(k)  + x);
+end
+
+% get geochemical component densities
+for k = 1:length(te0)
+    TE(:,:,k)  = rho.*(m.*tem(:,:,k) + x.*tex(:,:,k));
+end
+for k = 1:length(ir0)
+    IR(:,:,k)  = rho.*ir(:,:,k);
+end
 
 % initialise reaction/decay rates
 Gx = 0.*x; 
-dcy_rip = rho.*rip./HLRIP.*log(2);
-dcy_rid = rho.*rid./HLRID.*log(2);
 
 % initialise auxiliary variables 
-dTdt   = 0.*T;  diff_T = 0.*T; diss_h = 0.*T; bndS = zeros(size(ZZ));
-dSdt   = 0.*T;
-dCdt   = 0.*c;  diff_c = 0.*T;
-dXdt   = 0.*x;  diff_x = 0.*x;  
-dSIdt  = 0.*si;  diff_si  = 0.*SI;
-dITdt  = 0.*IT;  diff_it  = 0.*IT;
-dCTdt  = 0.*CT;  diff_ct  = 0.*CT;
-dRIPdt = 0.*RIP; diff_rip  = 0.*RIP;
-dRIDdt = 0.*RID; diff_rid  = 0.*RID;
+dSdt   = 0.*T(inz,inx); bnd_S = 0.*T(inz,inx); diss_h = 0.*T(inz,inx); 
+dCdt   = 0.*c(inz,inx);
+dXdt   = 0.*x(inz,inx);
+dTEdt  = 0.*te(inz,inx);
+dIRdt  = 0.*ir(inz,inx);
 
 % initialise timing and iterative parameters
 time    =  0;
@@ -277,17 +273,12 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','x','m','chi','mu','S','C','T','X','c','cm','cx','IT','CT','SI','RIP','RID','it','ct','si','rip','rid','dSdt','dCdt','dXdt','dITdt','dCTdt','dSIdt','dRIDdt','dRIPdt','Gx','rho','eta','exx','ezz','exz','txx','tzz','txz','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
-
-        xq = x;
+        load(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
+        
+        xq = x; fq = f;
         SOL = [W(:);U(:);P(:)];
-        dcy_rip = rho.*rip./HLRIP.*log(2);
-        dcy_rid = rho.*rid./HLRID.*log(2);
-        Pto = Pt; etao = eta; rhoo = rho; Div_rhoVo = Div_rhoV;
+        rhoo = rho; Div_rhoVo = Div_rhoV;
         update; output;
-        time  = time+dt;
-        step  = step+1;
-        theta = 0.5;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
     end
@@ -297,5 +288,7 @@ else
     fluidmech;
     history;
     output;
-    step = step+1;
 end
+
+time  = time+dt;
+step  = step+1;
