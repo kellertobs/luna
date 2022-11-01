@@ -7,9 +7,9 @@ Ti = T; ci = c; xi = x;
 advn_S = - advect(rho(inz,inx).*m(inz,inx).*sm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % heat advection
          - advect(rho(inz,inx).*x(inz,inx).*sx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-qTz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);                     % heat diffusion z-flux
-qTx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);                     % heat diffusion x-flux
-diff_T = (- ddz(qTz(:,inx),h)  ...                                         % heat diffusion
+qTz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);                     % heat diffusion
+qTx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);
+diff_T = (- ddz(qTz(:,inx),h)  ...
           - ddx(qTx(inz,:),h));
 
 diss_h = diss ./ T(inz,inx);
@@ -26,25 +26,28 @@ S([1 end],:) = S([2 end-1],:);                                             % app
 S(:,[1 end]) = S(:,[2 end-1]);
 
 % convert entropy to temperature
-T = (T0+273.15) * exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*(Pt-Ptop));   % convert entropy to temperature
+T = (T0+273.15) * exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*(Pt-Ptop));% convert entropy to temperature
 
 
 % update major component 
 advn_C = zeros(size(c(inz,inx,:)));
+diff_C = zeros(size(c(inz,inx,:)));
 for i = 1:cal.nc
-    
-    % get component advection
     advn_C(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*cm(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
                     - advect(rho(inz,inx).*x(inz,inx).*cx(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
+    qCz = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c(:,:,i),h);             % component diffusion
+    qCx = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c(:,:,i),h);
+    diff_C(:,:,i) = (- ddz(qCz(:,inx),h)  ...
+                     - ddx(qCx(inz,:),h));
 end
 
 % get total rate of change
-dCdt = advn_C;
+dCdt = advn_C + diff_C;
 
 % update trace element concentrations
 C(inz,inx,:) = Co(inz,inx,:) + (theta.*dCdt + (1-theta).*dCdto).*dt;       % explicit update
-C = max(0,min(rho, C ));                                                    % enforce min bound
+C = max(0,min(rho, C ));                                                   % enforce min bound
 C([1 end],:,:) = C([2 end-1],:,:);                                         % boundary conditions
 C(:,[1 end],:) = C(:,[2 end-1],:);
 

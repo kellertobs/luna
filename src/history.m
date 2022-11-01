@@ -71,9 +71,9 @@ for i = 1:cal.nc
     hist.c(stp,1,i) = min( c(2:end-1,2:end-1,i),[],'all');
     hist.c(stp,2,i) = mean(c(2:end-1,2:end-1,i)   ,'all');
     hist.c(stp,3,i) = max( c(2:end-1,2:end-1,i),[],'all');
-    hist.c_oxds(stp,1,i) = min( c_oxds(2:end-1,2:end-1,i),[],'all');
-    hist.c_oxds(stp,2,i) = mean(c_oxds(2:end-1,2:end-1,i)   ,'all');
-    hist.c_oxds(stp,3,i) = max( c_oxds(2:end-1,2:end-1,i),[],'all');
+    hist.c_oxd(stp,1,i) = min( c_oxd(2:end-1,2:end-1,i),[],'all');
+    hist.c_oxd(stp,2,i) = mean(c_oxd(2:end-1,2:end-1,i)   ,'all');
+    hist.c_oxd(stp,3,i) = max( c_oxd(2:end-1,2:end-1,i),[],'all');
 end
 
 hist.Gx(stp,1) = min( Gx(2:end-1,2:end-1),[],'all');

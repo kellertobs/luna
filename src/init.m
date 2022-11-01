@@ -20,6 +20,8 @@ run(['../cal/cal_',calID]);  % load melt model calibration
 calibrt =  0;                % not in calibrate mode
 TINY    =  1e-12;            % minimum cutoff phase, component fractions
 
+Dsx     = -cal.dS;           % use entropy change of crystallisation set in cal
+
 % calculate dimensionless numbers characterising the system dynamics
 var0.c = c0;          % in wt
 var0.T = T0;          % convert to C
@@ -32,7 +34,7 @@ m0  = phs0.f; x0 = 1-m0;
 cm0 = phs0.cl;
 
 % update phase oxide compositions
-oxdm0 = cm0*cal.oxds;
+oxdm0 = cm0*cal.oxd;
 
 wtm([1 3 4 6 7 8 11 12]) = [oxdm0,0,0]; % SiO2
 eta0 = grdmodel08(wtm,T0);

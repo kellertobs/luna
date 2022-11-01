@@ -1,9 +1,9 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase oxide compositions
-c_oxds  = reshape(reshape(c ,Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc);
-cm_oxds = reshape(reshape(cm,Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc);
-cx_oxds = reshape(reshape(cx,Nz*Nx,cal.nc)*cal.oxds,Nz,Nx,cal.nc);
+c_oxd  = reshape(reshape(c ,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
+cm_oxd = reshape(reshape(cm,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
+cx_oxd = reshape(reshape(cx,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
 
 % update phase densities
 rhom = squeeze(sum(permute(cm,[3,1,2])./rhom0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
@@ -17,21 +17,17 @@ rho(:,[1 end]) = rho(:,[2 end-1]);
 chi   = x.*rho./rhox;
 mu    = m.*rho./rhom;
 
-% diffusion parameters
-kT = kT0 * dffreg;
-ks = kT./T;
-
 % determine adaptive max viscosity / min segregation coefficient
 if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = 1e18; end
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
-wtm(:,1) = reshape(cm_oxds(:,:,1),Nz*Nx,1); % SiO2
-wtm(:,3) = reshape(cm_oxds(:,:,2),Nz*Nx,1); % Al2O3
-wtm(:,4) = reshape(cm_oxds(:,:,3),Nz*Nx,1); % FeO
-wtm(:,6) = reshape(cm_oxds(:,:,4),Nz*Nx,1); % MgO
-wtm(:,7) = reshape(cm_oxds(:,:,5),Nz*Nx,1); % CaO
-wtm(:,8) = reshape(cm_oxds(:,:,6),Nz*Nx,1); % Na2O
+wtm(:,1) = reshape(cm_oxd(:,:,1),Nz*Nx,1); % SiO2
+wtm(:,3) = reshape(cm_oxd(:,:,2),Nz*Nx,1); % Al2O3
+wtm(:,4) = reshape(cm_oxd(:,:,3),Nz*Nx,1); % FeO
+wtm(:,6) = reshape(cm_oxd(:,:,4),Nz*Nx,1); % MgO
+wtm(:,7) = reshape(cm_oxd(:,:,5),Nz*Nx,1); % CaO
+wtm(:,8) = reshape(cm_oxd(:,:,6),Nz*Nx,1); % Na2O
 etam  = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
 etax  = etax0.* ones(size(x));                                             % constant crystal viscosity
 
@@ -56,11 +52,11 @@ etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % eff
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
-Csgr = ((1-ff)./[dx;dx].^2.*(sgrreg.*kv.*thtv)).^-1 + 1e-18;
+Csgr = ((1-ff)./dx.^2.*(sgrreg.*kv.*thtv)).^-1 + 1e-18;
 
 Csgr_x = squeeze(Csgr(1,:,:));  Csgr_x([1 end],:) = Csgr_x([2 end-1],:);  Csgr_x(:,[1 end]) = Csgr_x(:,[2 end-1]);
 Csgr_m = squeeze(Csgr(2,:,:));  Csgr_m([1 end],:) = Csgr_m([2 end-1],:);  Csgr_m(:,[1 end]) = Csgr_m(:,[2 end-1]);
-Csgr_m = Csgr_m.*max(TINY,chi).^2; % dampen melt segregation at low crystallinity
+Csgr_m = Csgr_m.*max(TINY,chi).^2; % dampen melt segregation at high melt fraction
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -103,6 +99,11 @@ wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2.
 wm(1  ,:)     = 0;
 wm(end,:)     = 0;
 wm(:,[1 end]) = wm(:,[2 end-1]);
+
+% diffusion parameters
+kT = kT0 * dffreg;
+ks = kT./T;
+kc = abs((rhox-rho).*g0.*Csgr_x.*dx.*100) * dffreg;                        % chemical diffusion by fluctuation in crystal segregation speed
 
 % heat dissipation (entropy production) rate
 [grdTx,grdTz] = gradient(T,h);

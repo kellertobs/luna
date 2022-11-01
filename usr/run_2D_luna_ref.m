@@ -63,7 +63,6 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 cP       =  1300;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 calID    = 'luna6';              % calibration ID
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]

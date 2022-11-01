@@ -6,7 +6,7 @@ addpath('../src');
 runID    =  '1D_luna_ref';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  500;                 % output frame plotted/saved every 'nop' time steps
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -63,7 +63,6 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 cP       =  1300;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 calID    = 'luna6';              % calibration ID
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
