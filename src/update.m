@@ -103,7 +103,7 @@ wm(:,[1 end]) = wm(:,[2 end-1]);
 % diffusion parameters
 kT = kT0 * dffreg;
 ks = kT./T;
-kc = abs((rhox-rho).*g0.*Csgr_x.*dx.*100) * dffreg;                        % chemical diffusion by fluctuation in crystal segregation speed
+kc = min(kT./cP,rho.*abs((rhox-rho).*g0.*Csgr_x.*dx) * dffreg);            % chemical diffusion by fluctuation in crystal segregation speed
 
 % heat dissipation (entropy production) rate
 [grdTx,grdTz] = gradient(T,h);

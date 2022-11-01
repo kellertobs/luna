@@ -72,7 +72,7 @@ elseif Nx <= 10  % create 1D plots
     if ~exist('fh1','var'); fh1 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh1); clf;
     end
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
     plot(T(2:end-1,2:end-1)-273.15,Zc(2:end-1).'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -94,7 +94,7 @@ elseif Nx <= 10  % create 1D plots
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh2); clf;
     end
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
     plot(rhox(2:end-1,2:end-1),Zc(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     plot(rhom(2:end-1,2:end-1),Zc(2:end-1).'./1e3,CL{[1,3]},LW{:});
@@ -119,7 +119,7 @@ elseif Nx <= 10  % create 1D plots
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
     end
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     subplot(1,3,1)
     plot(squeeze(c_oxd(2:end-1,2:end-1,:)),Zc(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on;
     title('$\bar{c}_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -335,7 +335,7 @@ else % create 2D plots
     set(fh5,'CurrentAxes',ax(56));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,ir(2:end-1,2:end-1,2)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['isotope ratio 2'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
-    sgtitle(['time = ',num2str(time/hr,3),' [hr]'],TX{:},FS{:},'Color','k');
+    sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
 
     if plot_cv && iter > 0
         % plot residual fields in Fig. 4

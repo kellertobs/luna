@@ -81,7 +81,7 @@ cxq(:,:,1) = 1 - sum(cxq(:,:,2:end),3);
 % update crystal fraction
 if diseq % quasi-equilibrium approach
     
-    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(4*dt);
+    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(5*dt);
         
     advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
