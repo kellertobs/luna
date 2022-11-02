@@ -11,8 +11,6 @@ rhox = squeeze(sum(permute(cx,[3,1,2])./rhox0.')).^-1 .* (1 - aT.*(T-T0-273.15) 
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox);  
-rho([1 end],:) = rho([2 end-1],:);  
-rho(:,[1 end]) = rho(:,[2 end-1]);
 
 chi   = x.*rho./rhox;
 mu    = m.*rho./rhom;
@@ -103,7 +101,7 @@ wm(:,[1 end]) = wm(:,[2 end-1]);
 % diffusion parameters
 kT = kT0 * dffreg;
 ks = kT./T;
-kc = min(kT./cP,rho.*abs((rhox-rho).*g0.*Csgr_x.*dx) * dffreg);            % chemical diffusion by fluctuation in crystal segregation speed
+kc = min(kT./cP./10.*mu,rho.*abs((rhox-rho).*g0.*Csgr_x.*dx) * dffreg);    % chemical diffusion by fluctuation in crystal segregation speed
 
 % heat dissipation (entropy production) rate
 [grdTx,grdTz] = gradient(T,h);
@@ -116,11 +114,11 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
                         
 % update volume source
-Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*Um(inz,:),wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
+Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*Um(inz,:),wm(:,inx),h,{ADVN,''   },[1,2],BCA) ...
             + advect(rho(inz,inx).*x(inz,inx),0.*Ux(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
             + advect(rho(inz,inx)            ,   U (inz,:),W (:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-% if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx)*; end
-if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
+if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
+% if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 
 UBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (L/2-XXu);
 WBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (D/2-ZZw);

@@ -26,7 +26,7 @@ S([1 end],:) = S([2 end-1],:);                                             % app
 S(:,[1 end]) = S(:,[2 end-1]);
 
 % convert entropy to temperature
-T = (T0+273.15) * exp(S./rho./cP - x.*Dsx./cP + aT./rhoref./cP.*(Pt-Ptop));% convert entropy to temperature
+T = (T0+273.15) * exp(S./rho./cP - x.*Dsx./cP + Adbt./cP.*(Pt-Ptop));% convert entropy to temperature
 
 
 % update major component 
@@ -59,24 +59,30 @@ for i = 1:cal.nc; c(:,:,i) = C(:,:,i)./rho; end
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
-for i = 1:cal.nc
-    var.c(:,i) = reshape(c(:,:,i),Nx*Nz,1);  % in wt
-end
-var.T = T(:)-273.15;  % convert to C
-var.P = Pt(:)/1e9;    % convert to GPa
-var.f = 1-xq(:);      % in wt
+var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.nc);  % in wt
+var.T = reshape(T(inz,inx),(Nx-2)*(Nz-2),1)-273.15;  % convert to C
+var.P = reshape(Pt(inz,inx),(Nx-2)*(Nz-2),1)/1e9;    % convert to GPa
+var.f = 1-reshape(xq(inz,inx),(Nx-2)*(Nz-2),1);      % in wt
 
 [phs,cal]  =  meltmodel(var,cal,'E'); % cs and cl component prop in each phase VS T
 
-mq = max(TINY,min(1-TINY,reshape(phs.f ,Nz,Nx)));
+mq(inz,inx) = max(0,min(1,reshape(phs.f,(Nz-2),(Nx-2))));
+mq([1 end],:) = mq([2 end-1],:);
+mq(:,[1 end]) = mq(:,[2 end-1]);
+
 xq = 1-mq;
 
 for i = 2:cal.nc
-    cxq(:,:,i) = reshape(phs.cs(:,i),Nz,Nx);
-    cmq(:,:,i) = reshape(phs.cl(:,i),Nz,Nx);
+    cxq(inz,inx,i) = reshape(phs.cs(:,i),(Nz-2),(Nx-2));
+    cmq(inz,inx,i) = reshape(phs.cl(:,i),(Nz-2),(Nx-2));
 end
 cmq(:,:,1) = 1 - sum(cmq(:,:,2:end),3);
 cxq(:,:,1) = 1 - sum(cxq(:,:,2:end),3);
+
+cxq([1 end],:,:) = cxq([2 end-1],:,:);
+cxq(:,[1 end],:) = cxq(:,[2 end-1],:);
+cmq([1 end],:,:) = cmq([2 end-1],:,:);
+cmq(:,[1 end],:) = cmq(:,[2 end-1],:);
 
 % update crystal fraction
 if diseq % quasi-equilibrium approach

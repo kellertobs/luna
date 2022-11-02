@@ -1,6 +1,5 @@
 % store previous iteration
-Wi = W; Ui = U; Pi = P;
-
+SOLi = SOL;
 
 %% assemble coefficients for matrix velocity diagonal and right-hand side
 
@@ -58,7 +57,7 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; 2/3*EtaP2(:)/h^2];      %
 IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      % W one to the left
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % W one to the right
 
-% what shall we do with a drunken sailor...
+% what shall we do with the drunken sailor...
 aa = -ddz(rho(2:end-1,2:end-1),h).*g0.*dt/2;
 IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
     
@@ -73,7 +72,6 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:
 
 
 % z-RHS vector
-
 rr = - ((rho(2:end-2,2:end-1)+rho(3:end-1,2:end-1))/2 - rhoref) .* g0;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
@@ -251,7 +249,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = - VolSrc(2:end-1,2:end-1);
+rr = VolSrc(2:end-1,2:end-1);
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -273,7 +271,7 @@ if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 LL = [ KV  -GG  ; ...
       -DD   KP ];
 
-RR = [RV; RP];
+RR = [RV; -RP];
 
 SCL = sqrt(abs(diag(LL)));
 SCL = diag(sparse(1./(SCL+1)));
@@ -290,12 +288,9 @@ SOL = SCL*(LL\RR);  % update solution
 W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % matrix z-velocity
 U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
-% Pt = P + rhoref.*g0.*ZZ + Ptop;                                            % total pressure
 
 % get residual of fluid mechanics equations from iterative update
-resnorm_VP = norm(W - Wi,2)./(norm(W,2)+TINY) ...
-           + norm(U - Ui,2)./(norm(U,2)+TINY) ...
-           + norm(P - Pi,2)./(norm(P,2)+TINY);
+resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 
 % update phase velocities
 Wx   = W + wx;                                                             % xtl z-velocity
@@ -312,6 +307,6 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
  
 %% update time step
 
-dtk = min((h/2)^2./max([kT(:)./rho(:)./cP;kc(:)./rho(:)]));                % diffusive time step size
-dta = CFL*min(min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16))));         % advective time step size
+dtk = min((h/2)^2./max(kT./rho(:)./cP));                                   % diffusive time step size
+dta = CFL*min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16)));              % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size

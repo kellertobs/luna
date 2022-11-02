@@ -168,7 +168,7 @@ end
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
 P   =  zeros(size(XX));  Pi = P;  res_P = 0.*P;  meanQ = 0;  
-SS  = [W(:);U(:);P(:)];
+SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
 Wx  = W;  Ux  = U;
@@ -180,42 +180,55 @@ exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
 VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
-rhoref = rhom0(1);
-rhoo   = rhoref.*ones(size(P));
-Pt     = rhoref.*g0.*ZZ + Ptop;  
-if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(Pt)); end
-T   =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt); % convert to [K]
+rho    =  rhom0(1).*ones(size(Tp));
+rhoref =  mean(rho(inz,inx),'all');
+Pt     =  Ptop + rhoref.*g0.*ZZ;
+mq  =  ones(size(Tp));  m = mq;
+xq  = zeros(size(Tp));  x = xq;
 
 % get volume fractions and bulk density
 step   =  0;
 theta  = 1/2;
-res = 1;  tol = 1e-15;  x = ones(size(T))./10;
+res = 1;  tol = 1e-12;
 while res > tol
     xi = x;
     
-    for i = 1:cal.nc
-        var.c(:,i) = reshape(c(:,:,i),Nx*Nz,1);  % in wt
-    end
-    var.T = T(:)-273.15;  % convert to C
-    var.P = Pt(:)/1e9;    % convert to GPa
-    var.f = 1-x(:);       % in wt
+    rhoref =  mean(rho(inz,inx),'all');
+    Pt     =  Ptop + rhoref.*g0.*ZZ;
+    Adbt   =  aT./rhoref;
+    if Nz<=10; Pt = Ptop.*ones(size(T)); end
+
+    T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
+
+    var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.nc);  % in wt
+    var.T = reshape(T(inz,inx),(Nx-2)*(Nz-2),1)-273.15;  % convert to C
+    var.P = reshape(Pt(inz,inx),(Nx-2)*(Nz-2),1)/1e9;    % convert to GPa
+    var.f = 1-reshape(xq(inz,inx),(Nx-2)*(Nz-2),1);      % in wt
     
-    [phs,cal]  =  meltmodel(var,cal,'E');
+    [phs,cal]     =  meltmodel(var,cal,'E');
     
-    mq  = max(TINY,min(1-TINY,reshape(phs.f ,Nz,Nx))); xq = 1-mq; x = xq; m = mq;
-    for i = 1:cal.nc
-        cxq(:,:,i) = reshape(phs.cs(:,i),Nz,Nx); cx = cxq;
-        cmq(:,:,i) = reshape(phs.cl(:,i),Nz,Nx); cm = cmq;
+    mq(inz,inx)   = max(0,min(1,reshape(phs.f,(Nz-2),(Nx-2))));
+    mq([1 end],:) = mq([2 end-1],:);
+    mq(:,[1 end]) = mq(:,[2 end-1]);
+
+    xq = 1-mq;
+    x  = xq;  m = mq;
+
+    for i = 2:cal.nc
+        cxq(inz,inx,i) = reshape(phs.cs(:,i),(Nz-2),(Nx-2));
+        cmq(inz,inx,i) = reshape(phs.cl(:,i),(Nz-2),(Nx-2));
     end
+    cmq(:,:,1) = 1 - sum(cmq(:,:,2:end),3);
+    cxq(:,:,1) = 1 - sum(cxq(:,:,2:end),3);
+
+    cxq([1 end],:,:) = cxq([2 end-1],:,:);
+    cxq(:,[1 end],:) = cxq(:,[2 end-1],:);
+    cmq([1 end],:,:) = cmq([2 end-1],:,:);
+    cmq(:,[1 end],:) = cmq(:,[2 end-1],:);
+
+    cx = cxq;  cm = cmq;
 
     update;
-    
-    rhoref  = mean(mean(rho(2:end-1,2:end-1)));
-    Pt      = Ptop + rhoref.*g0.*ZZ;
-    if Nz<=10; Pt = mean(mean(Pt(2:end-1,2:end-1))).*ones(size(T)); end
-    rhoo  = rho;
-
-    T    =  (Tp+273.15).*exp(aT./rhoref./cP.*Pt);
 
     res  = norm(x(:)-xi(:),2)./sqrt(length(x(:)));
 end
@@ -224,8 +237,8 @@ Pto   = Pt;
   
 % get bulk enthalpy, silica, volatile content densities
 X  = rho.*x;
-S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - aT./rhoref.*(Pt-Ptop));  
-S0 = rho.*(cP.*log((T0+273.15)) - aT./rhoref.*(Ptop)); 
+S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - Adbt.*(Pt-Ptop));  
+S0 = rho.*(cP.*log((T0+273.15)) - Adbt.*(Ptop)); 
 s  = S./rho;
 C  = 0.*c;
 for i = 1:cal.nc; C(:,:,i) = rho.*(m.*cm(:,:,i) + x.*cx(:,:,i)); end
