@@ -88,12 +88,13 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % melt segregation speed
+% wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % melt segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*min(Csgr_x(1:end-1,:),Csgr_x(2:end,:)); % melt segregation speed
 wx(1  ,:)     = 0;
 wx(end,:)     = 0;
 wx(:,[1 end]) = wx(:,[2 end-1]);
 
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = 0.*((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
 wm(1  ,:)     = 0;
 wm(end,:)     = 0;
 wm(:,[1 end]) = wm(:,[2 end-1]);
@@ -101,7 +102,9 @@ wm(:,[1 end]) = wm(:,[2 end-1]);
 % diffusion parameters
 kT = kT0 * dffreg;
 ks = kT./T;
-kc = min(kT./cP./10.*mu,rho.*abs((rhox-rho).*g0.*Csgr_x.*dx) * dffreg);    % chemical diffusion by fluctuation in crystal segregation speed
+kc = 0.*rho.*abs((rhox-rho).*g0.*Csgr_x.*dx);           % chemical diffusion by fluctuation in crystal segregation speed
+kx = abs((rhox-rho).*g0.*Csgr_x.*dx) * dffreg;
+kx = kx.*min(kT./cP./rho./10,[],'all')./max(kx,[],'all');
 
 % heat dissipation (entropy production) rate
 [grdTx,grdTz] = gradient(T,h);
@@ -114,9 +117,9 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
                         
 % update volume source
-Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),0.*Um(inz,:),wm(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx).*x(inz,inx),0.*Ux(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx)            ,   U (inz,:),W (:,inx),h,{ADVN,'vdf'},[1,2],BCA);
+Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),Um(inz,:)-U(inz,:),Wm(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+            + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:)-U(inz,:),Wx(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+            + advect(rho(inz,inx)            ,          U(inz,:),          W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
 if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
 % if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 

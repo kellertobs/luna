@@ -292,9 +292,13 @@ P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % mat
 % get residual of fluid mechanics equations from iterative update
 resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 
+% phase fraction diffusion
+qxz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);
+qxx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);
+
 % update phase velocities
-Wx   = W + wx;                                                             % xtl z-velocity
-Ux   = U + 0.;                                                             % xtl x-velocity
+Wx   = W + wx + qxz;                                                       % xtl z-velocity
+Ux   = U + 0. + qxx;                                                       % xtl x-velocity
 Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 

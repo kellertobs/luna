@@ -6,7 +6,7 @@ addpath('../src');
 runID    =  '2D_luna_ref';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -39,16 +39,16 @@ T1       =  1700;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
-dc       =  [10,-1,1,-10,0,0].*1e-4; % amplitude of random noise [wt SiO2]
+dc       =  [1,-1,1,-1,0.1,-0.1].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
-te0      =  [0.1,0.3,2,3];       % trace elements top layer [wt ppm]
-te1      =  [0.1,0.3,2,3];       % trace elements base layer [wt ppm]
-dte      =  1e-3.*[1,1,-1,-1].*te0;% trace elements random noise [wt ppm]
+te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
+te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
+dte      =  1e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
 Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
 ir0      =  [0,-1];              % isotope ratios top layer [delta]
 ir1      =  [0, 1];              % isotope ratios base layer [delta]
-dir      =  [1,0.0];             % isotope ratios random noise [delta]
+dir      =  [1, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e5;                 % top pressure [Pa]

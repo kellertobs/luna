@@ -87,14 +87,17 @@ cmq(:,[1 end],:) = cmq(:,[2 end-1],:);
 % update crystal fraction
 if diseq % quasi-equilibrium approach
     
-    Gx = lambda.*Gx + (1-lambda) .* (xq-x).*rho./(5*dt);
-        
+    resGx = Gx - (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(4*dt);
+    if iter==1; resGx0 = resGx; end
+    lambda = 0.2+0.6.*max(0,min(1,(abs(resGx)./(abs(resGx0)+1e-6)).^0.2));
+    Gx = Gx - (1-lambda) .* resGx;
+
     advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    dXdt   = advn_X + Gx(inz,inx);                                         % total rate of change
+    dXdt   = advn_X + Gx;                                                  % total rate of change
     
     X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;       % explicit update of crystal fraction
-    X = min(rho.*(1-TINY),max(rho.*TINY,X));                               % enforce [0,1] limit
+    X = max(0,min(rho, X ));                                               % enforce [0,1] limit
     X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
     X(:,[1 end]) = X(:,[2 end-1]);
 

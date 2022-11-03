@@ -86,10 +86,10 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,4)
     plot(squeeze(cx(2:end-1,2:end-1,:))*100,Zc(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on;
     title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
-    legend(cal.CompStr,TX{:},FS{:},'location','west');
     subplot(1,5,5)
     plot(squeeze(cm(2:end-1,2:end-1,:))*100,Zc(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on;
     title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
+    legend(cal.CompStr,TX{:},FS{:},'location','east');
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh2); clf;
@@ -105,12 +105,11 @@ elseif Nx <= 10  % create 1D plots
     semilogx(eta(2:end-1,2:end-1),Zc(2:end-1).'./1e3,CL{[1,2]},LW{:});
     title('$\bar{\eta}$ [Pas]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,3)
-    plot(Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
+    plot(Gx./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9),Zc(2:end-1).'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     title('$\Gamma_x/\bar{\rho}$ [wt/yr]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,4)
-    plot(-W(:,2:end-1)*hr,Zf.'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1)*hr,Zf.'./1e3,CL{[1,4]},LW{:});
-    plot(-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1)*hr,Zf.'./1e3,CL{[1,3]},LW{:});
+    plot(                                                            -W(:,2:end-1) *hr,Zf.'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*(Wx(:,2:end-1)-W(:,2:end-1))*hr,Zf.'./1e3,CL{[1,4]},LW{:});
     title('$W$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,5)
     plot(P(2:end-1,2:end-1)/1e3,Zc(2:end-1).'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;
@@ -126,10 +125,10 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,3,2)
     plot(squeeze(cx_oxd(2:end-1,2:end-1,:)),Zc(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on;
     title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
-    legend(cal.oxdStr,TX{:},FS{:},'location','west');
     subplot(1,3,3)
     plot(squeeze(cm_oxd(2:end-1,2:end-1,:)),Zc(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on;
     title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
+    legend(cal.oxdStr,TX{:},FS{:},'location','east');
 
 else % create 2D plots
 
@@ -299,7 +298,7 @@ else % create 2D plots
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,chi(2:end-1,2:end-1).*100.*(chi(2:end-1,2:end-1)>1e-9) ); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\chi$ [vol\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
     set(fh4,'CurrentAxes',ax(42));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,Gx(2:end-1,2:end-1)./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,Gx./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/yr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh4,'CurrentAxes',ax(43));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,      rho(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;

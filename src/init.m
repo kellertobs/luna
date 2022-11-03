@@ -19,6 +19,7 @@ load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 calibrt =  0;                % not in calibrate mode
 TINY    =  1e-12;            % minimum cutoff phase, component fractions
+BCA     =  {'',''};          % boundary condition on advection (top/bot, sides)
 
 Dsx     = -cal.dS;           % use entropy change of crystallisation set in cal
 
@@ -262,7 +263,7 @@ for k = 1:length(ir0)
 end
 
 % initialise reaction/decay rates
-Gx = 0.*x; 
+Gx = 0.*x(inz,inx); 
 
 % initialise auxiliary variables 
 dSdt   = 0.*T(inz,inx); bnd_S = 0.*T(inz,inx); diss_h = 0.*T(inz,inx); 
