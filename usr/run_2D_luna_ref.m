@@ -5,7 +5,7 @@ addpath('../src');
 % set run parameters
 runID    =  '2D_luna_ref';       % run identifier
 opdir    =  '../out';            % output directory
-restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  0;                  % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -17,7 +17,7 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
 L        =  1000e3;              % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  120 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -34,8 +34,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1700;                % temperature top layer [deg C]
-T1       =  1700;                % temperature base layer [deg C]
+T0       =  1675;                % temperature top layer [deg C]
+T1       =  1675;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
@@ -90,7 +90,7 @@ maxit    =  10;                  % maximum outer its
 lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e12;                % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  etareg^0.5;          % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  1e5;                 % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

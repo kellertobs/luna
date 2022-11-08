@@ -80,9 +80,9 @@ hist.Gx(stp,1) = min( Gx,[],'all');
 hist.Gx(stp,2) = mean(Gx   ,'all');
 hist.Gx(stp,3) = max( Gx,[],'all');
 
-hist.dV(stp,1) = min( VolSrc(2:end-1,2:end-1),[],'all');
-hist.dV(stp,2) = mean(VolSrc(2:end-1,2:end-1)   ,'all');
-hist.dV(stp,3) = max( VolSrc(2:end-1,2:end-1),[],'all');
+hist.dV(stp,1) = min( VolSrc,[],'all');
+hist.dV(stp,2) = mean(VolSrc   ,'all');
+hist.dV(stp,3) = max( VolSrc,[],'all');
 
 hist.rho(stp,1) = min( rho(2:end-1,2:end-1),[],'all');
 hist.rho(stp,2) = mean(rho(2:end-1,2:end-1)   ,'all');

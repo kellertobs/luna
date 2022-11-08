@@ -34,21 +34,21 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1700;                % temperature top layer [deg C]
-T1       =  1700;                % temperature base layer [deg C]
+T0       =  1675;                % temperature top layer [deg C]
+T1       =  1675;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
 dc       =  [1,-1,1,-1,0,0].*0e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
-te0      =  [0.1,0.3,2,3];       % trace elements top layer [wt ppm]
-te1      =  [0.1,0.3,2,3];       % trace elements base layer [wt ppm]
-dte      =  0e-3.*[1,1,-1,-1];   % trace elements random noise [wt ppm]
+te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
+te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
+dte      =  0e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
 Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
-ir0      =  [5,0.76];            % isotope ratios top layer [delta]
-ir1      =  [5,0.76];            % isotope ratios base layer [delta]
-dir      =  [0,0.0];             % isotope ratios random noise [delta]
+ir0      =  [0,-1];              % isotope ratios top layer [delta]
+ir1      =  [0, 1];              % isotope ratios base layer [delta]
+dir      =  [0, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e5;                 % top pressure [Pa]
@@ -86,10 +86,10 @@ ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fro
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-lambda   =  0.5;                 % iterative lag parameter equilibration
-etareg   =  1e6;                 % regularisation factor for viscosity resisting convection
+lambda   =  0.25;                % iterative lag parameter equilibration
+etareg   =  1e5;                 % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  etareg;              % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  1e5;                 % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

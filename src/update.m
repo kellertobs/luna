@@ -100,11 +100,9 @@ wm(end,:)     = 0;
 wm(:,[1 end]) = wm(:,[2 end-1]);
 
 % diffusion parameters
-kT = kT0 * dffreg;
+kc = rho.*abs((rhox-rho).*g0.*Csgr_x.*dx) * dffreg;           % chemical diffusion by fluctuation in crystal segregation speed
+kT = kT0 * dffreg + cP*kc;
 ks = kT./T;
-kc = 0.*rho.*abs((rhox-rho).*g0.*Csgr_x.*dx);           % chemical diffusion by fluctuation in crystal segregation speed
-kx = abs((rhox-rho).*g0.*Csgr_x.*dx) * dffreg;
-kx = kx.*min(kT./cP./rho./10,[],'all')./max(kx,[],'all');
 
 % heat dissipation (entropy production) rate
 [grdTx,grdTz] = gradient(T,h);
@@ -117,11 +115,12 @@ diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
      +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
                         
 % update volume source
-Div_rhoV =  + advect(rho(inz,inx).*m(inz,inx),Um(inz,:)-U(inz,:),Wm(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:)-U(inz,:),Wx(:,inx)-W(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-            + advect(rho(inz,inx)            ,          U(inz,:),          W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
-% if step>0; VolSrc(inz,inx) = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
+Div_rhoVi =  + advect(rho(inz,inx).*m(inz,inx),0.*U(inz,:),wm(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+             + advect(rho(inz,inx).*x(inz,inx),0.*U(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
+             + advect(rho(inz,inx)            ,   U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
+Div_rhoV = lambda.*Div_rhoV + (1-lambda).*Div_rhoVi;
+if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
+% if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo)./rho(inz,inx); end
 
-UBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (L/2-XXu);
-WBG    = - 1*mean(mean(VolSrc(inz,inx)))./2 .* (D/2-ZZw);
+UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
+WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);

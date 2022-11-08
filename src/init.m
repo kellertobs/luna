@@ -176,10 +176,10 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_rhoV = 0.*P;  Div_rhoVo = Div_rhoV;
+Div_V  =  0.*P;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
 exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
 txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
-VolSrc =  0.*P;  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
+VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
 rho    =  rhom0(1).*ones(size(Tp));
 rhoref =  mean(rho(inz,inx),'all');
@@ -291,7 +291,7 @@ if restart
         fprintf('\n   restart from %s \n\n',name);
         load(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
         
-        xq = x; fq = f;
+        xq = x;
         SOL = [W(:);U(:);P(:)];
         rhoo = rho; Div_rhoVo = Div_rhoV;
         update; output;

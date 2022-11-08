@@ -249,7 +249,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = VolSrc(2:end-1,2:end-1);
+rr = VolSrc;
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -292,13 +292,9 @@ P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % mat
 % get residual of fluid mechanics equations from iterative update
 resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 
-% phase fraction diffusion
-qxz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);
-qxx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);
-
 % update phase velocities
-Wx   = W + wx + qxz;                                                       % xtl z-velocity
-Ux   = U + 0. + qxx;                                                       % xtl x-velocity
+Wx   = W + wx;                                                             % xtl z-velocity
+Ux   = U + 0.;                                                             % xtl x-velocity
 Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
@@ -311,6 +307,6 @@ Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
  
 %% update time step
 
-dtk = min((h/2)^2./max(kT./rho(:)./cP));                                   % diffusive time step size
+dtk = min((h/2)^2./max(kT(:)./rho(:)./cP));                                % diffusive time step size
 dta = CFL*min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16)));              % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
