@@ -54,12 +54,12 @@ Ptop     =  1e5;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-tau_T    =  5*yr;                % wall cooling/assimilation time [s]
+tau_T    =  6*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
 Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
-cP       =  1300;                % heat capacity [J/kg/K]
+cP       =  1200;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 calID    = 'luna6';              % calibration ID
 
@@ -86,9 +86,9 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
-etareg   =  1e5;                 % regularisation factor for viscosity resisting convection
+etareg   =  1e6;                 % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  1e5;                 % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  1e6;                 % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

@@ -23,9 +23,9 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  1e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  10*yr;               % end time for simulation [s]
+tend     =  8*yr;                % end time for simulation [s]
 dt       =  0.0125*yr;           % initial time step [s]
-dtmax    =  1e6;                 % maximum time step [s]
+dtmax    =  0.0125*yr;           % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -54,12 +54,12 @@ Ptop     =  1e5;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-tau_T    =  5*yr;                % wall cooling/assimilation time [s]
+tau_T    =  6*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
 Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
-cP       =  1300;                % heat capacity [J/kg/K]
+cP       =  1200;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 calID    = 'luna6';              % calibration ID
 
