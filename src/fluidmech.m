@@ -295,7 +295,7 @@ resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 % update phase velocities
 Wx   = W + wx;                                                             % xtl z-velocity
 Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + wm;                                                             % mlt z-velocity
+Wm   = W + 0.;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
 % update mixture volume flux

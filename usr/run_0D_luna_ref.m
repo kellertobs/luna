@@ -11,7 +11,6 @@ plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 diseq    =  1;                   % switch on disequilibrium approach
-entr_mth =  1;                   % switch on to use entropy equation for heat evolution, else temperature equation used
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on fluid mechanics solver
 
 % set model domain parameters
@@ -24,8 +23,8 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  1e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  8*yr;                % end time for simulation [s]
-dt       =  0.016*yr;            % initial time step [s]
+tend     =  10*yr;               % end time for simulation [s]
+dt       =  0.0125*yr;           % initial time step [s]
 dtmax    =  1e6;                 % maximum time step [s]
 
 % set initial thermo-chemical state
@@ -34,32 +33,21 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1700;                % temperature top layer [deg C]
-T1       =  1700;                % temperature base layer [deg C]
+T0       =  1650;                % temperature top layer [deg C]
+T1       =  1650;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
-cl       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
+c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
 dc       =  [1,-1,1,-1,0,0].*0e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
-it0      =  1;                   % incompatible tracer top layer [wt ppm]
-it1      =  1;                   % incompatible tracer base layer [wt ppm]
-dit      =  0.00;                % incompatible tracer random noise [wt ppm]
-KIT      =  1e-2;                % incompatible tracer partition coefficient
-ct0      =  1;                   % compatible tracer top layer [wt ppm]
-ct1      =  1;                   % compatible tracer base layer [wt ppm]
-dct      = -0.00;                % compatible tracer random noise [wt ppm]
-KCT      =  1e+2;                % compatible tracer partition coefficient
-si0      =  0;                   % stable isotope ratio top layer [delta]
-si1      =  0;                   % stable isotope ratio base layer [delta]
-dsi      =  0.00;                % stable isotope ratio random noise [delta]
-ri0      =  1;                   % radiogenic isotope top layer [wt ppm]
-ri1      =  1;                   % radiogenic isotope base layer [wt ppm]
-dri      = -0.00;                % radiogenic isotope random noise [wt ppm]
-KRIP     =  10.;                 % radiogenic parent isotope partition coefficient
-KRID     =  0.1;                 % radiogenic daughter isotope partition coefficient
-HLRIP    =  1e3*yr;              % radiogenic parent isotope half-life [s]
-HLRID    =  1e2*yr;              % radiogenic daughter isotope half-life [s]
+te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
+te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
+dte      =  0e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
+Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
+ir0      =  [0,-1];              % isotope ratios top layer [delta]
+ir1      =  [0, 1];              % isotope ratios base layer [delta]
+dir      =  [0, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e5;                 % top pressure [Pa]
@@ -74,7 +62,6 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 cP       =  1300;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 calID    = 'luna6';              % calibration ID
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
@@ -93,15 +80,15 @@ dx       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-ADVN     =  'FRM';               % advection scheme ('UPW2', 'UPW3', or 'FRM')
-rtol     =  1e-3;                % outer its relative tolerance
-atol     =  1e-6;                % outer its absolute tolerance
-maxit    =  10;                  % maximum outer its
-lambda   =  0.5;                 % iterative lag parameter equilibration
+CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+rtol     =  1e-5;                % outer its relative tolerance
+atol     =  1e-8;                % outer its absolute tolerance
+maxit    =  20;                  % maximum outer its
+lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  etareg^0.5;          % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  1e0;                 % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

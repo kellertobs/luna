@@ -21,14 +21,14 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     plot(hist.time/yr,hist.chi(:,2)*100.*(hist.chi(:,2)>1e-9),CL{[1,4]},LW{:});
     title(['$\mu$, $\chi$ [vol\%]'],TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,2)
-    fplot(hist.time/yr,squeeze(hist.c(:,2,:)),LW{:});  axis xy tight; box on;
+    plot(hist.time/yr,squeeze(hist.c(:,2,:)),LW{:});  axis xy tight; box on;
     title('$\bar{c}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(4,1,3)
-    fplot(hist.time/yr,squeeze(hist.cx(:,2,:)),LW{:});  axis xy tight; box on;
+    plot(hist.time/yr,squeeze(hist.cx(:,2,:)),LW{:});  axis xy tight; box on;
     title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     legend(cal.CompStr,TX{:},FS{:},'location','best');
     subplot(4,1,4)
-    fplot(hist.time/yr,squeeze(hist.cm(:,2,:)),LW{:});  axis xy tight; box on;
+    plot(hist.time/yr,squeeze(hist.cm(:,2,:)),LW{:});  axis xy tight; box on;
     title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     xlabel('Time [yr]',TX{:},FS{:});
 
@@ -56,14 +56,14 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     else; set(0, 'CurrentFigure', fh3); clf;
     end
     subplot(3,1,1)
-    fplot(hist.time/yr,squeeze(hist.c_oxd(:,2,:)),LW{:});  axis xy tight; box on;
+    plot(hist.time/yr,squeeze(hist.c_oxd(:,2,:)),LW{:});  axis xy tight; box on;
     title('$\bar{c}_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(3,1,2)
-    fplot(hist.time/yr,squeeze(hist.cx_oxd(:,2,:)),LW{:});  axis xy tight; box on;
+    plot(hist.time/yr,squeeze(hist.cx_oxd(:,2,:)),LW{:});  axis xy tight; box on;
     title('$c^x_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     legend(cal.oxdStr,TX{:},FS{:},'location','best');
     subplot(3,1,3)
-    fplot(hist.time/yr,squeeze(hist.cm_oxd(:,2,:)),LW{:});  axis xy tight; box on;
+    plot(hist.time/yr,squeeze(hist.cm_oxd(:,2,:)),LW{:});  axis xy tight; box on;
     title('$c^m_\mathrm{oxd}$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     xlabel('Time [yr]',TX{:},FS{:});
 

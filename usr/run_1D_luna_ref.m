@@ -11,7 +11,6 @@ plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 diseq    =  1;                   % switch on disequilibrium approach
-entr_mth =  1;                   % switch on to use entropy equation for heat evolution, else temperature equation used
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on fluid mechanics solver
 
 % set model domain parameters
