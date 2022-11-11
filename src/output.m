@@ -74,7 +74,8 @@ elseif Nx <= 10  % create 1D plots
     end
     sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
-    plot(T(2:end-1,2:end-1)-273.15,Zc(2:end-1).'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;
+    plot(reshape(cal.Tliq,Nz-2,Nx-2),Zc(2:end-1).'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(T(2:end-1,2:end-1)-273.15,Zc(2:end-1).'./1e3,CL{[1,2]},LW{:}); 
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,2)
     plot(mu (2:end-1,2:end-1)*100.*(mu (2:end-1,2:end-1)>1e-9),Zc(2:end-1).'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
@@ -112,8 +113,8 @@ elseif Nx <= 10  % create 1D plots
     plot(-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*(Wx(:,2:end-1)-W(:,2:end-1))*hr,Zf.'./1e3,CL{[1,4]},LW{:});
     title('$W$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,5)
-    plot(P(2:end-1,2:end-1)/1e3,Zc(2:end-1).'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;
-    title('$P$ [kPa]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
+    plot(P(2:end-1,2:end-1),Zc(2:end-1).'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;
+    title('$P$ [Pa]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh3); clf;
@@ -241,8 +242,8 @@ else % create 2D plots
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3, U(2:end-1,:      ).*hr); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$U$ [m/hr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh1,'CurrentAxes',ax(13));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3, P(2:end-1,2:end-1)./1e3); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$P$ [kPa]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); xlabel('Width [km]',TX{:},FS{:});
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3, P(2:end-1,2:end-1)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$P$ [Pa]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); xlabel('Width [km]',TX{:},FS{:});
     set(fh1,'CurrentAxes',ax(14));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,T(2:end-1,2:end-1)-273.15); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$T [^\circ$C]'],TX{:},FS{:}); xlabel('Width [km]',TX{:},FS{:}); set(gca,'YTickLabel',[]);
@@ -301,14 +302,14 @@ else % create 2D plots
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,Gx./rho(2:end-1,2:end-1)*yr*100.*(chi(2:end-1,2:end-1)>1e-9)); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\Gamma_x/\bar{\rho}$ [wt\%/yr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh4,'CurrentAxes',ax(43));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,      rho(2:end-1,2:end-1) ); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}$ [kg/m$^3$]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
-    set(fh4,'CurrentAxes',ax(44));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,-(chi(1:end-1,2:end-1)+chi(2:end,2:end-1))/2.*wx(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^x$ [m/hr]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^x$ [m/hr]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(fh4,'CurrentAxes',ax(44));
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,rho(2:end-1,2:end-1)-mean(rho(2:end-1,2:end-1),2)); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\rho}-\langle\bar{\rho}\rangle_h$ [kg/m$^3$]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
     set(fh4,'CurrentAxes',ax(45));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,-(mu (1:end-1,2:end-1)+mu (2:end,2:end-1))/2.*wm(:,2:end-1).*hr); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$w_\Delta^m$ [m/hr]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,log10(etam(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\eta^m$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
     set(fh4,'CurrentAxes',ax(46));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,log10(eta(2:end-1,2:end-1))); axis ij equal tight; box on; cb = colorbar;
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title(['$\bar{\eta}$ [log$_{10}$ Pas]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
@@ -417,9 +418,9 @@ if save_op
     end
 
     name = [opdir,'/',runID,'/',runID,'_',num2str(floor(step/nop))];
-    save(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
+    save(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx');
     name = [opdir,'/',runID,'/',runID,'_cont'];
-    save(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
+    save(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx');
 
     if step == 0
         logfile = [opdir,'/',runID,'/',runID,'.log'];

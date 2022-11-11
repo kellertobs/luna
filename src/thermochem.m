@@ -32,7 +32,7 @@ T = (T0+273.15) * exp(S./rho./cP - x.*Dsx./cP + Adbt./cP.*(Pt-Ptop));% convert e
 % update major component 
 advn_C = zeros(size(c(inz,inx,:)));
 diff_C = zeros(size(c(inz,inx,:)));
-for i = 1:cal.nc
+for i = 2:cal.nc
     advn_C(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*cm(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
                     - advect(rho(inz,inx).*x(inz,inx).*cx(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 

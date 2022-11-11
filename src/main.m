@@ -9,7 +9,9 @@ end
     
 % physical time stepping loop
 while time <= tend && step <= M
-        
+    
+    if step==1; theta=1; else; theta=1/2; end
+
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [yr]\n\n',step,dt./yr,time./yr);
     tic;
     
