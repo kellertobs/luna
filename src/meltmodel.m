@@ -51,7 +51,7 @@ r    =  sum(var.c./cal.K,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-12; % tolerance for Newton residual
+rnorm_tol  =  1e-14; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_T      =  0.1;   % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
@@ -104,7 +104,7 @@ function  [cal, flag]  =  Tliquidus(var,cal)
 %*****  subroutine to compute liquidus temperature at given bulk composition
 
 %***  exclude invalid compositions
-ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1;
+ii  =  sum(var.c(:,sum(var.c,1)>1),2)<=1+1e-14;
 
 %***  get P-dependent pure component melting T
 cal  =  K(var.T,var.P,cal);
@@ -124,7 +124,7 @@ r  =  sum(var.c.*cal.K,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-12; % tolerance for Newton residual
+rnorm_tol  =  1e-14; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_T      =  0.1;   % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
