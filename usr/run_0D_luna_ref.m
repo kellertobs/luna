@@ -6,7 +6,7 @@ addpath('../src');
 runID    =  '0D_luna_ref';       % run identifier
 opdir    =  '../out/';           % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -23,9 +23,9 @@ h        =  D/(N-2);             % grid spacing (equal in both dimensions, do no
 M        =  1e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  8*yr;                % end time for simulation [s]
-dt       =  0.0125*yr;           % initial time step [s]
-dtmax    =  0.0125*yr;           % maximum time step [s]
+tend     =  9*yr;                % end time for simulation [s]
+dt       =  0.005*yr;            % initial time step [s]
+dtmax    =  0.005*yr;            % maximum time step [s]
 
 % set initial thermo-chemical state
 seed     =  15;                  % random perturbation seed
@@ -33,8 +33,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1650;                % temperature top layer [deg C]
-T1       =  1650;                % temperature base layer [deg C]
+T0       =  1625;                % temperature top layer [deg C]
+T1       =  1625;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
@@ -54,7 +54,7 @@ Ptop     =  1e5;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-tau_T    =  6*yr;                % wall cooling/assimilation time [s]
+tau_T    =  5*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
 Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 

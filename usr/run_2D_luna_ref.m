@@ -5,7 +5,7 @@ addpath('../src');
 % set run parameters
 runID    =  '2D_luna_ref';       % run identifier
 opdir    =  '../out';            % output directory
-restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -39,23 +39,23 @@ T1       =  1675;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
-dc       =  [10,-1,1,-10,0,0].*1e-4; % amplitude of random noise [wt SiO2]
+dc       =  [2,-1,1,-2,0.1,-0.1].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
-te0      =  [0.1,0.3,2,3];       % trace elements top layer [wt ppm]
-te1      =  [0.1,0.3,2,3];       % trace elements base layer [wt ppm]
-dte      =  1e-3.*[1,1,-1,-1].*te0;% trace elements random noise [wt ppm]
+te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
+te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
+dte      =  1e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
 Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
 ir0      =  [0,-1];              % isotope ratios top layer [delta]
 ir1      =  [0, 1];              % isotope ratios base layer [delta]
-dir      =  [1,0.0];             % isotope ratios random noise [delta]
+dir      =  [1, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e5;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
-tau_T    =  6*yr;                % wall cooling/assimilation time [s]
+tau_T    =  5*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
 Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 
@@ -63,7 +63,6 @@ Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
 cP       =  1200;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
 calID    = 'luna6';              % calibration ID
-Dsx      = -300;                 % entropy change of crystallisation [J/kg]
 
 % set model rheology parameters
 etam0    =  1e1;                 % melt  reference viscosity [Pas]
