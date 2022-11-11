@@ -183,7 +183,7 @@ VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
 
 rho    =  rhom0(1).*ones(size(Tp));
 rhoref =  mean(rho(inz,inx),'all');
-Pt     =  Ptop + rhoref.*g0.*ZZ;
+Pt     =  Ptop + rhoref.*g0.*(ZZ+h/2).*1.05;
 mq  =  ones(size(Tp));  m = mq;
 xq  = zeros(size(Tp));  x = xq;
 
@@ -192,10 +192,11 @@ step   =  0;
 theta  = 1/2;
 res = 1;  tol = 1e-12;
 while res > tol
-    xi = x;
+    Pti = Pt;
     
     rhoref =  mean(rho(inz,inx),'all');
-    Pt     =  Ptop + rhoref.*g0.*ZZ;
+    rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
+    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     Adbt   =  aT./rhoref;
     if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
@@ -231,7 +232,7 @@ while res > tol
 
     update;
 
-    res  = norm(x(:)-xi(:),2)./sqrt(length(x(:)));
+    res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2);
 end
 dto   = dt;
 Pto   = Pt;
@@ -289,7 +290,7 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx','wm');
+        load(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx');
         
         xq = x;
         SOL = [W(:);U(:);P(:)];
