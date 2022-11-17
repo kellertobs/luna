@@ -75,6 +75,7 @@ elseif Nx <= 10  % create 1D plots
     sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
     subplot(1,5,1)
     plot(reshape(cal.Tliq,Nz-2,Nx-2),Zc(2:end-1).'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(reshape(cal.Tsol,Nz-2,Nx-2),Zc(2:end-1).'./1e3,CL{[1,4]},LW{:});
     plot(T(2:end-1,2:end-1)-273.15,Zc(2:end-1).'./1e3,CL{[1,2]},LW{:}); 
     title('$T [^\circ$C]',TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:}); set(gca,TL{:},TS{:});
     subplot(1,5,2)

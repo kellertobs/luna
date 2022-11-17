@@ -190,7 +190,8 @@ xq  = zeros(size(Tp));  x = xq;
 % get volume fractions and bulk density
 step   =  0;
 theta  = 1/2;
-res = 1;  tol = 1e-12;
+res    = 1;  tol = 1e-12;
+cal.Tliq = reshape(Tp(inz,inx),[],1);
 while res > tol
     Pti = Pt;
     
@@ -200,7 +201,11 @@ while res > tol
     Adbt   =  aT./rhoref;
     if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
-    T    =  (Tp+273.15).*exp(Adbt./cP.*Pt);
+    T  = (Tp+273.15).*exp(Adbt./cP.*Pt);
+
+    T(inz,inx)   = max(T(inz,inx),reshape(cal.Tliq+273.15,(Nz-2),(Nx-2)));
+    T([1 end],:) = T([2 end-1],:);
+    T(:,[1 end]) = T(:,[2 end-1]);
 
     var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.nc);  % in wt
     var.T = reshape(T(inz,inx),(Nx-2)*(Nz-2),1)-273.15;  % convert to C

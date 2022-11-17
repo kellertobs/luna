@@ -58,8 +58,10 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      %
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % W one to the right
 
 % what shall we do with the drunken sailor...
-aa = -ddz(rho(2:end-1,2:end-1),h).*g0.*dt/2;
-IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
+if ~bnchm
+    aa = -ddz(rho(2:end-1,2:end-1),h).*g0.*dt/2;
+    IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
+end
     
 % coefficients multiplying x-velocities U
 %         top left         ||        bottom left          ||       top right       ||       bottom right
@@ -250,7 +252,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = VolSrc;
+rr = -VolSrc;
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -272,7 +274,7 @@ if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 LL = [ KV  -GG  ; ...
       -DD   KP ];
 
-RR = [RV; -RP];
+RR = [RV; RP];
 
 SCL = sqrt(abs(diag(LL)));
 SCL = diag(sparse(1./(SCL+1)));
@@ -290,6 +292,7 @@ W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % mat
 U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
 Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
 % get residual of fluid mechanics equations from iterative update
 resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);

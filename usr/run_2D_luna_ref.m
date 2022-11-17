@@ -6,18 +6,17 @@ addpath('../src');
 runID    =  '2D_luna_ref';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  100;                 % output frame plotted/saved every 'nop' time steps
+nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 diseq    =  1;                   % switch on disequilibrium approach
-entr_mth =  1;                   % switch on to use entropy equation for heat evolution, else temperature equation used
 bnchm    =  0;                   % switch on to run manufactured solution benchmark on fluid mechanics solver
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
 L        =  1000e3;              % chamber width [m]
-N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -34,8 +33,8 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1675;                % temperature top layer [deg C]
-T1       =  1675;                % temperature base layer [deg C]
+T0       =  1650;                % temperature top layer [deg C]
+T1       =  1650;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
 c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
@@ -51,21 +50,20 @@ ir1      =  [0, 1];              % isotope ratios base layer [delta]
 dir      =  [1, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
-Ptop     =  1e5;                 % top pressure [Pa]
+Ptop     =  1e4;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 tau_T    =  5*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
-Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
+Tbot     =  1950;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
 cP       =  1200;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
-calID    = 'luna6';              % calibration ID
+calID    = 'luna';               % calibration ID
 
 % set model rheology parameters
-etam0    =  1e1;                 % melt  reference viscosity [Pas]
 etax0    =  1e16;                % solid reference viscosity [Pas]
 AA       = [ 0.6907, 0.1853; 0.1311, 0.1644; ];  % permission slopes
 BB       = [ 0.6904, 0.3096; 0.9988, 0.0012; ];  % permission step locations
@@ -83,7 +81,6 @@ g0       =  1.62;                % gravity [m/s2]
 % set numerical model parameters
 CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-BCA      =  {'',''};             % boundary condition on advection (top/bot, sides)
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its

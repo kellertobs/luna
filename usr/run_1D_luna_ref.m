@@ -15,8 +15,8 @@ bnchm    =  0;                   % switch on to run manufactured solution benchm
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-L        =  1000e3/400;          % chamber width [m]
-N        =  400 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+L        =  1000e3/300;          % chamber width [m]
+N        =  300 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -33,11 +33,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1675;                % temperature top layer [deg C]
-T1       =  1675;                % temperature base layer [deg C]
+T0       =  1800;                % temperature top layer [deg C]
+T1       =  1800;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
-c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
+c0       =  [0.44,0.10,0.20,0.13,0.12,0.01]; % major component top layer
+c1       =  [0.44,0.10,0.20,0.13,0.12,0.01]; % major component base layer
 dc       =  [1,-1,1,-1,0,0].*0e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
@@ -50,21 +50,20 @@ ir1      =  [0, 1];              % isotope ratios base layer [delta]
 dir      =  [0, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
-Ptop     =  1e5;                 % top pressure [Pa]
+Ptop     =  1e4;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
 dw       =  1*h;                 % boundary layer thickness for assimilation [m]
 tau_T    =  5*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
-Tbot     =  1900;                % wall temperature [degC] (nan = insulating)
+Tbot     =  1950;                % wall temperature [degC] (nan = insulating)
 
 % set thermo-chemical material parameters
 cP       =  1200;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
-calID    = 'luna6';              % calibration ID
+calID    = 'luna';               % calibration ID
 
 % set model rheology parameters
-etam0    =  1e1;                 % melt  reference viscosity [Pas]
 etax0    =  1e16;                % solid reference viscosity [Pas]
 AA       = [ 0.6907, 0.1853; 0.1311, 0.1644; ];  % permission slopes
 BB       = [ 0.6904, 0.3096; 0.9988, 0.0012; ];  % permission step locations
@@ -86,9 +85,9 @@ rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
-etareg   =  10^6;              % regularisation factor for viscosity resisting convection
+etareg   =  1e6;                 % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  10^6;              % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  1e6;                 % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************
