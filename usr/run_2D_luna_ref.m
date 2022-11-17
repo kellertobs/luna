@@ -10,8 +10,6 @@ nop      =  200;                 % output frame plotted/saved every 'nop' time s
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
-diseq    =  1;                   % switch on disequilibrium approach
-bnchm    =  0;                   % switch on to run manufactured solution benchmark on fluid mechanics solver
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
@@ -33,11 +31,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1650;                % temperature top layer [deg C]
-T1       =  1650;                % temperature base layer [deg C]
+T0       =  1800;                % temperature top layer [deg C]
+T1       =  1800;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component top layer
-c1       =  [0.40,0.10,0.21,0.13,0.12,0.04]; % major component base layer
+c0       =  [0.44,0.10,0.20,0.13,0.12,0.01]; % major component top layer
+c1       =  [0.44,0.10,0.20,0.13,0.12,0.01]; % major component base layer
 dc       =  [2,-1,1,-2,0.1,-0.1].*1e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters

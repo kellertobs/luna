@@ -85,25 +85,22 @@ cmq([1 end],:,:) = cmq([2 end-1],:,:);
 cmq(:,[1 end],:) = cmq(:,[2 end-1],:);
 
 % update crystal fraction
-if diseq % quasi-equilibrium approach
-    
-    Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(4*dt);
+Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(4*dt);
 
-    advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
-    dXdt   = advn_X + Gx;                                                  % total rate of change
-    
-    X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;       % explicit update of crystal fraction
-    X = max(0,min(rho, X ));                                               % enforce [0,1] limit
-    X([1 end],:) = X([2 end-1],:);                                         % apply boundary conditions
-    X(:,[1 end]) = X(:,[2 end-1]);
+qXz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);
+qXx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);
+diff_X = (- ddz(qXz(:,inx),h)  ...
+          - ddx(qXx(inz,:),h));
 
-else
-    
-    X  =  lambda.*X + (1-lambda).*xq.*rho;
-    Gx = (X(inz,inx)-Xo(inz,inx))./dt + advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % reconstruct crystallisation rate
-    
-end
+dXdt   = advn_X + diff_X + Gx;                                             % total rate of change
+
+X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;           % explicit update of crystal fraction
+X = max(0,min(rho, X ));                                                   % enforce [0,1] limit
+X([1 end],:) = X([2 end-1],:);                                             % apply boundary conditions
+X(:,[1 end]) = X(:,[2 end-1]);
+
 
 % update phase fractions
 x = X./rho;

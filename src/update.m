@@ -94,9 +94,10 @@ wx(end,:)     = 0;
 wx(:,[1 end]) = wx(:,[2 end-1]);
 
 % diffusion parameters
-% kc = rho.*abs((rhox-rho).*g0.*Csgr_x*dx)  * dffreg;                      % component diffusion
-kc = rho.*abs(rhox-rhom)/10.*g0./(eta/etareg)*dx^3 * dffreg;               % component diffusion
-kT = kT0 * dffreg + kc.*cP;                                                % heat diffusion
+kc = rho.*abs((rhox-rho).*g0.*Csgr_x*dx)  * dffreg;                      % component diffusion
+% kc = rho.*abs(rhox-rhom)/10.*g0./(eta/etareg)*dx^3 * dffreg;               % component diffusion
+kx = x.*kc;
+kT = kT0 + kc.*cP;                                                         % heat diffusion
 ks = kT./T;                                                                % entropy diffusion
 
 % heat dissipation (entropy production) rate

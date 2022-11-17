@@ -20,6 +20,7 @@ run(['../cal/cal_',calID]);  % load melt model calibration
 calibrt =  0;                % not in calibrate mode
 TINY    =  1e-12;            % minimum cutoff phase, component fractions
 BCA     =  {'',''};          % boundary condition on advection (top/bot, sides)
+bnchm   =  0;                % not a benchmark run
 
 Dsx     = -cal.dS;           % use entropy change of crystallisation set in cal
 
@@ -297,8 +298,8 @@ if restart
         fprintf('\n   restart from %s \n\n',name);
         load(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx');
         
-        xq = x;
-        SOL = [W(:);U(:);P(:)];
+        xq   = x;
+        SOL  = [W(:);U(:);P(:)];
         rhoo = rho; Div_rhoVo = Div_rhoV;
         update; output;
     else % continuation file does not exist, start from scratch
