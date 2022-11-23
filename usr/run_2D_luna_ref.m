@@ -85,7 +85,6 @@ maxit    =  10;                  % maximum outer its
 lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e12;                % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  etareg^0.5;          % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

@@ -54,7 +54,7 @@ u0    = Drho0*g0*(D/10)^2/eta0/etareg;
 
 wx0   = mean(abs(rhox0-rhom0))*g0*d0^2/eta0;
 
-ud0   = kT0*dffreg/rho0/cP/(D/10);
+ud0   = kT0/rho0/cP/(D/10);
 
 uwT   = dw/tau_T; 
 
