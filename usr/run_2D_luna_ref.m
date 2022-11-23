@@ -3,7 +3,7 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '2D_luna_ref';       % run identifier
+runID    =  '2D_luna_ref_eta12'; % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
@@ -73,11 +73,11 @@ rhom0    =  [2710,3580,2580,2850,2530,2310];  % melt phase ref. density [kg/m3] 
 aT       =  5e-5;                % thermal expansivity [1/K]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  3e-11;               % melt compressibility [1/Pa]
-dx       =  1e-3;                % crystal size [m]
+d0       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.80;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance

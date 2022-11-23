@@ -52,7 +52,7 @@ uc    = Drhoc*g0*(D/10)^2/eta0/etareg;
 ux    = Drhox*g0*(D/10)^2/eta0/etareg;
 u0    = Drho0*g0*(D/10)^2/eta0/etareg;
 
-wx0   = mean(abs(rhox0-rhom0))*g0*dx^2/eta0;
+wx0   = mean(abs(rhox0-rhom0))*g0*d0^2/eta0;
 
 ud0   = kT0*dffreg/rho0/cP/(D/10);
 
@@ -68,7 +68,7 @@ Rux   = wx0/u0;
 RwT   = uwT/u0;
 
 Re    = u0*rho0*(D/10)/eta0/etareg;
-Rex   = wx0*rho0*dx/eta0;
+Rex   = wx0*rho0*d0/eta0;
 
 fprintf('    crystal Re: %1.3e \n'  ,Rex);
 fprintf('     system Re: %1.3e \n\n',Re );
@@ -169,7 +169,7 @@ end
 
 U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
 W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
-P   =  zeros(size(XX));  Pi = P;  res_P = 0.*P;  meanQ = 0;  
+P   =  zeros(size(XX));  Pi = P;  res_P = 0.*P;  meanQ = 0;  Vel = 0.*P;
 SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
@@ -198,8 +198,11 @@ while res > tol
     
     rhoref =  mean(rho(inz,inx),'all');
     rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
-    Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
     Adbt   =  aT./rhoref;
+    Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    Pt            = Pt - Pt(2,:)/2 + Ptop;
+    Pt([1 end],:) = Pt([2 end-1],:);
+    Pt(:,[1 end]) = Pt(:,[2 end-1]);
     if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
     T  = (Tp+273.15).*exp(Adbt./cP.*Pt);
@@ -296,14 +299,20 @@ if restart
     end
     if exist(name,'file')
         fprintf('\n   restart from %s \n\n',name);
-        load(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','hist','VolSrc','wx');
-        
+        load(name,'U','W','P','Pt','x','m','chi','mu','X','S','C','T','c','cm','cx','TE','IR','te','ir','dSdt','dCdt','dXdt','dTEdt','dIRdt','Gx','rho','eta','eII','tII','dt','time','step','VolSrc','wx','wm');
+        name = [opdir,'/',runID,'/',runID,'_hist'];
+        load(name,'hist');
+
         xq   = x;
         SOL  = [W(:);U(:);P(:)];
         rhoo = rho; Div_rhoVo = Div_rhoV;
         update; output;
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
+        update;
+        fluidmech;
+        history;
+        output;
     end
 else
     % complete, plot, and save initial condition

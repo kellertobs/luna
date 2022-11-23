@@ -73,19 +73,19 @@ rhom0    =  [2710,3580,2580,2850,2530,2310];  % melt phase ref. density [kg/m3] 
 aT       =  5e-5;                % thermal expansivity [1/K]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  3e-11;               % melt compressibility [1/Pa]
-dx       =  1e-3;                % crystal size [m]
+d0       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.80;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 lambda   =  0.25;                % iterative lag parameter equilibration
-etareg   =  1e6;                 % regularisation factor for viscosity resisting convection
+etareg   =  1e0;                 % regularisation factor for viscosity resisting convection
 sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
-dffreg   =  1e6;                 % regularisation factor for thermal, chemical, phase diffusion
+dffreg   =  1e0;                 % regularisation factor for thermal, chemical, phase diffusion
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

@@ -85,7 +85,7 @@ cmq([1 end],:,:) = cmq([2 end-1],:,:);
 cmq(:,[1 end],:) = cmq(:,[2 end-1],:);
 
 % update crystal fraction
-Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(4*dt);
+Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(5*dt);
 
 advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 

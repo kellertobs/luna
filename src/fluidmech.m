@@ -74,7 +74,6 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; (1/2*EtaC2(:)-1/3*EtaP2(:
 
 
 % z-RHS vector
-rhofz = (rho(1:end-1,:)+rho(2:end,:))/2;
 rr = - (rhofz(2:end-1,2:end-1) - mean(rhofz(2:end-1,2:end-1),2)) .* g0;
 if bnchm; rr = rr + src_W_mms(2:end-1,2:end-1); end
 
@@ -291,7 +290,15 @@ SOL = SCL*(LL\RR);  % update solution
 W  = full(reshape(SOL(MapW(:))        ,(Nz-1), Nx   ));                    % matrix z-velocity
 U  = full(reshape(SOL(MapU(:))        , Nz   ,(Nx-1)));                    % matrix x-velocity
 P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % matrix dynamic pressure
-Pt(2:end,:) = Ptop + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+
+% magma velocity magnitude
+Vel  = sqrt(((W([1,1:end],:)+W([1:end,end],:))/2).^2 ...
+          + ((U(:,[1,1:end])+U(:,[1:end,end]))/2).^2);
+
+Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+Pt            = Pt - Pt(2,:)/2 + Ptop;
+Pt([1 end],:) = Pt([2 end-1],:);
+Pt(:,[1 end]) = Pt(:,[2 end-1]);
 if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
 % get residual of fluid mechanics equations from iterative update
@@ -300,7 +307,7 @@ resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
 % update phase velocities
 Wx   = W + wx;                                                             % xtl z-velocity
 Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + 0.;                                                             % mlt z-velocity
+Wm   = W + wm;                                                             % mlt z-velocity
 Um   = U + 0.;                                                             % mlt x-velocity
 
 % update mixture volume flux
@@ -309,9 +316,12 @@ Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
 Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
      + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux; 
 
+% mixture velocity magnitude
+Vbar = sqrt(((Wbar([1,1:end],:)+Wbar([1:end,end],:))/2).^2 ...
+          + ((Ubar(:,[1,1:end])+Ubar(:,[1:end,end]))/2).^2);
+
  
 %% update time step
-
 dtk = min((h/2)^2./max(kT(:)./rho(:)./cP));                                % diffusive time step size
-dta = CFL*min(h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16)));              % advective time step size
+dta = CFL*min(h/2/max(abs([Um(:);Wm(:);Ux(:);Wx(:)]+1e-16)));              % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
