@@ -5,7 +5,7 @@ addpath('../src');
 % set run parameters
 runID    =  '2D_luna_ref_eta12'; % run identifier
 opdir    =  '../out';            % output directory
-restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  200;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
@@ -84,7 +84,7 @@ atol     =  1e-6;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
 lambda   =  0.5;                 % iterative lag parameter equilibration
 etareg   =  1e12;                % regularisation factor for viscosity resisting convection
-sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
+sgrreg   =  1e1;                 % regularisation factor for viscosity resisting segregation
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

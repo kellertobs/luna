@@ -28,7 +28,7 @@ wtm(:,4) = reshape(cm_oxd(:,:,3),Nz*Nx,1); % FeO
 wtm(:,6) = reshape(cm_oxd(:,:,4),Nz*Nx,1); % MgO
 wtm(:,7) = reshape(cm_oxd(:,:,5),Nz*Nx,1); % CaO
 wtm(:,8) = reshape(cm_oxd(:,:,6),Nz*Nx,1); % Na2O
-etam  = reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx);
+etam  = max(1e-2,reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx));
 etax  = etax0.* ones(size(x));                                             % constant crystal viscosity
 
 % get permission weights
@@ -52,11 +52,12 @@ etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % eff
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
-Csgr = ((1-ff)./d0^2.*(sgrreg.*kv.*thtv)).^-1 + TINY^2;
+dd = permute(cat(3,d0*ones(size(mu)),d0*(1-mu)),[3,1,2]);
+Csgr = ((1-ff)./dd.^2.*(sgrreg.*kv.*thtv)).^-1 + TINY^2;
 
 Csgr_x = squeeze(Csgr(1,:,:));  Csgr_x([1 end],:) = Csgr_x([2 end-1],:);  Csgr_x(:,[1 end]) = Csgr_x(:,[2 end-1]);
 Csgr_m = squeeze(Csgr(2,:,:));  Csgr_m([1 end],:) = Csgr_m([2 end-1],:);  Csgr_m(:,[1 end]) = Csgr_m(:,[2 end-1]);
-Csgr_m = Csgr_m.*max(TINY,1-mu).^2 + TINY^2; % dampen melt segregation at high melt fraction
+% Csgr_m = Csgr_m.*max(TINY,1-mu).^2 + TINY^2; % dampen melt segregation at high melt fraction
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -100,8 +101,8 @@ wx(:,[1 end]) = wx(:,[2 end-1]);
 
 % diffusion parameters
 kW  = Vel*h/100;                                                           % magma convection fluctuation diffusivity
-kwm = abs((rhom-rho).*g0.*Csgr_m*d0);                                      % melt segregation fluctuation diffusivity
-kwx = abs((rhox-rho).*g0.*Csgr_x*d0);                                      % solid segregation fluctuation diffusivity
+kwm = abs((rhom-rho).*g0.*Csgr_m*d0*10);                                   % melt segregation fluctuation diffusivity
+kwx = abs((rhox-rho).*g0.*Csgr_x*d0*10);                                   % solid segregation fluctuation diffusivity
 kx  = x.*(kwx + kW).*rho;                                                  % phase diffusion 
 kc  = (x.*kwx + m.*kwm + kW).*rho;                                         % component diffusion
 kT  = kT0 + kc.*cP;                                                        % heat diffusion

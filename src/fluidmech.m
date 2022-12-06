@@ -322,6 +322,6 @@ Vbar = sqrt(((Wbar([1,1:end],:)+Wbar([1:end,end],:))/2).^2 ...
 
  
 %% update time step
-dtk = min((h/2)^2./max(kT(:)./rho(:)./cP));                                % diffusive time step size
-dta = CFL*min(h/2/max(abs([Um(:);Wm(:);Ux(:);Wx(:)]+1e-16)));              % advective time step size
+dtk = (h/2)^2./max(kT(:)./rho(:)./cP);                                     % diffusive time step size
+dta = CFL*h/2/max(abs([Um(:);Wm(:);Ux(:);Wx(:)]+1e-16));                   % advective time step size
 dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size

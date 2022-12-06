@@ -13,8 +13,8 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-L        =  1000e3/300;          % chamber width [m]
-N        =  300 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+L        =  1000e3/400;          % chamber width [m]
+N        =  400 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
@@ -77,14 +77,14 @@ d0       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.80;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  10;                  % maximum outer its
-lambda   =  0.25;                % iterative lag parameter equilibration
+lambda   =  0.50;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % regularisation factor for viscosity resisting convection
-sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
+sgrreg   =  1e1;                 % regularisation factor for viscosity resisting segregation
 
 
 %*****  RUN NAKHLA MODEL  *************************************************
