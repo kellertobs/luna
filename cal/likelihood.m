@@ -1,16 +1,22 @@
-function [L] = likelihood (mdl, exp, sig)
+function [L] = likelihood (mdl, exp, sig, Tsol, Tliq, Tsl_sigma, wgt)
 
 % returns log likelihood of the model (scalar),
 % assumes normally distributed data errors
 
 if mdl.flag == 1
     % solution found
-    data  = [exp.fphs(:); exp.oxds(:)];
-    dhat  = [mdl.fphs(:); mdl.oxds(:)];
-    sigma = [sig.fphs(:); sig.oxds(:)];
+
+    % experimental data from Schmidt & Kraettli (2020)
+    expt_data  = [exp.fphs(:); exp.oxds(:)];
+    expt_dhat  = [mdl.fphs(:); mdl.oxds(:)];
+    expt_sigma = [sig.fphs(:); sig.oxds(:)];
+
+    % solidus and liquidus info
+    Tsl_data   = [    Tsol(:);     Tliq(:)];
+    Tsl_dhat   = [mdl.Tsol(:); mdl.Tliq(:)];
     
-    L = sum(-0.5*((data-dhat)./sigma).^2);
-    
+    L = wgt(1)*sum( -0.5*((expt_data - expt_dhat)./expt_sigma).^2 ) + ...
+        wgt(2)*sum( -0.5*(( Tsl_data -  Tsl_dhat)./ Tsl_sigma).^2 );
 else
     % newton solver did not converge, assign a very small likelihood
     L = -1e8;

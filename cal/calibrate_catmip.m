@@ -1,7 +1,7 @@
 %% prep workspace
 clear all; close all;
 addpath('../src');
-addpath('../cal');
+addpath('util/')
 
 % prep plotting options
 TX = {'Interpreter','latex'};
@@ -19,12 +19,20 @@ Niter   = 500;            % number of iterations per catmip temperature
 Nstep   = 100;            % number of steps in MCMC in catmip
 pllopt  = 8;              % whether to run in parallel, number of workers
 
+
+Niter   = 100;            % number of iterations per catmip temperature
+Nstep   = 10;            % number of steps in MCMC in catmip
+pllopt  = 0;              % whether to run in parallel, number of workers
+
 rng(10); % for reproducibility during testing, comment this for actual run
 
 %% load calibration
-cal_catmip
+cal_catmip;
+cal0 = cal;
 
-%% load experimental data from Schmidt & Kraettli (2020), Table 3
+%% set up data for calibration
+
+% load experimental data from Schmidt & Kraettli (2020), Table 3
 Load_SKTable3;
 nphs = 6; olv=1; opx=2; cpx=3; plg=4; tis=5; mlt=6;
 ncmp = 11; Si=1; Ti=2; Al=3; Cr=4; Fe=5; Mn=6; Mg=7; Ca=8; Na=9; K=10; P=11;
@@ -53,6 +61,15 @@ sig_oxds           = zeros(size(oxds));
 sig_oxds(oxds>=20) = factor*max(0.02*oxds(oxds>=20), 1.00);
 sig_oxds(oxds< 20) = factor*max(0.10*oxds(oxds< 20), 0.20);
 sig_oxds(:,pxn,:)  = 2*sig_oxds(:,pxn,:);
+
+
+% load data for solidus and liquidus
+Psol = (0.2:0.1:0.6)';
+[Tsol, Tliq] = solidusliquidus('johnson2021', Psol);
+Tsl_sigma = 10;
+
+% weights for datasets - [SK2020, Tsol/Tliq]
+wgts = [1; 2];
 
 %% prepare information for the parameter fitting
 
@@ -154,14 +171,12 @@ plot(cal.oxds(cal.ab ,Si),cal.oxds(cal.ab ,Na),'s',CL{[1,4]},MS{1},12,LW{:});
 set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('Na$_2$O [wt\%]',TX{:});
 drawnow;
 
-%% define and check functions for mcmc
-
-cal0 = cal;
+%% define and check functions for inversion
 
 prsampfunc= @(Ni)    priorsamp(bnds.mat, Ni);
 priorfunc = @(model) prior(model, bnds.mat);
-likefunc  = @(model) likefrommodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig);
-dhatfunc  = @(model) runmodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg);
+likefunc  = @(model) likefrommodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig, Tsol, Tliq, Psol, Tsl_sigma, wgts);
+dhatfunc  = @(model) runmodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psol);
 
 %% run catmip
 
@@ -339,6 +354,7 @@ figure(); clf;
 plot(cal.Tm,var.P,LW{:}); axis ij tight; box on; hold on
 plot(cal.Tsol,var.P,'k--',LW{1},3); axis ij tight; box on;
 plot(cal.Tliq,var.P,'k-.',LW{1},3); axis ij tight; box on;
+plot(Tsol, Psol, 'k+', Tliq, Psol, 'kx')
 legend(cal.CompStr{:},'$T_\mathrm{sol}$','$T_\mathrm{liq}$',FS{[1,2]},TX{:})
 set(gca,TL{:},FS{[1,2]})
 xlabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})

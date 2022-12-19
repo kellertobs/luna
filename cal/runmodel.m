@@ -1,4 +1,4 @@
-function [mdl] = runmodel (model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg)
+function [mdl] = runmodel (model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psol)
 
 % run melt model and cast outputs into the same form as the data
 
@@ -39,5 +39,12 @@ for stg = stages
     mdl.oxds(stg,mlt,:) = phs.cl*cal.oxds;
     
 end
+
+% calculate solidus and liquidus from the bulk composition
+var.P = Psol;
+var.c = var.c.*ones(size(Psol));
+[~,cal] = meltmodel(var,cal,'T');
+mdl.Tsol = cal.Tsol; 
+mdl.Tliq = cal.Tliq;
 
 end
