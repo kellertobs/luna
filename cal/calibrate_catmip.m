@@ -19,11 +19,6 @@ Niter   = 500;            % number of iterations per catmip temperature
 Nstep   = 100;            % number of steps in MCMC in catmip
 pllopt  = 8;              % whether to run in parallel, number of workers
 
-
-Niter   = 100;            % number of iterations per catmip temperature
-Nstep   = 10;            % number of steps in MCMC in catmip
-pllopt  = 0;              % whether to run in parallel, number of workers
-
 rng(10); % for reproducibility during testing, comment this for actual run
 
 %% load calibration
