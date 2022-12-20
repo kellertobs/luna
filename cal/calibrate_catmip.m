@@ -64,12 +64,12 @@ sig_oxds(:,pxn,:)  = 2*sig_oxds(:,pxn,:);
 
 
 % load data for solidus and liquidus
-Psol = (0.2:0.1:0.6)';
-[Tsol, Tliq] = solidusliquidus('johnson2021', Psol);
-Tsl_sigma = 10;
+Psl = (0.1:0.2:4)'; % all across pressure space
+[Tsol, Tliq] = solidusliquidus('johnson2021', Psl);
+Tsl_sigma = 5;
 
 % weights for datasets - [SK2020, Tsol/Tliq]
-wgts = [1; 2];
+wgts = [1; 1];
 
 %% prepare information for the parameter fitting
 
@@ -175,8 +175,8 @@ drawnow;
 
 prsampfunc= @(Ni)    priorsamp(bnds.mat, Ni);
 priorfunc = @(model) prior(model, bnds.mat);
-likefunc  = @(model) likefrommodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig, Tsol, Tliq, Psol, Tsl_sigma, wgts);
-dhatfunc  = @(model) runmodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psol);
+likefunc  = @(model) likefrommodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig, Tsol, Tliq, Psl, Tsl_sigma, wgts);
+dhatfunc  = @(model) runmodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psl);
 
 %% run catmip
 
@@ -310,12 +310,8 @@ set(gca,TL{:},FS{[1,2]})
 ylabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 xlabel('ab [wt]',TX{:},FS{[1,3]})
 
-% set bulk composition as ['fo','fa','opx','px2','cpx,'an','ab']
-c0 = [0.35;0.10;0.23;0.13;0.15;0.04];  % find end-member proportions of first step
-c0 = c0.'./sum(c0);
-
 % plot partition coefficients (T-dependent)
-var.c = ones(100,1)*c0;
+var.c = ones(100,1)*cal.c0;
 var.T = linspace(1000,1800,100).';
 var.P = linspace(1.5,1.5,100).';
 
@@ -330,7 +326,7 @@ ylabel('log$_{10} \ K$',TX{:},FS{[1,3]})
 
 
 % plot partition coefficients (P-dependent)
-var.c = ones(100,1)*c0;
+var.c = ones(100,1)*cal.c0;
 var.T = linspace(1300,1300,100).';
 var.P = linspace(0,4,100).';
 
@@ -344,7 +340,7 @@ xlabel('log$_{10} \ K$',TX{:},FS{[1,3]})
 ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
 
 % plot melting points, solidus, liquidus (P-dependent)
-var.c = ones(100,1)*c0;
+var.c = ones(100,1)*cal.c0;
 var.T = linspace(1300,1300,100).';
 var.P = linspace(0,4,100).';
 
@@ -354,14 +350,14 @@ figure(); clf;
 plot(cal.Tm,var.P,LW{:}); axis ij tight; box on; hold on
 plot(cal.Tsol,var.P,'k--',LW{1},3); axis ij tight; box on;
 plot(cal.Tliq,var.P,'k-.',LW{1},3); axis ij tight; box on;
-plot(Tsol, Psol, 'k+', Tliq, Psol, 'kx')
+plot(Tsol, Psl, 'k+', Tliq, Psl, 'kx')
 legend(cal.CompStr{:},'$T_\mathrm{sol}$','$T_\mathrm{liq}$',FS{[1,2]},TX{:})
 set(gca,TL{:},FS{[1,2]})
 xlabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
 
 % plot melt fraction, phase compositions (T-dependent)
-var.c = ones(100,1)*c0;
+var.c = ones(100,1)*cal.c0;
 var.T = linspace(1300,1300,100).';
 var.P = linspace(0.1,0.1,100).';
 

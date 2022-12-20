@@ -16,6 +16,9 @@ cal.oxds   = [  42.7    0.0    0.0   57.3    0.0      0
 %                 67.4   20.4    1.5    0.1    0.6   10.0  ];
 cal.oxds = cal.oxds./sum(cal.oxds,2)*100;
 
+% set bulk composition
+cal.c0 = [0.44,0.10,0.20,0.13,0.12,0.01];
+
 % specify calibration parameters
 
 % set pure component melting points T_m^i at P=0
@@ -62,12 +65,12 @@ bnds.T0(cal.cpx,:) = cal.T0(cal.cpx) + [-1,+1]*100;
 bnds.T0(cal.an ,:) = cal.T0(cal.an ) + [-1,+1]* 30;
 bnds.T0(cal.ab ,:) = cal.T0(cal.ab ) + [-1,+1]*100;
 
-bnds.A(cal.fo ,:)  = cal.A(cal.fo )  + [-1,+1]*1;
-bnds.A(cal.fay,:)  = cal.A(cal.fay)  + [-1,+1]*1;
-bnds.A(cal.opx,:)  = cal.A(cal.opx)  + [-1,+1]*1;
-bnds.A(cal.cpx,:)  = cal.A(cal.cpx)  + [-1,+1]*1;
-bnds.A(cal.an ,:)  = cal.A(cal.an )  + [-1,+1]*1;
-bnds.A(cal.ab ,:)  = cal.A(cal.ab )  + [-1,+1]*1;
+bnds.A(cal.fo ,:)  = cal.A(cal.fo )  + [-1,+1]*10;
+bnds.A(cal.fay,:)  = cal.A(cal.fay)  + [-1,+1]*10;
+bnds.A(cal.opx,:)  = cal.A(cal.opx)  + [-1,+1]*10;
+bnds.A(cal.cpx,:)  = cal.A(cal.cpx)  + [-1,+1]*10;
+bnds.A(cal.an ,:)  = cal.A(cal.an )  + [-1,+1]*10;
+bnds.A(cal.ab ,:)  = cal.A(cal.ab )  + [-1,+1]*10;
 
 bnds.B(cal.fo ,:)  = cal.B(cal.fo )  + [-1,+1]*0.2;
 bnds.B(cal.fay,:)  = cal.B(cal.fay)  + [-1,+1]*0.2;

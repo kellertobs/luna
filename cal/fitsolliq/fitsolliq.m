@@ -14,12 +14,33 @@ liq = table2array( readtable("liq.xlsx",ReadVariableNames=false) ); % P and T fo
 Tsol = sol(:,1);    Psol = sol(:,2);
 Tliq = liq(:,1);    Pliq = liq(:,2);
 
+%% do it using Simon's Law 
+% preferred method for consistency with meltmodel function
+
+simonlaw = @(x, P) x(1).*(1 + P./x(2)).^(1./x(3));
+cfit_liq = lsqcurvefit(simonlaw, [Tliq(end),1,1], Pliq, Tliq);
+cfit_sol = lsqcurvefit(simonlaw, [Tsol(end),1,1], Psol, Tsol);
+
+figure;
+set(gcf,'defaultaxescolororder', repelem(lines(2), 2, 1));
+plot(Tsol, Psol, '+', 'markersize', 10); hold on; axis manual
+plot(simonlaw(cfit_sol, Psol), Psol); 
+plot(Tliq, Pliq, '+', 'markersize', 10); 
+plot(simonlaw(cfit_liq, Pliq), Pliq);  hold off;
+set(gca,'ydir', 'reverse'); xlim([1000,1900])
+xlabel('Temperature [degC]');
+ylabel('Pressure [GPa]');
+
+save('solliq_johnson2021.mat', 'cfit_liq', 'cfit_sol', 'simonlaw');
+
+%% other options I tested
+
 %% use polynomial fitting
 % but we need to split into deep and shallow parts because there are kinks
 % in the curves
 
-solcurve_deep = polyfit(Psol(Psol>1), Tsol(Psol>1), 3);
-solcurve_shal = polyfit(Psol(Psol<1), Tsol(Psol<1), 3);
+solcurve_deep = polyfit(Psol(Psol>1), Tsol(Psol>1), 2);
+solcurve_shal = polyfit(Psol(Psol<1), Tsol(Psol<1), 2);
 liqcurve_deep = polyfit(Pliq(Pliq>4), Tliq(Pliq>4), 2);
 liqcurve_shal = polyfit(Pliq(Pliq<4), Tliq(Pliq<4), 2);
 
@@ -50,4 +71,6 @@ set(gca,'ydir', 'reverse'); xlim([1000,1900])
 xlabel('Temperature [degC]');
 ylabel('Pressure [GPa]');
 
-save('solliq_johnson2021.mat', 'ppsol', 'ppliq')
+% save('solliq_johnson2021.mat', 'ppsol', 'ppliq')
+
+

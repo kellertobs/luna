@@ -1,4 +1,4 @@
-function [mdl] = runmodel (model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psol)
+function [mdl] = runmodel (model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psl)
 
 % run melt model and cast outputs into the same form as the data
 
@@ -11,8 +11,8 @@ cal = model2cal(cal0, model);
 for stg = stages
 
     % get computed phase proportions, compositions
-    c0       =  max(0,min(1,cal.oxds.'\squeeze(oxds(stg,blk,:))));  % find end-member proportions of first step
-    var.c    =  c0.'./sum(c0);
+%     c0       =  max(0,min(1,cal.oxds.'\squeeze(oxds(stg,blk,:))));  % find end-member proportions of first step
+    var.c    =  cal.c0;
     var.T    =  Temp(stg);
     var.P    =  Pres(stg);
     [phs,~]  =  meltmodel(var,cal,'E');
@@ -41,10 +41,11 @@ for stg = stages
 end
 
 % calculate solidus and liquidus from the bulk composition
-var.P = Psol;
-var.c = var.c.*ones(size(Psol));
-[~,cal] = meltmodel(var,cal,'T');
+var.P    = Psl;
+var.c    = cal.c0.*ones(size(Psl));
+[~,cal]  = meltmodel(var,cal,'T');
 mdl.Tsol = cal.Tsol; 
 mdl.Tliq = cal.Tliq;
+mdl.Tm   = cal.Tm;
 
 end

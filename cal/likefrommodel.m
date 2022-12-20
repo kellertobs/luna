@@ -1,4 +1,4 @@
-function [L, tmp] = likefrommodel (model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig, Tsol, Tliq, Psol, Tsl_sigma, wgt)
+function [L, tmp] = likefrommodel (model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig, Tsol, Tliq, Psl, Tsl_sigma, wgt)
 % 
 % [L] = likefrommodel (model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, exp, sig)
 % 
@@ -8,7 +8,7 @@ function [L, tmp] = likefrommodel (model, cal0, oxds, Temp, Pres, stages, hasolv
 % 
 % 
 
-mdl = runmodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psol);
+mdl = runmodel(model, cal0, oxds, Temp, Pres, stages, hasolv, haspxn, hasplg, Psl);
 L   = likelihood(mdl, exp, sig, Tsol, Tliq, Tsl_sigma, wgt);
 tmp = 1;
 

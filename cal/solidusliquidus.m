@@ -12,9 +12,9 @@ switch phasemodel
         % Earth and Planetary Science Letters, 556, 116721. 
         % https://doi.org/10.1016/j.epsl.2020.116721
 
-        load("fitsolliq/solliq_johnson2021.mat");
-        Tsol = ppval(ppsol, Psol);
-        Tliq = ppval(ppliq, Pliq);
+        load("fitsolliq/solliq_johnson2021.mat", 'cfit_liq', 'cfit_sol', 'simonlaw');
+        Tsol = simonlaw(cfit_sol, Psol);
+        Tliq = simonlaw(cfit_liq, Pliq);
 
     %case other paper
 
