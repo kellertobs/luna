@@ -17,7 +17,7 @@ cal.oxds   = [  42.7    0.0    0.0   57.3    0.0      0
 cal.oxds = cal.oxds./sum(cal.oxds,2)*100;
 
 % set bulk composition
-cal.c0 = bulkmoon;
+cal.c0 = [0.44, 0.10, 0.20, 0.13, 0.12, 0.01];
 
 % specify calibration parameters
 

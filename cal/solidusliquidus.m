@@ -1,8 +1,8 @@
-function [Tsol, Tliq] = solidusliquidus(phasemodel, Psol, Pliq)
+function [Tsol, Tliq] = solidusliquidus(model, Psol, Pliq)
 
 if nargin<3, Pliq = Psol; end
 
-switch phasemodel
+switch model
 
     case 'johnson2021'
         % Johnson, T. E., Morrissey, L. J., Nemchin, A. A., Gardiner, N. J.,
