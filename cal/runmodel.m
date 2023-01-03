@@ -12,6 +12,7 @@ for stg = stages
 
     % get computed phase proportions, compositions
     c0       =  max(0,min(1,cal.oxds.'\squeeze(oxds(stg,blk,:))));  % find end-member proportions of first step
+    var.c    =  c0.'./sum(c0);
     var.T    =  Temp(stg);
     var.P    =  Pres(stg);
     [phs,~]  =  meltmodel(var,cal,'E');
