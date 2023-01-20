@@ -25,7 +25,7 @@ for i = 1:cal.nc
                + sum(  C(2:end-1,2,i).*U(2:end-1,1)*h*1) - sum(  C(2:end-1,end-1,i).*U(2:end-1,end)*h*1);  % [kg/s]
 end
 
-if stp>1; hist.DM(stp)   = hist.DM(stp-1)   +        dsumMdt                      .*dt; else; hist.DM(stp) = 0; end  % [kg]
+if stp>1; hist.DM(stp)   = hist.DM(stp-1)   + (theta*dsumMdt + (1-theta)*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [J/K]
 if stp>1; hist.DS(stp)   = hist.DS(stp-1)   + (theta*dsumSdt + (1-theta)*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J/K]
 if stp>1; hist.DC(stp,:) = hist.DC(stp-1,:) + (theta*dsumCdt + (1-theta)*dsumCdto).*dt; else; hist.DC(stp,:) = zeros(1,cal.nc); end  % [kg]
 

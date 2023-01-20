@@ -13,12 +13,12 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
-L        =  1000e3/400;          % chamber width [m]
-N        =  400 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+L        =  1000e3/500;          % chamber width [m]
+N        =  500 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  1e6;                 % number of time steps to take
+Nt       =  1e6;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1e3*yr;              % end time for simulation [s]
@@ -51,7 +51,7 @@ dir      =  [0, 0];              % isotope ratios random noise [delta]
 Ptop     =  1e4;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
-dw       =  1*h;                 % boundary layer thickness for assimilation [m]
+dw       =  h;                   % boundary layer thickness for assimilation [m]
 tau_T    =  5*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
 Tbot     =  1950;                % wall temperature [degC] (nan = insulating)
@@ -77,11 +77,12 @@ d0       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
+theta    =  0.5;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
 CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
-maxit    =  10;                  % maximum outer its
+maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 etareg   =  1e0;                 % regularisation factor for viscosity resisting convection
 sgrreg   =  1e1;                 % regularisation factor for viscosity resisting segregation

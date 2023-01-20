@@ -52,12 +52,11 @@ etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % eff
        +  eta(1:end-1,2:end  )+eta(2:end,2:end  ))./4;
 
 % get segregation coefficients
-dd = permute(cat(3,d0*ones(size(mu)),d0*(1-mu)),[3,1,2]);
-Csgr = ((1-ff)./dd.^2.*(sgrreg.*kv.*thtv)).^-1 + TINY^2;
+dd   = permute(cat(3,d0*ones(size(mu)),d0*(1-mu)),[3,1,2]);
+Ksgr = ((1-ff)./dd.^2.*(sgrreg.*kv.*thtv)).^-1 + TINY^2;
 
-Csgr_x = squeeze(Csgr(1,:,:));  Csgr_x([1 end],:) = Csgr_x([2 end-1],:);  Csgr_x(:,[1 end]) = Csgr_x(:,[2 end-1]);
-Csgr_m = squeeze(Csgr(2,:,:));  Csgr_m([1 end],:) = Csgr_m([2 end-1],:);  Csgr_m(:,[1 end]) = Csgr_m(:,[2 end-1]);
-% Csgr_m = Csgr_m.*max(TINY,1-mu).^2 + TINY^2; % dampen melt segregation at high melt fraction
+Ksgr_x = squeeze(Ksgr(1,:,:));  Ksgr_x([1 end],:) = Ksgr_x([2 end-1],:);  Ksgr_x(:,[1 end]) = Ksgr_x(:,[2 end-1]);
+Ksgr_m = squeeze(Ksgr(2,:,:));  Ksgr_m([1 end],:) = Ksgr_m([2 end-1],:);  Ksgr_m(:,[1 end]) = Ksgr_m(:,[2 end-1]);
 
 % update velocity divergence
 Div_V(2:end-1,2:end-1) = ddz(W(:,2:end-1),h) ...                           % get velocity divergence
@@ -66,10 +65,10 @@ Div_V([1 end],:) = Div_V([2 end-1],:);                                     % app
 Div_V(:,[1 end]) = Div_V(:,[2 end-1]);
 
 % update strain rates
-exx(:,2:end-1) = diff(U,1,2)./h - Div_V(:,2:end-1)./3;                     % x-normal strain rate
+exx(:,2:end-1) = diff(U,1,2)./h - Div_V(:,2:end-1)./2;                     % x-normal strain rate
 exx([1 end],:) = exx([2 end-1],:);                                         % apply boundary conditions
 exx(:,[1 end]) = exx(:,[2 end-1]);
-ezz(2:end-1,:) = diff(W,1,1)./h - Div_V(2:end-1,:)./3;                     % z-normal strain rate
+ezz(2:end-1,:) = diff(W,1,1)./h - Div_V(2:end-1,:)./2;                     % z-normal strain rate
 ezz([1 end],:) = ezz([2 end-1],:);                                         % apply boundary conditions
 ezz(:,[1 end]) = ezz(:,[2 end-1]);
 exz            = 1/2.*(diff(U,1,1)./h+diff(W,1,2)./h);                     % shear strain rate
@@ -91,38 +90,41 @@ tII(:,[1 end]) = tII(:,[2 end-1]);
 tII([1 end],:) = tII([2 end-1],:);
 
 % update phase segregation speeds
-wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_m(1:end-1,:)+1./Csgr_m(2:end,:)); % melt segregation speed
+wm = ((rhom(1:end-1,:)+rhom(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Ksgr_m(1:end-1,:)+1./Ksgr_m(2:end,:)); % melt segregation speed
 wm([1 end],:) = 0;
 wm(:,[1 end]) = wm(:,[2 end-1]);
 
-wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Csgr_x(1:end-1,:)+1./Csgr_x(2:end,:)); % solid segregation speed
+wx = ((rhox(1:end-1,:)+rhox(2:end,:))/2-(rho(1:end-1,:)+rho(2:end,:))/2).*g0.*2./(1./Ksgr_x(1:end-1,:)+1./Ksgr_x(2:end,:)); % solid segregation speed
 wx([1 end],:) = 0;
 wx(:,[1 end]) = wx(:,[2 end-1]);
 
 % diffusion parameters
-kW  = Vel*h/100;                                                           % magma convection fluctuation diffusivity
-kwm = abs((rhom-rho).*g0.*Csgr_m*d0*10);                                   % melt segregation fluctuation diffusivity
-kwx = abs((rhox-rho).*g0.*Csgr_x*d0*10);                                   % solid segregation fluctuation diffusivity
-kx  = x.*(kwx + kW).*rho;                                                  % phase diffusion 
-kc  = (x.*kwx + m.*kwm + kW).*rho;                                         % component diffusion
-kT  = kT0 + kc.*cP;                                                        % heat diffusion
+kW  = Vel/10*h/10;                                                         % convection fluctuation diffusivity
+kwx = abs((rhox-rho).*g0.*Ksgr_x*d0*10);                                   % segregation fluctuation diffusivity
+kx  = chi.*(kwx + kW);                                                     % solid fraction diffusion 
+kT  = kT0 + (x.*kwx + kW).*rho.*cP;                                        % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 
 % heat dissipation (entropy production) rate
-[grdTx,grdTz] = gradient(T,h);
-diss =  exx(2:end-1,2:end-1).*txx(2:end-1,2:end-1) ...
-     +  ezz(2:end-1,2:end-1).*tzz(2:end-1,2:end-1) ...
-     +  2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
-         .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...
-     +   mu(2:end-1,2:end-1)./Csgr_m(2:end-1,2:end-1) .* ((wm(1:end-1,2:end-1)+wm(2:end,2:end-1))./2).^2 ...
-     +  chi(2:end-1,2:end-1)./Csgr_x(2:end-1,2:end-1) .* ((wx(1:end-1,2:end-1)+wx(2:end,2:end-1))./2).^2 ...
-     +  ks(2:end-1,2:end-1).*(grdTz(2:end-1,2:end-1).^2 + grdTx(2:end-1,2:end-1).^2);
+if Nz==3 && Nx==3  
+    diss = 0.*T(inz,inx);  % no dissipation in 0-D mode (no diffusion, no shear deformation, no segregation)
+else
+    [grdTx,grdTz] = gradient(T,h);
+    diss = ks(inz,inx).*(grdTz(inz,inx).^2 + grdTx(inz,inx).^2) ...
+        + exx(inz,inx).*txx(inz,inx) + ezz(inz,inx).*tzz(inz,inx) ...
+        + 2.*(exz(1:end-1,1:end-1)+exz(2:end,1:end-1)+exz(1:end-1,2:end)+exz(2:end,2:end))./4 ...
+           .*(txz(1:end-1,1:end-1)+txz(2:end,1:end-1)+txz(1:end-1,2:end)+txz(2:end,2:end))./4 ...
+        +  mu(inz,inx)./Ksgr_m(inz,inx) .* ((wm(inz,inx)+wm(inz,inx))./2).^2 ...
+        + chi(inz,inx)./Ksgr_x(inz,inx) .* ((wx(inz,inx)+wx(inz,inx))./2).^2;
+end
                         
 % update volume source
-Div_rhoV  =  + advect(rho(inz,inx).*x(inz,inx),0.*U(inz,:),wx(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-             + advect(rho(inz,inx).*m(inz,inx),0.*U(inz,:),wm(:,inx),h,{ADVN,''   },[1,2],BCA) ...
-             + advect(rho(inz,inx)            ,   U(inz,:), W(:,inx),h,{ADVN,'vdf'},[1,2],BCA);
-if step>0; VolSrc = -((rho(inz,inx)-rhoo(inz,inx))./dt + Div_rhoV)./rho(inz,inx); end
+if step>0
+    Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt advection
+               + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % xtal advection
+    F_DivV   = (rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo;  % get residual of mixture mass conservation
+    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
+end
 
 UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
 WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);

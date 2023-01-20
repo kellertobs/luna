@@ -5,8 +5,8 @@ addpath('../src');
 % set run parameters
 runID    =  '2D_luna_ref_eta12'; % run identifier
 opdir    =  '../out';            % output directory
-restart  = -1;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  200;                 % output frame plotted/saved every 'nop' time steps
+restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
+nop      =  100;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
 save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
@@ -14,11 +14,11 @@ plot_cv  =  0;                   % switch on to live plot iterative convergence
 % set model domain parameters
 D        =  1000e3;              % chamber depth [m]
 L        =  1000e3;              % chamber width [m]
-N        =  150 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
+N        =  100 + 2;             % number of grid points in z-direction (incl. 2 ghosts)
 h        =  D/(N-2);             % grid spacing (equal in both dimensions, do not set) [m]
 
 % set model timing parameters
-M        =  1e6;                 % number of time steps to take
+Nt       =  1e6;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
 tend     =  1e3*yr;              % end time for simulation [s]
@@ -51,7 +51,7 @@ dir      =  [1, 0];              % isotope ratios random noise [delta]
 Ptop     =  1e4;                 % top pressure [Pa]
 bndmode  =  3;                   % boundary assimilation mode (0 = none; 1 = top only; 2 = bot only; 3 = top/bot;)
 bndinit  =  0;                   % switch on (1) to initialise with already established boundary layers
-dw       =  1*h;                 % boundary layer thickness for assimilation [m]
+dw       =  h;                   % boundary layer thickness for assimilation [m]
 tau_T    =  5*yr;                % wall cooling/assimilation time [s]
 Ttop     =  0;                   % wall temperature [degC] (nan = insulating)
 Tbot     =  1950;                % wall temperature [degC] (nan = insulating)
@@ -77,12 +77,13 @@ d0       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-CFL      =  0.80;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+theta    =  0.5;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
+CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 rtol     =  1e-3;                % outer its relative tolerance
 atol     =  1e-6;                % outer its absolute tolerance
-maxit    =  10;                  % maximum outer its
-lambda   =  0.5;                 % iterative lag parameter equilibration
+maxit    =  20;                  % maximum outer its
+lambda   =  0.25;                % iterative lag parameter equilibration
 etareg   =  1e12;                % regularisation factor for viscosity resisting convection
 sgrreg   =  1e1;                 % regularisation factor for viscosity resisting segregation
 

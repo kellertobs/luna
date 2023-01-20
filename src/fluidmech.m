@@ -1,5 +1,15 @@
 % store previous iteration
-SOLi = SOL;
+SOLi = SOL; 
+
+%% 0-D run does not require fluidmech solve
+if Nz==3 && Nx==3  
+    W  = WBG; Wm = W;  Wx = W;  Wf = W;
+    U  = UBG; Um = U;  Ux = U;  Uf = U;
+    P  = zeros(Nz,Nx);
+    Pt = Ptop.*ones(Nz,Nx);
+    resnorm_VP = 0;
+else
+
 
 %% assemble coefficients for matrix velocity diagonal and right-hand side
 
@@ -58,10 +68,8 @@ IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; 1/2*EtaC1(:)/h^2];      %
 IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; 1/2*EtaC2(:)/h^2];      % W one to the right
 
 % what shall we do with the drunken sailor...
-if ~bnchm
-    aa = -ddz(rho(2:end-1,2:end-1),h).*g0.*dt/2;
-    IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
-end
+aa = -ddz(rho(2:end-1,2:end-1),h).*g0.*dt/2;
+IIL = [IIL; ii(:)]; JJL = [JJL;  ii(:)];   AAL = [AAL; aa(:)];
     
 % coefficients multiplying x-velocities U
 %         top left         ||        bottom left          ||       top right       ||       bottom right
@@ -149,7 +157,6 @@ KV = sparse(IIL,JJL,AAL,NW+NU,NW+NU);
 RV = sparse(IIR,ones(size(IIR)),AAR);
 
 
-
 %% assemble coefficients for gradient operator
 
 if ~exist('GG','var') || bnchm
@@ -204,7 +211,7 @@ if ~exist('DD','var') || bnchm
     IIL = [IIL; ii(:)]; JJL = [JJL; jj2(:)];   AAL = [AAL; aa(:)+1/h];  % U one to the right
     IIL = [IIL; ii(:)]; JJL = [JJL; jj3(:)];   AAL = [AAL; aa(:)-1/h];  % W one above
     IIL = [IIL; ii(:)]; JJL = [JJL; jj4(:)];   AAL = [AAL; aa(:)+1/h];  % W one below
-    
+
     % assemble coefficient matrix
     DD = sparse(IIL,JJL,AAL,NP,NW+NU);
 end
@@ -251,7 +258,7 @@ AAR  = [];       % forcing entries for R
 
 ii = MapP(2:end-1,2:end-1);
 
-rr = -VolSrc;
+rr = - VolSrc;
 if bnchm; rr = rr + src_P_mms(2:end-1,2:end-1); end
 
 IIR = [IIR; ii(:)]; AAR = [AAR; rr(:)];
@@ -270,10 +277,10 @@ if bnchm; RP(MapP(nzp,nxp),:) = P_mms(nzp,nxp); end
 
 %% assemble and scale global coefficient matrix and right-hand side vector
 
-LL = [ KV  -GG  ; ...
-      -DD   KP ];
+LL  = [ KV  -GG  ; ...
+       -DD   KP ];
 
-RR = [RV; RP];
+RR  = [RV; RP];
 
 SCL = sqrt(abs(diag(LL)));
 SCL = diag(sparse(1./(SCL+1)));
@@ -295,33 +302,40 @@ P  = full(reshape(SOL(MapP(:)+(NW+NU)), Nz   , Nx   ));                    % mat
 Vel  = sqrt(((W([1,1:end],:)+W([1:end,end],:))/2).^2 ...
           + ((U(:,[1,1:end])+U(:,[1:end,end]))/2).^2);
 
-Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
-Pt            = Pt - Pt(2,:)/2 + Ptop;
-Pt([1 end],:) = Pt([2 end-1],:);
-Pt(:,[1 end]) = Pt(:,[2 end-1]);
-if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
+if ~bnchm
+    Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    Pt            = Pt - Pt(2,:)/2 + Ptop;
+    Pt([1 end],:) = Pt([2 end-1],:);
+    Pt(:,[1 end]) = Pt(:,[2 end-1]);
+    if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
 
-% get residual of fluid mechanics equations from iterative update
-resnorm_VP = norm(SOL - SOLi,2)./(norm(SOL,2)+TINY);
+    % get residual of fluid mechanics equations from iterative update
+    resnorm_VP = 0;%norm(SOL - SOLi,'fro')./(norm(SOL,'fro')+TINY);
 
-% update phase velocities
-Wx   = W + wx;                                                             % xtl z-velocity
-Ux   = U + 0.;                                                             % xtl x-velocity
-Wm   = W + wm;                                                             % mlt z-velocity
-Um   = U + 0.;                                                             % mlt x-velocity
+    qxz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(chi,h);  % z-flux
+    qxx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(chi,h);  % x-flux
 
-% update mixture volume flux
-Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
-     + (chi(1:end-1,:)+chi(2:end,:))/2 .* Wx;
-Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
-     + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux; 
+    % update phase velocities
+    Wx   = W + wx + qxz./max(TINY,(chi(1:end-1,:)+chi(2:end,:))./2);               % xtl z-velocity
+    Ux   = U + 0. + qxx./max(TINY,(chi(:,1:end-1)+chi(:,2:end))./2);               % xtl x-velocity
+    Wm   = W + wm - qxz./max(TINY,(mu (1:end-1,:)+mu (2:end,:))./2);               % mlt z-velocity
+    Um   = U + 0. - qxx./max(TINY,(mu (:,1:end-1)+mu (:,2:end))./2);               % mlt x-velocity
 
-% mixture velocity magnitude
-Vbar = sqrt(((Wbar([1,1:end],:)+Wbar([1:end,end],:))/2).^2 ...
-          + ((Ubar(:,[1,1:end])+Ubar(:,[1:end,end]))/2).^2);
+    % update mixture volume flux
+    Wbar = (mu (1:end-1,:)+mu (2:end,:))/2 .* Wm ...
+         + (chi(1:end-1,:)+chi(2:end,:))/2 .* Wx;
+    Ubar = (mu (:,1:end-1)+mu (:,2:end))/2 .* Um ...
+         + (chi(:,1:end-1)+chi(:,2:end))/2 .* Ux;
 
- 
-%% update time step
-dtk = (h/2)^2./max(kT(:)./rho(:)./cP);                                     % diffusive time step size
-dta = CFL*h/2/max(abs([Um(:);Wm(:);Ux(:);Wx(:)]+1e-16));                   % advective time step size
-dt  = min([2*dto,dtmax,min(dtk,dta)]);                                     % physical time step size
+    % mixture volume flux magnitude
+    Vbar = sqrt(((Wbar([1,1:end],:)+Wbar([1:end,end],:))/2).^2 ...
+              + ((Ubar(:,[1,1:end])+Ubar(:,[1:end,end]))/2).^2);
+
+    
+    %% update time step
+    dtk = (h/2)^2./max(kT(:)./rho(:)./cP)/2;                               % diffusive time step size
+    dta = CFL*h/2/max(abs([Ux(:);Wx(:);Um(:);Wm(:)]+1e-16));               % advective time step size
+    dt  = min([2*dto,dtmax,min(dtk,dta)]);                                 % physical time step size
+end
+
+end

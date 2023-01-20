@@ -190,7 +190,6 @@ xq  = zeros(size(Tp));  x = xq;
 
 % get volume fractions and bulk density
 step   =  0;
-theta  = 1/2;
 res    = 1;  tol = 1e-12;
 cal.Tliq = reshape(Tp(inz,inx),[],1);
 while res > tol
@@ -247,7 +246,7 @@ dto   = dt;
 Pto   = Pt;
   
 % get bulk enthalpy, silica, volatile content densities
-X  = rho.*x;
+X  = rho.*x;  M = rho-X;
 S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - Adbt.*(Pt-Ptop));  
 S0 = rho.*(cP.*log((T0+273.15)) - Adbt.*(Ptop)); 
 s  = S./rho;

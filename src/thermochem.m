@@ -1,11 +1,11 @@
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 
 % store previous iteration
-Ti = T; ci = c; xi = x;
+Si = S; Ci = C; Xi = X;
 
 % update temperature    
-advn_S = - advect(rho(inz,inx).*m(inz,inx).*sm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % heat advection
-         - advect(rho(inz,inx).*x(inz,inx).*sx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+advn_S = - advect(M(inz,inx).*sm(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % heat advection
+         - advect(X(inz,inx).*sx(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
 
 qTz    = - (ks(1:end-1,:)+ks(2:end,:))./2 .* ddz(T,h);                     % heat diffusion
 qTx    = - (ks(:,1:end-1)+ks(:,2:end))./2 .* ddx(T,h);
@@ -26,28 +26,23 @@ S([1 end],:) = S([2 end-1],:);                                             % app
 S(:,[1 end]) = S(:,[2 end-1]);
 
 % convert entropy to temperature
-T = (T0+273.15) * exp(S./rho./cP - x.*Dsx./cP + Adbt./cP.*(Pt-Ptop));% convert entropy to temperature
+T = (T0+273.15) * exp((S - X.*Dsx)./rho./cP + Adbt./cP.*(Pt-Ptop));        % convert entropy to temperature
 
 
 % update major component 
 advn_C = zeros(size(c(inz,inx,:)));
 diff_C = zeros(size(c(inz,inx,:)));
 for i = 2:cal.nc
-    advn_C(:,:,i) = - advect(rho(inz,inx).*m(inz,inx).*cm(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...
-                    - advect(rho(inz,inx).*x(inz,inx).*cx(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
-
-    qCz = - (kc(1:end-1,:)+kc(2:end,:))./2 .* ddz(c(:,:,i),h);             % component diffusion
-    qCx = - (kc(:,1:end-1)+kc(:,2:end))./2 .* ddx(c(:,:,i),h);
-    diff_C(:,:,i) = (- ddz(qCz(:,inx),h)  ...
-                     - ddx(qCx(inz,:),h));
+    advn_C(:,:,i) = - advect(M(inz,inx).*cm(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt advection
+                    - advect(X(inz,inx).*cx(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % xtal advection
 end
 
 % get total rate of change
-dCdt = advn_C + diff_C;
+dCdt = advn_C;
 
 % update trace element concentrations
 C(inz,inx,:) = Co(inz,inx,:) + (theta.*dCdt + (1-theta).*dCdto).*dt;       % explicit update
-C = max(0,min(rho, C ));                                                   % enforce min bound
+C = max(0, C );                                                            % enforce min bound
 C([1 end],:,:) = C([2 end-1],:,:);                                         % boundary conditions
 C(:,[1 end],:) = C(:,[2 end-1],:);
 
@@ -85,29 +80,25 @@ cmq([1 end],:,:) = cmq([2 end-1],:,:);
 cmq(:,[1 end],:) = cmq(:,[2 end-1],:);
 
 % update crystal fraction
-Gx = lambda * Gx + (1-lambda) * (xq(inz,inx)-x(inz,inx)).*rho(inz,inx)./(5*dt);
+Gx = lambda * Gx + (1-lambda) * (rho(inz,inx).*xq(inz,inx)-X(inz,inx))./(3*dt);
 
-advn_X = - advect(rho(inz,inx).*x(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);
+advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);   % xtal advection
 
-qXz    = - (kx(1:end-1,:)+kx(2:end,:))./2 .* ddz(x,h);
-qXx    = - (kx(:,1:end-1)+kx(:,2:end))./2 .* ddx(x,h);
-diff_X = (- ddz(qXz(:,inx),h)  ...
-          - ddx(qXx(inz,:),h));
-
-dXdt   = advn_X + diff_X + Gx;                                             % total rate of change
+dXdt   = advn_X + Gx;                                                      % total rate of change
 
 X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;           % explicit update of crystal fraction
-X = max(0,min(rho, X ));                                                   % enforce [0,1] limit
+X = max(0, X );                                                            % enforce min bound
 X([1 end],:) = X([2 end-1],:);                                             % apply boundary conditions
 X(:,[1 end]) = X(:,[2 end-1]);
 
+M = rho-X;
 
 % update phase fractions
 x = X./rho;
 m = max(0,min(1,1-x));
 
 % phase entropies
-sm = S./rho - x.*Dsx;
+sm = (S - X.*Dsx)./rho;
 sx = sm + Dsx;
 
 % phase compositions
@@ -121,6 +112,6 @@ cm(:,:,1) = 1 - sum(cm(:,:,2:end),3);
 cx(:,:,1) = 1 - sum(cx(:,:,2:end),3);
 
 % get residual of thermochemical equations from iterative update
-resnorm_TC = norm( T(:) - Ti(:),2)./(norm(T(:),2)+TINY) ...
-           + norm( c(:) - ci(:),2)./(norm(c(:),2)+TINY) ...
-           + norm((x(:) - xi(:)).*(x(:)>10*TINY),2)./(norm(x(:),2)+TINY);
+resnorm_TC = norm( S(inz,inx) - Si(inz,inx),'fro')./(norm(S(inz,inx),'fro')+TINY) ...
+           + norm( C(inz,inx) - Ci(inz,inx),'fro')./(norm(C(inz,inx),'fro')+TINY) ...
+           + norm((X(inz,inx) - Xi(inz,inx)).*(x(inz,inx)>10*TINY),2)./(norm(X(inz,inx),2)+TINY);
