@@ -1,10 +1,10 @@
 % record run history
 
-dsumMdto = dsumMdt;
-dsumSdto = dsumSdt;
-dsumCdto = dsumCdt;
+dsumMdtoo = dsumMdto; dsumMdto = dsumMdt;
+dsumSdtoo = dsumSdto; dsumSdto = dsumSdt;
+dsumCdtoo = dsumCdto; dsumCdto = dsumCdt;
 
-stp = max(1,step-1);
+stp = max(1,step+1);
 
 % record model time
 hist.time(stp) = time;
@@ -25,9 +25,9 @@ for i = 1:cal.nc
                + sum(  C(2:end-1,2,i).*U(2:end-1,1)*h*1) - sum(  C(2:end-1,end-1,i).*U(2:end-1,end)*h*1);  % [kg/s]
 end
 
-if stp>1; hist.DM(stp)   = hist.DM(stp-1)   + (theta*dsumMdt + (1-theta)*dsumMdto).*dt; else; hist.DM(stp) = 0; end  % [J/K]
-if stp>1; hist.DS(stp)   = hist.DS(stp-1)   + (theta*dsumSdt + (1-theta)*dsumSdto).*dt; else; hist.DS(stp) = 0; end  % [J/K]
-if stp>1; hist.DC(stp,:) = hist.DC(stp-1,:) + (theta*dsumCdt + (1-theta)*dsumCdto).*dt; else; hist.DC(stp,:) = zeros(1,cal.nc); end  % [kg]
+if step>=1; hist.DM(stp  ) = (alpha2*hist.DM(stp-1  ) + alpha3*hist.DM(max(1,stp-2)  ) + (beta1*dsumMdt + beta2*dsumMdto + beta3*dsumMdtoo)*dt)/alpha1; else; hist.DM(stp  ) = 0; end  % [kg]
+if step>=1; hist.DS(stp  ) = (alpha2*hist.DS(stp-1  ) + alpha3*hist.DS(max(1,stp-2)  ) + (beta1*dsumSdt + beta2*dsumSdto + beta3*dsumSdtoo)*dt)/alpha1; else; hist.DS(stp  ) = 0; end  % [kg]
+if step>=1; hist.DC(stp,:) = (alpha2*hist.DC(stp-1,:) + alpha3*hist.DC(max(1,stp-2),:) + (beta1*dsumCdt + beta2*dsumCdto + beta3*dsumCdtoo)*dt)/alpha1; else; hist.DC(stp,:) = zeros(1,cal.nc); end  % [kg]
 
 % record conservation error of mass M, heat S, major component C, volatile component V
 hist.EM(stp)   = (hist.sumM(stp)   - hist.DM(stp))  ./hist.sumM(1)   - 1;  % [kg/kg]

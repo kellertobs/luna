@@ -391,7 +391,7 @@ drawnow
 
 
 % save output to file
-if save_op
+if save_op && ~restart
     if Nx <= 10 && Nz <= 10  % print 0D plots
         name = [opdir,'/',runID,'/',runID,'_tch_',num2str(floor(step/nop))];
         print(fh1,name,'-dpng','-r300','-image');

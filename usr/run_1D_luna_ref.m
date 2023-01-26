@@ -77,15 +77,15 @@ d0       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-theta    =  0.5;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
-CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
+CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
 atol     =  1e-7;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
-etareg   =  1e0;                 % regularisation factor for viscosity resisting convection
-sgrreg   =  1e1;                 % regularisation factor for viscosity resisting segregation
+etareg   =  1e11;                % regularisation factor for viscosity resisting convection
+sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

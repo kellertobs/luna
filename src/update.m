@@ -99,10 +99,14 @@ wx([1 end],:) = 0;
 wx(:,[1 end]) = wx(:,[2 end-1]);
 
 % diffusion parameters
+if Nx==3
+    [~,grdrhoz] = gradient(rho,h);
+    Vel = abs(grdrhoz*h*g0*h^2./eta);                                      % estimate convective speed in 1D case
+end
 kW  = Vel/10*h/10;                                                         % convection fluctuation diffusivity
 kwx = abs((rhox-rho).*g0.*Ksgr_x*d0*10);                                   % segregation fluctuation diffusivity
 kx  = chi.*(kwx + kW);                                                     % solid fraction diffusion 
-kT  = kT0 + (x.*kwx + kW).*rho.*cP;                                        % heat diffusion
+kT  = kT0 + (chi.*kwx + kW).*rho.*cP;                                      % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 
 % heat dissipation (entropy production) rate
@@ -119,12 +123,12 @@ else
 end
                         
 % update volume source
-if step>0
+if step>0 && ~restart
     Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt advection
                + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % xtal advection
-    F_DivV   = (rho(inz,inx)-rhoo(inz,inx))./dt + theta.*Div_rhoV + (1-theta).*Div_rhoVo;  % get residual of mixture mass conservation
+    F_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
     VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
 end
 
-UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
-WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);
+UBG    = - 0*mean(mean(VolSrc))./2 .* (L/2-XXu);
+WBG    = - 2*mean(mean(VolSrc))./2 .* (D/2-ZZw);

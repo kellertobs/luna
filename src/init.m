@@ -156,12 +156,12 @@ for i=1:cal.nc
     if bndinit && ~isnan(cwall); c(inz,inx,i) = c(inz,inx,i) + (cwall-c(inz,inx,i)).*bndshape; end % major component
 end
 
-te = zeros(Nz,Nx,length(te0));
+te = zeros(Nz,Nx,cal.nte);
 for i = 1:length(te0)
     te(:,:,i)  =  te0(i) + (te1(i)-te0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dte(i).*rp;  % trace elements
     if any(bndinit(:)) && ~isnan(tewall(i)); te(inz,inx,i)  = te(inz,inx,i) + (tewall(i)-te(inz,inx,i)).*bndshape; end 
 end
-ir = zeros(Nz,Nx,length(ir0));
+ir = zeros(Nz,Nx,cal.nir);
 for i = 1:length(ir0)
     ir(:,:,i)  =  ir0(i) + (ir1(i)-ir0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dir(i).*rp;  % isotope ratios
     if any(bndinit(:)) && ~isnan(irwall(i)); ir(inz,inx,i)  = ir(inz,inx,i) + (irwall(i)-ir(inz,inx,i)).*bndshape; end 
@@ -189,7 +189,7 @@ mq  =  ones(size(Tp));  m = mq;
 xq  = zeros(size(Tp));  x = xq;
 
 % get volume fractions and bulk density
-step   =  0;
+step   = 0;
 res    = 1;  tol = 1e-12;
 cal.Tliq = reshape(Tp(inz,inx),[],1);
 while res > tol
@@ -242,15 +242,16 @@ while res > tol
 
     res  = norm(Pt(:)-Pti(:),2)./norm(Pt(:),2);
 end
+rhoo = rho; 
 dto   = dt;
 Pto   = Pt;
   
 % get bulk enthalpy, silica, volatile content densities
-X  = rho.*x;  M = rho-X;
-S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - Adbt.*(Pt-Ptop));  
+X  = rho.*x;  Xo = X;  M = rho-X;
+S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - Adbt.*(Pt-Ptop));  So = S;
 S0 = rho.*(cP.*log((T0+273.15)) - Adbt.*(Ptop)); 
 s  = S./rho;
-C  = 0.*c;
+C  = 0.*c;  Co = C;
 for i = 1:cal.nc; C(:,:,i) = rho.*(m.*cm(:,:,i) + x.*cx(:,:,i)); end
 
 % get phase entropies
@@ -258,36 +259,39 @@ sm = S./rho - x.*Dsx;
 sx = sm + Dsx;
 
 % get trace element phase compositions
-for k = 1:length(te0)
+for k = 1:cal.nte
     tem(:,:,k)  = te(:,:,k)./(m + x.*Kte(k) );
     tex(:,:,k)  = te(:,:,k)./(m./Kte(k)  + x);
 end
 
 % get geochemical component densities
-for k = 1:length(te0)
+for k = 1:cal.nte
     TE(:,:,k)  = rho.*(m.*tem(:,:,k) + x.*tex(:,:,k));
 end
-for k = 1:length(ir0)
+TEo = TE;
+
+for k = 1:cal.nir
     IR(:,:,k)  = rho.*ir(:,:,k);
 end
+IRo = IR;
 
 % initialise reaction/decay rates
 Gx = 0.*x(inz,inx); 
 
 % initialise auxiliary variables 
-dSdt   = 0.*T(inz,inx); bnd_S = 0.*T(inz,inx); diss_h = 0.*T(inz,inx); 
-dCdt   = 0.*c(inz,inx);
-dXdt   = 0.*x(inz,inx);
-dTEdt  = 0.*te(inz,inx);
-dIRdt  = 0.*ir(inz,inx);
+dSdt   = 0.*T(inz,inx); dSdto = dSdt; bnd_S = 0.*T(inz,inx); diss_h = 0.*T(inz,inx); 
+dCdt   = 0.*c(inz,inx); dCdto = dCdt;
+dXdt   = 0.*x(inz,inx); dXdto = dXdt;
+dTEdt  = 0.*te(inz,inx); dTEdto = dTEdt;
+dIRdt  = 0.*ir(inz,inx); dIRdto = dIRdt;
 
 % initialise timing and iterative parameters
 time    =  0;
 iter    =  0;
 hist    = [];
-dsumMdt = 0;
-dsumSdt = 0;
-dsumCdt = zeros(1,cal.nc);
+dsumMdt = 0; dsumMdto = 0;
+dsumSdt = 0; dsumSdto = 0;
+dsumCdt = zeros(1,cal.nc); dsumCdto = zeros(1,cal.nc);
 
 % overwrite fields from file if restarting run
 if restart
@@ -302,10 +306,29 @@ if restart
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
-        xq   = x;
-        SOL  = [W(:);U(:);P(:)];
-        rhoo = rho; Div_rhoVo = Div_rhoV;
-        update; output;
+        M   = rho-F-X;
+        xq  = x; fq = f;
+        SOL = [W(:);U(:);P(:)];
+
+        So = S;
+        Co = C;
+        Vo = V;
+        Xo = X;
+        Fo = F;
+        TEo = TE;
+        IRo = IR;
+        dSdto = dSdt;
+        dCdto = dCdt;
+        dVdto = dVdt;
+        dXdto = dXdt;
+        dFdto = dFdt;
+        dTEdto = dTEdt;
+        dIRdto = dIRdt;
+        rhoo = rho;
+        Div_rhoVo = Div_rhoV;
+
+        update; output; restart = 0;
+        
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
         update;

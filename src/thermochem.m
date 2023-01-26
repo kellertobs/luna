@@ -21,7 +21,8 @@ bnd_S = rho(inz,inx).*cP.*bnd_T./T(inz,inx);
 
 dSdt = advn_S + diff_T + diss_h + bnd_S;                                   % total rate of change
 
-S(inz,inx) = So(inz,inx) + (theta.*dSdt + (1-theta).*dSdto).*dt;           % explicit update of major component density
+% semi-implicit update of bulk entropy density
+S(inz,inx) = (alpha2*So(inz,inx) + alpha3*Soo(inz,inx) + (beta1*dSdt + beta2*dSdto + beta3*dSdtoo)*dt)/alpha1; % semi-implicit update of bulk entropy density
 S([1 end],:) = S([2 end-1],:);                                             % apply zero flux boundary conditions
 S(:,[1 end]) = S(:,[2 end-1]);
 
@@ -40,8 +41,8 @@ end
 % get total rate of change
 dCdt = advn_C;
 
-% update trace element concentrations
-C(inz,inx,:) = Co(inz,inx,:) + (theta.*dCdt + (1-theta).*dCdto).*dt;       % explicit update
+% semi-implicit update of major component density
+C(inz,inx,:) = (alpha2*Co(inz,inx,:) + alpha3*Coo(inz,inx,:) + (beta1*dCdt + beta2*dCdto + beta3*dCdtoo)*dt)/alpha1;
 C = max(0, C );                                                            % enforce min bound
 C([1 end],:,:) = C([2 end-1],:,:);                                         % boundary conditions
 C(:,[1 end],:) = C(:,[2 end-1],:);
@@ -86,7 +87,8 @@ advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);   % xta
 
 dXdt   = advn_X + Gx;                                                      % total rate of change
 
-X(inz,inx) = Xo(inz,inx) + (theta.*dXdt + (1-theta).*dXdto).*dt;           % explicit update of crystal fraction
+% semi-implicit update of crystal fraction
+X(inz,inx) = (alpha2*Xo(inz,inx) + alpha3*Xoo(inz,inx) + (beta1*dXdt + beta2*dXdto + beta3*dXdtoo)*dt)/alpha1;
 X = max(0, X );                                                            % enforce min bound
 X([1 end],:) = X([2 end-1],:);                                             % apply boundary conditions
 X(:,[1 end]) = X(:,[2 end-1]);

@@ -3,7 +3,7 @@ clear all; close all;
 addpath('../src');
 
 % set run parameters
-runID    =  '2D_luna_ref_eta12'; % run identifier
+runID    =  '2D_luna_ref_eta11'; % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
 nop      =  100;                 % output frame plotted/saved every 'nop' time steps
@@ -43,9 +43,9 @@ te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
 te1      =  [1,1,1,1];           % trace elements base layer [wt ppm]
 dte      =  1e-3.*[-1,-1,1,1];   % trace elements random noise [wt ppm]
 Kte      =  [0.01,0.1,3,10];     % trace elements partition coefficients
-ir0      =  [0,-1];              % isotope ratios top layer [delta]
-ir1      =  [0, 1];              % isotope ratios base layer [delta]
-dir      =  [1, 0];              % isotope ratios random noise [delta]
+ir0      =  [1,-1];              % isotope ratios top layer [delta]
+ir1      =  [1, 1];              % isotope ratios base layer [delta]
+dir      =  [0, 0];              % isotope ratios random noise [delta]
 
 % set thermo-chemical boundary parameters
 Ptop     =  1e4;                 % top pressure [Pa]
@@ -77,15 +77,15 @@ d0       =  1e-3;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-theta    =  0.5;                 % time stepping mode (0 explicit Euler, 1/2 Crank-Nicolson, 1 implicit Euler)
-CFL      =  0.75;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-rtol     =  1e-3;                % outer its relative tolerance
-atol     =  1e-6;                % outer its absolute tolerance
-maxit    =  20;                  % maximum outer its
-lambda   =  0.25;                % iterative lag parameter equilibration
-etareg   =  1e12;                % regularisation factor for viscosity resisting convection
-sgrreg   =  1e1;                 % regularisation factor for viscosity resisting segregation
+CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-4;                % outer its relative tolerance
+atol     =  1e-7;                % outer its absolute tolerance
+maxit    =  50;                  % maximum outer its
+lambda   =  0.50;                % iterative lag parameter equilibration
+etareg   =  1e11;                % regularisation factor for viscosity resisting convection
+sgrreg   =  1e0;                 % regularisation factor for viscosity resisting segregation
 
 
 %*****  RUN NAKHLA MODEL  *************************************************

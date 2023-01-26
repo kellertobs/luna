@@ -52,3 +52,11 @@ cal.r(cal.opx)   =  97;
 cal.r(cal.cpx)   =  21;
 cal.r(cal.an )   =  96;
 cal.r(cal.ab )   =  31;
+
+% specify geochemical model parameters
+cal.nte          =  4;  % number of trace elements
+cal.nir          =  2;  % number of isotope ratios
+cal.Kte_cmp      =  [0.01  0.01  0.01  0.01  0.01  0.01  % component-wise trace element partition coefficients
+                     0.10  0.10  0.10  0.10  0.10  0.10
+                     3.00  3.00  3.00  3.00  3.00  3.00
+                     10.0  10.0  10.0  10.0  10.0  10.0];
