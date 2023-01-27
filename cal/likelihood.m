@@ -7,9 +7,9 @@ if mdl.flag == 1
     % solution found
 
     % experimental data from Schmidt & Kraettli (2020)
-    expt_data  = [exp.fphs(:); exp.oxds(:)];
-    expt_dhat  = [mdl.fphs(:); mdl.oxds(:)];
-    expt_sigma = [sig.fphs(:); sig.oxds(:)];
+    expt_data  = [exp.phs(:); exp.oxd(:)];
+    expt_dhat  = [mdl.phs(:); mdl.oxd(:)];
+    expt_sigma = [sig.phs(:); sig.oxd(:)];
 
     % solidus and liquidus info
     Tsl_data   = [    Tsol(:);     Tliq(:)];
