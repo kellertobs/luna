@@ -15,7 +15,7 @@ TINY = 1e-16;
 %% catmip parameters - adjust this
 
 % catmip options
-Niter   = 250;            % number of iterations per catmip temperature
+Niter   = 500;            % number of iterations per catmip temperature
 Nstep   = 100;            % number of steps in MCMC in catmip
 pllopt  = 8;              % whether to run in parallel, number of workers
 
@@ -63,7 +63,7 @@ Psl = (0.1:0.2:4)'; % all across pressure space
 Tsl_sigma = 10;
 
 % weights for datasets - [SK2020, Tsol/Tliq]
-wgts = [5; 1];
+wgts = [10; 1];
 
 %% prepare information for the parameter fitting
 
@@ -377,7 +377,7 @@ var.P = linspace(1.5,1.5,100).';
 
 figure(); clf;
 semilogy(var.T,cal.K,LW{:}); axis xy tight; box on;
-legend(cal.CompStr{:},FS{[1,2]},TX{:})
+legend(cal.cmpStr{:},FS{[1,2]},TX{:})
 set(gca,TL{:},FS{[1,2]})
 xlabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 ylabel('log$_{10} \ K$',TX{:},FS{[1,3]})
@@ -392,7 +392,7 @@ var.P = linspace(0,4,100).';
 
 figure(); clf;
 semilogx(cal.K,var.P,LW{:}); axis ij tight; box on;
-legend(cal.CompStr{:},FS{[1,2]},TX{:})
+legend(cal.cmpStr{:},FS{[1,2]},TX{:})
 set(gca,TL{:},FS{[1,2]})
 xlabel('log$_{10} \ K$',TX{:},FS{[1,3]})
 ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
@@ -409,7 +409,7 @@ plot(cal.Tm,var.P,LW{:}); axis ij tight; box on; hold on
 plot(cal.Tsol,var.P,'k--',LW{1},3); axis ij tight; box on;
 plot(cal.Tliq,var.P,'k-.',LW{1},3); axis ij tight; box on;
 plot(Tsol, Psl, 'k+', Tliq, Psl, 'kx')
-legend(cal.CompStr{:},'$T_\mathrm{sol}$','$T_\mathrm{liq}$',FS{[1,2]},TX{:})
+legend(cal.cmpStr{:},'$T_\mathrm{sol}$','$T_\mathrm{liq}$',FS{[1,2]},TX{:})
 set(gca,TL{:},FS{[1,2]})
 xlabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
@@ -434,14 +434,14 @@ ylabel('$f$ [wt]',TX{:},FS{[1,3]})
 
 figure(); clf;
 plot(var.T,phs.cs,LW{:}); axis xy tight; box on;
-legend(cal.CompStr{:},FS{[1,2]},TX{:})
+legend(cal.cmpStr{:},FS{[1,2]},TX{:})
 set(gca,TL{:},FS{[1,2]})
 xlabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 ylabel('$c^s$ [wt]',TX{:},FS{[1,3]})
 
 figure(); clf;
 plot(var.T,phs.cl,LW{:}); axis xy tight; box on;
-legend(cal.CompStr{:},FS{[1,2]},TX{:})
+legend(cal.cmpStr{:},FS{[1,2]},TX{:})
 set(gca,TL{:},FS{[1,2]})
 xlabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 ylabel('$c^\ell$ [wt]',TX{:},FS{[1,3]})
