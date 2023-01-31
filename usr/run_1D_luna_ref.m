@@ -31,11 +31,11 @@ smth     =  (N/30)^2;            % regularisation of initial random perturbation
 zlay     =  0.5;                 % layer thickness (relative to domain depth D)
 wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
-T0       =  1800;                % temperature top layer [deg C]
-T1       =  1800;                % temperature base layer [deg C]
+T0       =  1770;                % temperature top layer [deg C]
+T1       =  1770;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.44,0.10,0.20,0.13,0.12,0.01]; % major component top layer
-c1       =  [0.44,0.10,0.20,0.13,0.12,0.01]; % major component base layer
+c0       =  [0.4299,0.0862,0.1331,0.1449,0.1067,0.0992]; % major component top layer
+c1       =  [0.4299,0.0862,0.1331,0.1449,0.1067,0.0992]; % major component base layer
 dc       =  [1,-1,1,-1,0,0].*0e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
@@ -68,8 +68,8 @@ BB       = [ 0.6904, 0.3096; 0.9988, 0.0012; ];  % permission step locations
 CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 
 % set model buoyancy parameters
-rhox0    =  [3270,4390,3000,3250,2730,2620];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhom0    =  [2710,3580,2580,2850,2530,2310];  % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhox0    =  [3270,4390,3000,3250,2730,3260];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhom0    =  [2710,3580,2580,2850,2530,2880];  % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  5e-5;                % thermal expansivity [1/K]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  3e-11;               % melt compressibility [1/Pa]
@@ -79,9 +79,9 @@ g0       =  1.62;                % gravity [m/s2]
 % set numerical model parameters
 TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  1.00;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+CFL      =  1.0;                % (physical) time stepping courant number (multiplies stable step) [0,1]
+rtol     =  1e-6;                % outer its relative tolerance
+atol     =  1e-9;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 etareg   =  1e11;                % regularisation factor for viscosity resisting convection

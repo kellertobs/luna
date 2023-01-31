@@ -36,7 +36,6 @@ oxd(:,:,P ) = [];  % ignore P2O5
 oxd(:,:,K ) = [];  % ignore K2O
 oxd(:,:,Mn) = [];  % ignore MnO
 oxd(:,:,Cr) = [];  % ignore Cr2O3
-oxd(:,:,Ti) = [];  % ignore TiO2
 
 % combine opx and cpx
 oxd(:,opx,:) = (phs(:,opx).*squeeze(oxd(:,opx,:)) + phs(:,cpx).*squeeze(oxd(:,cpx,:)))./(phs(:,opx) + phs(:,cpx) + TINY);
@@ -46,7 +45,7 @@ oxd(:,cpx,:) = []; phs(:,cpx) = [];
 oxd = oxd./(sum(oxd,3)+TINY)*100;  % normalise remaining oxides to 100%
 
 nphs = 6; olv=1; pxn=2; plg=3; spn=4; qtz=5; mlt=6; blk=7;
-ncmp = 6; Si=1; Al=2; Fe=3; Mg=4; Ca=5; Na=6;
+ncmp = 6; Si=1; Ti=2; Al=3; Fe=4; Mg=5; Ca=6; Na=7;
 
 % assign errors for phases and oxides - please review
 factor           = 2; % to adjust sigmas, maybe too small
@@ -87,13 +86,14 @@ for stg = stages
     sig.oxd(stg,:,:) = sig_oxd(stg,1:nphs,:);
 
     % fit component fractions to bulk compositions
-    c0(stg,:)  =  fitc0(squeeze(oxd(stg,blk,:)).',cal);  % find end-member proportions of first step
+    c0(stg,:)  =  fitc0(squeeze(oxd(stg,blk,:)).',cal.oxd);  % find end-member proportions of first step
 
 end
 
+cal.c0 = c0(1,:);
+
 % plot Harker diagrams
 figure(1); clf;
-subplot(2,3,1);
 plot(Tmp(phs(:,olv)>0),phs(phs(:,olv)>0,olv),'d',CL{[1,2]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
 plot(Tmp(phs(:,pxn)>0),phs(phs(:,pxn)>0,pxn),'v',CL{[1,3]},MS{:},LW{1},1.5);
 plot(Tmp(phs(:,plg)>0),phs(phs(:,plg)>0,plg),'s',CL{[1,4]},MS{:},LW{1},1.5);
@@ -101,6 +101,23 @@ plot(Tmp(phs(:,spn)>0),phs(phs(:,spn)>0,spn),'^',CL{[1,5]},MS{:},LW{1},1.5);
 plot(Tmp(phs(:,qtz)>0),phs(phs(:,qtz)>0,qtz),'x',CL{[1,6]},MS{:},LW{1},1.5);
 plot(Tmp(phs(:,mlt)>0),phs(phs(:,mlt)>0,mlt),'o',CL{[1,7]},MS{:},LW{1},1.5);
 set(gca,TL{:}); xlabel('$T [^\circ$C]',TX{:}); ylabel('$f_\mathrm{phs}$ [wt]',TX{:});
+
+figure(2); clf;
+subplot(2,3,1);
+plot(oxd(:,blk,Si),oxd(:,blk,Ti),'k.',MS{1},12,LW{1},1.5); axis xy tight; box on; hold on
+plot(oxd(phs(:,olv)>0,olv,Si),oxd(phs(:,olv)>0,olv,Ti),'d',CL{[1,2]},MS{:},LW{1},1.5);
+plot(oxd(phs(:,pxn)>0,pxn,Si),oxd(phs(:,pxn)>0,pxn,Ti),'v',CL{[1,3]},MS{:},LW{1},1.5);
+plot(oxd(phs(:,plg)>0,plg,Si),oxd(phs(:,plg)>0,plg,Ti),'s',CL{[1,4]},MS{:},LW{1},1.5);
+plot(oxd(phs(:,mlt)>0,mlt,Si),oxd(phs(:,mlt)>0,mlt,Ti),'o',CL{[1,7]},MS{:},LW{1},1.5);
+plot(cal.mnr_oxd(cal.mnr_for,Si),cal.mnr_oxd(cal.mnr_for,Ti),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_fay,Si),cal.mnr_oxd(cal.mnr_fay,Ti),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_px1,Si),cal.mnr_oxd(cal.mnr_px1,Ti),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_px2,Si),cal.mnr_oxd(cal.mnr_px2,Ti),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_px3,Si),cal.mnr_oxd(cal.mnr_px3,Ti),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_ant,Si),cal.mnr_oxd(cal.mnr_ant,Ti),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_alb,Si),cal.mnr_oxd(cal.mnr_alb,Ti),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.oxd(cal.eut,Si),cal.oxd(cal.eut,Ti),'h',CL{[1,7]},MS{1},12,LW{:});
+set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('TiO$_2$ [wt\%]',TX{:});
 
 subplot(2,3,2);
 plot(oxd(:,blk,Si),oxd(:,blk,Al),'k.',MS{1},12,LW{1},1.5); axis xy tight; box on; hold on
@@ -185,10 +202,10 @@ drawnow;
 
 %% define and check functions for inversion
 
-prsampfunc= @(Ni)    priorsamp(bnds.mat, Ni);
-priorfunc = @(model) prior(model, bnds.mat);
-likefunc  = @(model) likefrommodel(model, cal0, c0, Tmp, Prs, stages, hasolv, haspxn, hasplg, hasspn, hasqtz, exp, sig, Tsol, Tliq, Psl, Tsl_sigma, wgts);
-dhatfunc  = @(model) runmodel(model, cal0, c0, Tmp, Prs, stages, hasolv, haspxn, hasplg, hasspn, hasqtz, Psl);
+prsampfunc = @(Ni)    priorsamp(bnds.mat, Ni);
+priorfunc  = @(model) prior(model, bnds.mat);
+likefunc   = @(model) likefrommodel(model, cal0, c0, Tmp, Prs, stages, hasolv, haspxn, hasplg, hasspn, hasqtz, exp, sig, Tsol, Tliq, Psl, Tsl_sigma, wgts);
+dhatfunc   = @(model) runmodel(model, cal0, c0, Tmp, Prs, stages, hasolv, haspxn, hasplg, hasspn, hasqtz, Psl);
 
 %% run catmip
 
@@ -208,8 +225,7 @@ mdl  = dhatfunc(mMAP);
 
 % mdl = runmodel([], cal0, c0, Tmp, Prs, stages, hasolv, haspxn, hasplg, hasspn, hasqtz, Psl);;
 
-figure(2); clf;
-subplot(2,3,1);
+figure(3); clf;
 plot(exp.Tmp(hasolv),exp.phs(hasolv,olv),'d',CL{[1,8]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
 plot(exp.Tmp(haspxn),exp.phs(haspxn,pxn),'v',CL{[1,8]},MS{:},LW{1},1.5);
 plot(exp.Tmp(hasplg),exp.phs(hasplg,plg),'s',CL{[1,8]},MS{:},LW{1},1.5);
@@ -223,6 +239,26 @@ plot(exp.Tmp(hasspn),mdl.phs(hasspn,spn),'^',CL{[1,5]},MS{:},LW{1},1.5);
 plot(exp.Tmp(hasqtz),mdl.phs(hasqtz,qtz),'x',CL{[1,6]},MS{:},LW{1},1.5);
 plot(exp.Tmp,mdl.phs(:,mlt),'o',CL{[1,7]},MS{:},LW{1},1.5);
 set(gca,TL{:}); xlabel('$T [^\circ$C]',TX{:}); ylabel('$f_\mathrm{phs}$ [wt]',TX{:});
+
+figure(4); clf;
+subplot(2,3,1);
+plot(exp.oxd(hasolv,olv,Si),exp.oxd(hasolv,olv,Ti),'d',CL{[1,8]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
+plot(exp.oxd(haspxn,pxn,Si),exp.oxd(haspxn,pxn,Ti),'v',CL{[1,8]},MS{:},LW{1},1.5);
+plot(exp.oxd(hasplg,plg,Si),exp.oxd(hasplg,plg,Ti),'s',CL{[1,8]},MS{:},LW{1},1.5);
+plot(exp.oxd(:,mlt,Si),exp.oxd(:,mlt,Ti),'o',CL{[1,8]},MS{:},LW{1},1.5);
+plot(mdl.oxd(hasolv,olv,Si),mdl.oxd(hasolv,olv,Ti),'d',CL{[1,2]},MS{:},LW{1},1.5);
+plot(mdl.oxd(haspxn,pxn,Si),mdl.oxd(haspxn,pxn,Ti),'v',CL{[1,3]},MS{:},LW{1},1.5);
+plot(mdl.oxd(hasplg,plg,Si),mdl.oxd(hasplg,plg,Ti),'s',CL{[1,4]},MS{:},LW{1},1.5);
+plot(mdl.oxd(:,mlt,Si),mdl.oxd(:,mlt,Ti),'o',CL{[1,7]},MS{:},LW{1},1.5);
+plot(cal.mnr_oxd(cal.mnr_for,Si),cal.mnr_oxd(cal.mnr_for,Ti),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_fay,Si),cal.mnr_oxd(cal.mnr_fay,Ti),'d',CL{[1,2]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_px1,Si),cal.mnr_oxd(cal.mnr_px1,Ti),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_px2,Si),cal.mnr_oxd(cal.mnr_px2,Ti),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_px3,Si),cal.mnr_oxd(cal.mnr_px3,Ti),'v',CL{[1,3]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_ant,Si),cal.mnr_oxd(cal.mnr_ant,Ti),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.mnr_oxd(cal.mnr_alb,Si),cal.mnr_oxd(cal.mnr_alb,Ti),'s',CL{[1,4]},MS{1},12,LW{:});
+plot(cal.oxd(cal.eut,Si),cal.oxd(cal.eut,Ti),'h',CL{[1,7]},MS{1},12,LW{:});
+set(gca,TL{:}); xlabel('SiO$_2$ [wt\%]',TX{:}); ylabel('TiO$_2$ [wt\%]',TX{:});
 
 subplot(2,3,2);
 plot(exp.oxd(hasolv,olv,Si),exp.oxd(hasolv,olv,Al),'d',CL{[1,8]},MS{:},LW{1},1.5); axis xy tight; box on; hold on
@@ -369,7 +405,7 @@ ylabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 xlabel('ab [wt]',TX{:},FS{[1,3]})
 
 % plot partition coefficients (T-dependent)
-var.c = ones(100,1)*cal.c0;
+var.c = ones(100,1)*c0(1,:);
 var.T = linspace(1000,1800,100).';
 var.P = linspace(1.5,1.5,100).';
 
@@ -384,7 +420,7 @@ ylabel('log$_{10} \ K$',TX{:},FS{[1,3]})
 
 
 % plot partition coefficients (P-dependent)
-var.c = ones(100,1)*cal.c0;
+var.c = ones(100,1)*c0(1,:);
 var.T = linspace(1300,1300,100).';
 var.P = linspace(0,4,100).';
 
@@ -398,7 +434,7 @@ xlabel('log$_{10} \ K$',TX{:},FS{[1,3]})
 ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
 
 % plot melting points, solidus, liquidus (P-dependent)
-var.c = ones(100,1)*cal.c0;
+var.c = ones(100,1)*c0(1,:);
 var.T = linspace(1300,1300,100).';
 var.P = linspace(0,4,100).';
 
@@ -415,7 +451,7 @@ xlabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
 ylabel('$P$ [GPa]',TX{:},FS{[1,3]})
 
 % plot melt fraction, phase compositions (T-dependent)
-var.c = ones(100,1)*cal.c0;
+var.c = ones(100,1)*c0(1,:);
 var.T = linspace(1300,1300,100).';
 var.P = linspace(0.1,0.1,100).';
 

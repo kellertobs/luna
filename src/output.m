@@ -26,7 +26,7 @@ if Nx <= 10 && Nz <= 10  % create 0D plots
     subplot(4,1,3)
     plot(hist.time/yr,squeeze(hist.cx(:,2,:)),LW{:});  axis xy tight; box on;
     title('$c^x$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
-    legend(cal.CompStr,TX{:},FS{:},'location','best');
+    legend(cal.cmpStr,TX{:},FS{:},'location','best');
     subplot(4,1,4)
     plot(hist.time/yr,squeeze(hist.cm(:,2,:)),LW{:});  axis xy tight; box on;
     title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:});
@@ -91,7 +91,7 @@ elseif Nx <= 10  % create 1D plots
     subplot(1,5,5)
     plot(squeeze(cm(2:end-1,2:end-1,:))*100,Zc(2:end-1).'./1e3,LW{:}); axis ij tight; box on; hold on;
     title('$c^m$ [wt\%]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
-    legend(cal.CompStr,TX{:},FS{:},'location','east');
+    legend(cal.cmpStr,TX{:},FS{:},'location','east');
 
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
     else; set(0, 'CurrentFigure', fh2); clf;
@@ -255,22 +255,22 @@ else % create 2D plots
     set(0,'CurrentFigure',fh2)
     set(fh2,'CurrentAxes',ax(21));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.CompStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(22));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,2)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.CompStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh2,'CurrentAxes',ax(23));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,3)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.CompStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh2,'CurrentAxes',ax(24));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,4)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.CompStr{4},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(25));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,5)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.CompStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(26));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,6)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.CompStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
 
     % plot major oxide composition in Fig. 2

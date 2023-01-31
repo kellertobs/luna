@@ -5,6 +5,37 @@ c_oxd  = reshape(reshape(c ,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
 cm_oxd = reshape(reshape(cm,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
 cx_oxd = reshape(reshape(cx,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
 
+% update phase mineral end-member compositions
+c_mnr(:,:,cal.mnr_for) = squeeze(c(:,:,cal.for)).*100;
+c_mnr(:,:,cal.mnr_fay) = squeeze(c(:,:,cal.fay)).*100;
+c_mnr(:,:,cal.mnr_px1) = squeeze(c(:,:,cal.opx)).*100;
+c_mnr(:,:,cal.mnr_px2) = squeeze(c(:,:,cal.cpx)).*100;
+c_mnr(:,:,cal.mnr_px3) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
+c_mnr(:,:,cal.mnr_ant) = squeeze(c(:,:,cal.ant)).*100;
+c_mnr(:,:,cal.mnr_alb) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
+c_mnr(:,:,cal.mnr_spn) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
+c_mnr(:,:,cal.mnr_qtz) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
+
+cx_mnr(:,:,cal.mnr_for) = squeeze(cx(:,:,cal.for)).*100;
+cx_mnr(:,:,cal.mnr_fay) = squeeze(cx(:,:,cal.fay)).*100;
+cx_mnr(:,:,cal.mnr_px1) = squeeze(cx(:,:,cal.opx)).*100;
+cx_mnr(:,:,cal.mnr_px2) = squeeze(cx(:,:,cal.cpx)).*100;
+cx_mnr(:,:,cal.mnr_px3) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
+cx_mnr(:,:,cal.mnr_ant) = squeeze(cx(:,:,cal.ant)).*100;
+cx_mnr(:,:,cal.mnr_alb) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
+cx_mnr(:,:,cal.mnr_spn) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
+cx_mnr(:,:,cal.mnr_qtz) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
+
+cm_mnr(:,:,cal.mnr_for) = squeeze(cm(:,:,cal.for)).*100;
+cm_mnr(:,:,cal.mnr_fay) = squeeze(cm(:,:,cal.fay)).*100;
+cm_mnr(:,:,cal.mnr_px1) = squeeze(cm(:,:,cal.opx)).*100;
+cm_mnr(:,:,cal.mnr_px2) = squeeze(cm(:,:,cal.cpx)).*100;
+cm_mnr(:,:,cal.mnr_px3) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
+cm_mnr(:,:,cal.mnr_ant) = squeeze(cm(:,:,cal.ant)).*100;
+cm_mnr(:,:,cal.mnr_alb) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
+cm_mnr(:,:,cal.mnr_spn) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
+cm_mnr(:,:,cal.mnr_qtz) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
+
 % update phase densities
 rhom = squeeze(sum(permute(cm,[3,1,2])./rhom0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
 rhox = squeeze(sum(permute(cx,[3,1,2])./rhox0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));

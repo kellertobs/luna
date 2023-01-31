@@ -11,8 +11,6 @@ cal = model2cal(cal0, model);
 for stg = stages
 
     % get computed phase proportions, compositions
-%     c0       =  max(0,min(1,cal.oxd.'\squeeze(oxd(stg,blk,:))));  % find end-member proportions of first step
-%     c0       =  fitc0(squeeze(oxd(stg,blk,:)).',cal);  % find end-member proportions of first step
     var.c    =  c0(stg,:);
     var.T    =  Tmp(stg);
     var.P    =  Prs(stg);
