@@ -22,7 +22,7 @@ cal.mnr_oxd = cal.mnr_oxd./sum(cal.mnr_oxd,2)*100;
 cal.mnrStr  = {'mnr_for','mnr_fay','mnr_px1','mnr_px2','mnr_px3','mnr_ant','mnr_alb','mnr_spn','mnr_qtz'};
 for i = 1:length(cal.mnrStr); cal.(cal.mnrStr{i}) = i; end
 
-cal.eut_mnr = [ 0.0   0.0   0.0   0.0   0.44  0.15  0.13  0.21  0.07];
+cal.eut_mnr = [ 0.0   0.0   0.0   0.0   0.45  0.17  0.11  0.20  0.07];
 cal.eut_mnr = cal.eut_mnr./sum(cal.eut_mnr,2);
 
 % get oxide composition of eutectic component
@@ -31,69 +31,69 @@ cal.oxd = [cal.mnr_oxd([1 2 3 4 6],:); cal.eut_mnr*cal.mnr_oxd];
 % specify calibration parameters
 
 % set pure component melting points T_m^i at P=0
-cal.T0(cal.for)  =  1900;
-cal.T0(cal.fay)  =  1200;
-cal.T0(cal.opx)  =  1500;
-cal.T0(cal.cpx)  =  1100;
-cal.T0(cal.ant)  =  1300;
-cal.T0(cal.eut)  =  1000;
+cal.T0(cal.for)  =  1890;
+cal.T0(cal.fay)  =  1205;
+cal.T0(cal.opx)  =  1450;
+cal.T0(cal.cpx)  =  1175;
+cal.T0(cal.ant)  =  1325;
+cal.T0(cal.eut)  =   988;
 
 % set first coeff. for P-dependence of T_m^i [GPa]
-cal.A(cal.for)   =  15.0;
-cal.A(cal.fay)   =  15.0;
-cal.A(cal.opx)   =  15.0;
-cal.A(cal.cpx)   =  15.0;
-cal.A(cal.ant)   =  15.0;
-cal.A(cal.eut)   =  15.0;
+cal.A(cal.for)   =  24;
+cal.A(cal.fay)   =   8;
+cal.A(cal.opx)   =  14;
+cal.A(cal.cpx)   =   5;
+cal.A(cal.ant)   =   9;
+cal.A(cal.eut)   =   3.5;
 
 % set second coeff. for P-dependence of T_m^i [1]
-cal.B(cal.for)   =  2.00;
-cal.B(cal.fay)   =  2.00;
-cal.B(cal.opx)   =  2.00;
-cal.B(cal.cpx)   =  2.00;
-cal.B(cal.ant)   =  2.00;
-cal.B(cal.eut)   =  2.00;
+cal.B(cal.for)   =  3.0;
+cal.B(cal.fay)   =  2.0;
+cal.B(cal.opx)   =  2.2;
+cal.B(cal.cpx)   =  1.9;
+cal.B(cal.ant)   =  2.2;
+cal.B(cal.eut)   =  2.0;
 
 % set entropy gain of fusion DeltaS [J/K]
-cal.dS           =  350;
+cal.dS           =  300;
 
 % set coeff. for T-dependence of partition coefficients K^i [1/K]
-cal.r(cal.for)   =  55;
-cal.r(cal.fay)   =  55;
-cal.r(cal.opx)   =  55;
-cal.r(cal.cpx)   =  25;
-cal.r(cal.ant)   =  45;
-cal.r(cal.eut)   =  25;
+cal.r(cal.for)   =  33.0;
+cal.r(cal.fay)   =  31.0;
+cal.r(cal.opx)   =  60.0;
+cal.r(cal.cpx)   =  18.0;
+cal.r(cal.ant)   =  70.0;
+cal.r(cal.eut)   =  10.0;
 
 
 % set up calibration parameter bounds for mcmc
-bnds.T0(cal.for,:) = cal.T0(cal.for) + [-1,+1]*50;
-bnds.T0(cal.fay,:) = cal.T0(cal.fay) + [-1,+1]*50;
-bnds.T0(cal.opx,:) = cal.T0(cal.opx) + [-1,+1]*50;
-bnds.T0(cal.cpx,:) = cal.T0(cal.cpx) + [-1,+1]*50;
-bnds.T0(cal.ant,:) = cal.T0(cal.ant) + [-1,+1]*50;
-bnds.T0(cal.eut,:) = cal.T0(cal.eut) + [-1,+1]*50;
+bnds.T0(cal.for,:) = cal.T0(cal.for) + [-1,+1]*5;
+bnds.T0(cal.fay,:) = cal.T0(cal.fay) + [-1,+1]*5;
+bnds.T0(cal.opx,:) = cal.T0(cal.opx) + [-1,+1]*25;
+bnds.T0(cal.cpx,:) = cal.T0(cal.cpx) + [-1,+1]*10;
+bnds.T0(cal.ant,:) = cal.T0(cal.ant) + [-1,+1]*25;
+bnds.T0(cal.eut,:) = cal.T0(cal.eut) + [-1,+1]*5;
 
-bnds.A(cal.for,:)  = cal.A(cal.for)  + [-1,+1]*5;
-bnds.A(cal.fay,:)  = cal.A(cal.fay)  + [-1,+1]*5;
-bnds.A(cal.opx,:)  = cal.A(cal.opx)  + [-1,+1]*5;
-bnds.A(cal.cpx,:)  = cal.A(cal.cpx)  + [-1,+1]*5;
-bnds.A(cal.ant,:)  = cal.A(cal.ant)  + [-1,+1]*5;
-bnds.A(cal.eut,:)  = cal.A(cal.eut)  + [-1,+1]*5;
+bnds.A(cal.for,:)  = cal.A(cal.for)  + [-1,+1]*2;
+bnds.A(cal.fay,:)  = cal.A(cal.fay)  + [-1,+1]*1;
+bnds.A(cal.opx,:)  = cal.A(cal.opx)  + [-1,+1]*2;
+bnds.A(cal.cpx,:)  = cal.A(cal.cpx)  + [-1,+1]*1;
+bnds.A(cal.ant,:)  = cal.A(cal.ant)  + [-1,+1]*1.5;
+bnds.A(cal.eut,:)  = cal.A(cal.eut)  + [-1,+1]*0.5;
 
-bnds.B(cal.for,:)  = cal.B(cal.for)  + [-1,+1]*1;
-bnds.B(cal.fay,:)  = cal.B(cal.fay)  + [-1,+1]*1;
-bnds.B(cal.opx,:)  = cal.B(cal.opx)  + [-1,+1]*1;
-bnds.B(cal.cpx,:)  = cal.B(cal.cpx)  + [-1,+1]*1;
-bnds.B(cal.ant,:)  = cal.B(cal.ant)  + [-1,+1]*1;
-bnds.B(cal.eut,:)  = cal.B(cal.eut)  + [-1,+1]*1;
+bnds.B(cal.for,:)  = cal.B(cal.for)  + [-1,+1]*0.25;
+bnds.B(cal.fay,:)  = cal.B(cal.fay)  + [-1,+1]*0.25;
+bnds.B(cal.opx,:)  = cal.B(cal.opx)  + [-1,+1]*0.25;
+bnds.B(cal.cpx,:)  = cal.B(cal.cpx)  + [-1,+1]*0.25;
+bnds.B(cal.ant,:)  = cal.B(cal.ant)  + [-1,+1]*0.25;
+bnds.B(cal.eut,:)  = cal.B(cal.eut)  + [-1,+1]*0.25;
 
-bnds.r(cal.for,:)  = cal.r(cal.for)  + [-1,+1]*20;
-bnds.r(cal.fay,:)  = cal.r(cal.fay)  + [-1,+1]*20;
-bnds.r(cal.opx,:)  = cal.r(cal.opx)  + [-1,+1]*20;
-bnds.r(cal.cpx,:)  = cal.r(cal.cpx)  + [-1,+1]*20;
-bnds.r(cal.ant,:)  = cal.r(cal.ant)  + [-1,+1]*20;
-bnds.r(cal.eut,:)  = cal.r(cal.eut)  + [-1,+1]*20;
+bnds.r(cal.for,:)  = cal.r(cal.for)  + [-1,+1]*5;
+bnds.r(cal.fay,:)  = cal.r(cal.fay)  + [-1,+1]*5;
+bnds.r(cal.opx,:)  = cal.r(cal.opx)  + [-1,+1]*10;
+bnds.r(cal.cpx,:)  = cal.r(cal.cpx)  + [-1,+1]*4;
+bnds.r(cal.ant,:)  = cal.r(cal.ant)  + [-1,+1]*10;
+bnds.r(cal.eut,:)  = cal.r(cal.eut)  + [-1,+1]*2;
 
 bnds.mat           = [bnds.T0; bnds.A; bnds.B; bnds.r];
 

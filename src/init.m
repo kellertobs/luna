@@ -38,7 +38,7 @@ cm0 = phs0.cl;
 % update phase oxide compositions
 oxdm0 = cm0*cal.oxd;
 
-wtm([1 3 4 6 7 8 11 12]) = [oxdm0,0,0]; % SiO2
+wtm([1 2 3 4 6 7 8 11 12]) = [oxdm0,0,0]; % SiO2
 eta0 = grdmodel08(wtm,T0);
 rho0 = sum(cm0./rhom0).^-1;
 
@@ -328,7 +328,7 @@ if restart
         Div_rhoVo = Div_rhoV;
 
         update; output; restart = 0;
-        
+
     else % continuation file does not exist, start from scratch
         fprintf('\n   !!! restart file does not exist !!! \n   => starting run from scratch %s \n\n',name);
         update;

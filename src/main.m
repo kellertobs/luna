@@ -7,10 +7,10 @@ while time <= tend && step <= Nt
     fprintf(1,'*****  step %d;  dt = %4.4e;  time = %4.4e [yr]\n\n',step,dt./yr,time./yr);
     tic;
     
-    if     strcmp(TINT,'bwei') || step==1  % first step  / 1st-order backward-Euler implicit scheme
+    if     strcmp(TINT,'bwei') || step<=2 % first step  / 1st-order backward-Euler implicit scheme
         alpha1 = 1; alpha2 = 1; alpha3 = 0;
         beta1  = 1; beta2  = 0; beta3  = 0;
-    elseif strcmp(TINT,'cnsi') || step==2  % second step / 2nd-order Crank-Nicolson semi-implicit scheme
+    elseif strcmp(TINT,'cnsi')            % second step / 2nd-order Crank-Nicolson semi-implicit scheme
         alpha1 = 1;   alpha2 = 1;   alpha3 = 0;
         beta1  = 1/2; beta2  = 1/2; beta3  = 0;
     elseif strcmp(TINT,'bd3i')            % other steps / 2nd-order 3-point backward-difference implicit scheme

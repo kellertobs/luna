@@ -6,6 +6,7 @@ olv=1; pxn=2; plg=3; spn=4; qtz=5; mlt=6; blk=7;
 TINY = 1e-16;
 
 cal = model2cal(cal0, model);
+% cal = cal0;
 
 % extract experimental data and compute model outcome for each stage
 for stg = stages
@@ -27,18 +28,18 @@ for stg = stages
     mdl.c0(stg,:) = var.c;
 
     % bring model result into form of experimental data
-    mdl.phs(stg,olv) = (                                            phs.cs(cal.for) + phs.cs(cal.fay)) .* (1-phs.f) .* hasolv(stg);
-    mdl.phs(stg,pxn) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3) + phs.cs(cal.opx) + phs.cs(cal.cpx)) .* (1-phs.f) .* haspxn(stg);
-    mdl.phs(stg,plg) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb) + phs.cs(cal.ant)                  ) .* (1-phs.f) .* hasplg(stg);
-    mdl.phs(stg,spn) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)                                    ) .* (1-phs.f) .* hasspn(stg);
-    mdl.phs(stg,qtz) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)                                    ) .* (1-phs.f) .* hasqtz(stg);
+    mdl.phs(stg,olv) = (                                                                                        phs.cs(cal.for) + phs.cs(cal.fay)) .* (1-phs.f) .* hasolv(stg);
+    mdl.phs(stg,pxn) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3) +                                             phs.cs(cal.opx) + phs.cs(cal.cpx)) .* (1-phs.f) .* haspxn(stg);
+    mdl.phs(stg,plg) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb) + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_ant) + phs.cs(cal.ant)                  ) .* (1-phs.f) .* hasplg(stg);
+    mdl.phs(stg,spn) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)                                                                                ) .* (1-phs.f) .* hasspn(stg);
+    mdl.phs(stg,qtz) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)                                                                                ) .* (1-phs.f) .* hasqtz(stg);
     mdl.phs(stg,mlt) =  phs.f;
 
-    mdl.oxd(stg,olv,:) = (                                                                       phs.cs(cal.for)*cal.oxd(cal.for,:) + phs.cs(cal.fay)*cal.oxd(cal.fay,:)) ./ (                                          phs.cs(cal.for)+phs.cs(cal.fay)+TINY) .* hasolv(stg);
-    mdl.oxd(stg,pxn,:) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3)*cal.mnr_oxd(cal.mnr_px3,:) + phs.cs(cal.opx)*cal.oxd(cal.opx,:) + phs.cs(cal.cpx)*cal.oxd(cal.cpx,:)) ./ (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3)+phs.cs(cal.opx)+phs.cs(cal.cpx)+TINY) .* haspxn(stg);
-    mdl.oxd(stg,plg,:) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb)*cal.mnr_oxd(cal.mnr_alb,:) + phs.cs(cal.ant)*cal.oxd(cal.ant,:)                                     ) ./ (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb)+phs.cs(cal.ant)                +TINY) .* hasplg(stg);
-    mdl.oxd(stg,spn,:) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)*cal.mnr_oxd(cal.mnr_spn,:)                                                                          ) ./ (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)                                +TINY) .* hasspn(stg);
-    mdl.oxd(stg,qtz,:) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)*cal.mnr_oxd(cal.mnr_qtz,:)                                                                          ) ./ (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)                                +TINY) .* hasqtz(stg);
+    mdl.oxd(stg,olv,:) = (phs.cs(cal.for)*cal.oxd(cal.for,:) + phs.cs(cal.fay)*cal.oxd(cal.fay,:)                                                                                                                                              ) ./ (phs.cs(cal.for)+phs.cs(cal.fay)                                                                                    +TINY) .* hasolv(stg);
+    mdl.oxd(stg,pxn,:) = (phs.cs(cal.opx)*cal.oxd(cal.opx,:) + phs.cs(cal.cpx)*cal.oxd(cal.cpx,:) + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3)*cal.mnr_oxd(cal.mnr_px3,:)                                                                       ) ./ (phs.cs(cal.opx)+phs.cs(cal.cpx)+phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3)                                          +TINY) .* haspxn(stg);
+    mdl.oxd(stg,plg,:) = (phs.cs(cal.ant)*cal.oxd(cal.ant,:)                                      + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb)*cal.mnr_oxd(cal.mnr_alb,:) + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_ant)*cal.mnr_oxd(cal.mnr_ant,:)) ./ (phs.cs(cal.ant)                +phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb)+phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_ant)+TINY) .* hasplg(stg);
+    mdl.oxd(stg,spn,:) = (                                                                        + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)*cal.mnr_oxd(cal.mnr_spn,:)                                                                       ) ./ (                                phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)                                          +TINY) .* hasspn(stg);
+    mdl.oxd(stg,qtz,:) = (                                                                        + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)*cal.mnr_oxd(cal.mnr_qtz,:)                                                                       ) ./ (                                phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)                                          +TINY) .* hasqtz(stg);
     mdl.oxd(stg,mlt,:) =  phs.cl*cal.oxd;
     
 end

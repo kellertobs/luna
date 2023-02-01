@@ -62,7 +62,7 @@ Psl = (0.1:0.2:4)'; % all across pressure space
 Tsl_sigma = 10;
 
 % weights for datasets - [SK2020, Tsol/Tliq]
-wgts = [10; 1];
+wgts = [5; 1];
 
 %% prepare information for the parameter fitting
 
@@ -223,6 +223,8 @@ mMAP = plotpdfs(mout, Pout, vname, bnds.mat);
 cal  = model2cal(cal0, mMAP)
 mdl  = dhatfunc(mMAP);
 
+% cal_luna; cal0 = cal;
+
 % mdl = runmodel([], cal0, c0, Tmp, Prs, stages, hasolv, haspxn, hasplg, hasspn, hasqtz, Psl);;
 
 figure(3); clf;
@@ -372,7 +374,7 @@ figure();
 plot(var.c(:,cal.fay),cal.Tsol,'k-',var.c(:,cal.fay),cal.Tliq,'k-',LW{:}); axis xy tight; box on;
 set(gca,TL{:},FS{[1,2]})
 ylabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
-xlabel('fay [wt]',TX{:},FS{[1,3]})
+xlabel('for-fay [wt]',TX{:},FS{[1,3]})
 
 % plot opx-cpx phase diagram
 var.c = zeros(100,cal.nc);
@@ -387,7 +389,7 @@ figure();
 plot(var.c(:,cal.cpx),cal.Tsol,'k-',var.c(:,cal.cpx),cal.Tliq,'k-',LW{:}); axis xy tight; box on;
 set(gca,TL{:},FS{[1,2]})
 ylabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
-xlabel('cpx [wt]',TX{:},FS{[1,3]})
+xlabel('opx-cpx [wt]',TX{:},FS{[1,3]})
 
 % plot an-ab phase diagram
 var.c = zeros(100,cal.nc);
@@ -402,7 +404,7 @@ figure();
 plot(var.c(:,cal.eut),cal.Tsol,'k-',var.c(:,cal.eut),cal.Tliq,'k-',LW{:}); axis xy tight; box on;
 set(gca,TL{:},FS{[1,2]})
 ylabel('$T \ [^\circ$C]',TX{:},FS{[1,3]})
-xlabel('ab [wt]',TX{:},FS{[1,3]})
+xlabel('ant-eut [wt]',TX{:},FS{[1,3]})
 
 % plot partition coefficients (T-dependent)
 var.c = ones(100,1)*c0(1,:);

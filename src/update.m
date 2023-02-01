@@ -1,9 +1,9 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase oxide compositions
-c_oxd  = reshape(reshape(c ,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
-cm_oxd = reshape(reshape(cm,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
-cx_oxd = reshape(reshape(cx,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,cal.nc);
+c_oxd  = reshape(reshape(c ,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,length(cal.oxdStr));
+cm_oxd = reshape(reshape(cm,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,length(cal.oxdStr));
+cx_oxd = reshape(reshape(cx,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,length(cal.oxdStr));
 
 % update phase mineral end-member compositions
 c_mnr(:,:,cal.mnr_for) = squeeze(c(:,:,cal.for)).*100;
@@ -11,7 +11,7 @@ c_mnr(:,:,cal.mnr_fay) = squeeze(c(:,:,cal.fay)).*100;
 c_mnr(:,:,cal.mnr_px1) = squeeze(c(:,:,cal.opx)).*100;
 c_mnr(:,:,cal.mnr_px2) = squeeze(c(:,:,cal.cpx)).*100;
 c_mnr(:,:,cal.mnr_px3) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
-c_mnr(:,:,cal.mnr_ant) = squeeze(c(:,:,cal.ant)).*100;
+c_mnr(:,:,cal.mnr_ant) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_ant)+c(:,:,cal.ant)).*100;
 c_mnr(:,:,cal.mnr_alb) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
 c_mnr(:,:,cal.mnr_spn) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
 c_mnr(:,:,cal.mnr_qtz) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
@@ -21,7 +21,7 @@ cx_mnr(:,:,cal.mnr_fay) = squeeze(cx(:,:,cal.fay)).*100;
 cx_mnr(:,:,cal.mnr_px1) = squeeze(cx(:,:,cal.opx)).*100;
 cx_mnr(:,:,cal.mnr_px2) = squeeze(cx(:,:,cal.cpx)).*100;
 cx_mnr(:,:,cal.mnr_px3) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
-cx_mnr(:,:,cal.mnr_ant) = squeeze(cx(:,:,cal.ant)).*100;
+cx_mnr(:,:,cal.mnr_ant) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_ant)+cx(:,:,cal.ant)).*100;
 cx_mnr(:,:,cal.mnr_alb) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
 cx_mnr(:,:,cal.mnr_spn) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
 cx_mnr(:,:,cal.mnr_qtz) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
@@ -31,7 +31,7 @@ cm_mnr(:,:,cal.mnr_fay) = squeeze(cm(:,:,cal.fay)).*100;
 cm_mnr(:,:,cal.mnr_px1) = squeeze(cm(:,:,cal.opx)).*100;
 cm_mnr(:,:,cal.mnr_px2) = squeeze(cm(:,:,cal.cpx)).*100;
 cm_mnr(:,:,cal.mnr_px3) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
-cm_mnr(:,:,cal.mnr_ant) = squeeze(cm(:,:,cal.ant)).*100;
+cm_mnr(:,:,cal.mnr_ant) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_ant)+cm(:,:,cal.ant)).*100;
 cm_mnr(:,:,cal.mnr_alb) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
 cm_mnr(:,:,cal.mnr_spn) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
 cm_mnr(:,:,cal.mnr_qtz) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
@@ -49,16 +49,17 @@ chi   = x.*rho./rhox;
 mu    = m.*rho./rhom;
 
 % determine adaptive max viscosity / min segregation coefficient
-if exist('eta','var'); etamax = 1e+6.*min(eta (:)); else; etamax = 1e18; end
+if exist('eta','var'); etamax = etacntr.*min(eta (:)); else; etamax = 1e18; end
 
 % update effective viscosity
 wtm      = zeros(Nz*Nx,12);
 wtm(:,1) = reshape(cm_oxd(:,:,1),Nz*Nx,1); % SiO2
-wtm(:,3) = reshape(cm_oxd(:,:,2),Nz*Nx,1); % Al2O3
-wtm(:,4) = reshape(cm_oxd(:,:,3),Nz*Nx,1); % FeO
-wtm(:,6) = reshape(cm_oxd(:,:,4),Nz*Nx,1); % MgO
-wtm(:,7) = reshape(cm_oxd(:,:,5),Nz*Nx,1); % CaO
-wtm(:,8) = reshape(cm_oxd(:,:,6),Nz*Nx,1); % Na2O
+wtm(:,2) = reshape(cm_oxd(:,:,2),Nz*Nx,1); % SiO2
+wtm(:,3) = reshape(cm_oxd(:,:,3),Nz*Nx,1); % Al2O3
+wtm(:,4) = reshape(cm_oxd(:,:,4),Nz*Nx,1); % FeO
+wtm(:,6) = reshape(cm_oxd(:,:,5),Nz*Nx,1); % MgO
+wtm(:,7) = reshape(cm_oxd(:,:,6),Nz*Nx,1); % CaO
+wtm(:,8) = reshape(cm_oxd(:,:,7),Nz*Nx,1); % Na2O
 etam  = max(1e-2,reshape(grdmodel08(wtm,T(:)-273.15),Nz,Nx));
 etax  = etax0.* ones(size(x));                                             % constant crystal viscosity
 
@@ -76,7 +77,7 @@ thtv = squeeze(prod(Mv.^Xf,2));
 
 % get effective viscosity
 eta  = squeeze(sum(ff.*kv.*thtv,1));
-eta  = (1./etamax + 1./(etareg*eta)).^-1;% + etabnd(1);
+eta  = (etamax.^-1 + (etareg*eta).^-1).^-1;
 eta([1 end],:) = eta([2 end-1],:);  
 eta(:,[1 end]) = eta(:,[2 end-1]);
 etaco  = (eta(1:end-1,1:end-1)+eta(2:end,1:end-1) ...                      % effective viscosity in cell corners
@@ -158,8 +159,8 @@ if step>0 && ~restart
     Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt advection
                + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % xtal advection
     F_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
-    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx);  % correct volume source term by scaled residual
+    VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx)/4;  % correct volume source term by scaled residual
 end
 
-UBG    = - 0*mean(mean(VolSrc))./2 .* (L/2-XXu);
-WBG    = - 2*mean(mean(VolSrc))./2 .* (D/2-ZZw);
+UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
+WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);
