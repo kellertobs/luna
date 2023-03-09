@@ -4,8 +4,7 @@ function [prior] = prior (model, bnds)
 % model     vector of Nparams x 1 
 % bnds      vector of Nparams x 2 [lower, upper]
 
-pvar  = double(model(:)>=bnds (:,1) & model(:)<=bnds(:,2));
+pvar  = double(model(:)>=bnds(:,1) & model(:)<=bnds(:,2));
 prior = sum(log(pvar)); 
-
 
 end

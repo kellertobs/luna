@@ -4,7 +4,7 @@ c = ones(1,size(caloxd,1));
 c = c./sum(max(0,c));
 
 tol   = 1e-2;
-maxit = 1e+4;
+maxit = 1e+3;
 
 c0   = c;
 res  = 1;
@@ -12,10 +12,10 @@ res0 = 1;
 it   = 1;
 while res>tol && it<maxit
 
-    c = max(0.001,c0 + max(0.05,c0)/2.*randn(size(c)).*res0^0.25);
+    c = max(0.001,c0 + max(0.05,c0).*randn(size(c)).*res0^0.25);
     c = c./sum(c);
 
-    res = norm(abs(c*caloxd - oxd)./oxd.^0.5)/sqrt(length(oxd));
+    res = norm(abs(c*caloxd - oxd)./oxd.^0.2)/10;
 
     if it==1; res0 = res; end
 
@@ -26,3 +26,5 @@ while res>tol && it<maxit
 
     it = it+1;
 end
+
+disp(['stopped at res = ',num2str(res0,4),' after ',int2str(it),' iterations'])

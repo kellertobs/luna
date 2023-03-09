@@ -1,12 +1,12 @@
-function [mdl] = runmodel (model, cal0, c0, Tmp, Prs, stages, hasolv, haspxn, hasplg, hasspn, hasqtz, Psl)
+function [mdl] = runmodel (model, cal0, c0, Tmp, Prs, stages, Psl)
 
 % run melt model and cast outputs into the same form as the data
 
-olv=1; pxn=2; plg=3; spn=4; qtz=5; mlt=6; blk=7;
+nphs = 7; olv=1; opx=2; cpx=3; plg=4; ilm=5; qtz=6; mlt=7; blk=8; xtl=9;
 TINY = 1e-16;
 
-cal = model2cal(cal0, model);
-% cal = cal0;
+% cal = model2cal(cal0, model);
+cal = cal0;
 
 % extract experimental data and compute model outcome for each stage
 for stg = stages
@@ -28,20 +28,33 @@ for stg = stages
     mdl.c0(stg,:) = var.c;
 
     % bring model result into form of experimental data
-    mdl.phs(stg,olv) = (                                                                                        phs.cs(cal.for) + phs.cs(cal.fay)) .* (1-phs.f) .* hasolv(stg);
-    mdl.phs(stg,pxn) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3) +                                             phs.cs(cal.opx) + phs.cs(cal.cpx)) .* (1-phs.f) .* haspxn(stg);
-    mdl.phs(stg,plg) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb) + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_ant) + phs.cs(cal.ant)                  ) .* (1-phs.f) .* hasplg(stg);
-    mdl.phs(stg,spn) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)                                                                                ) .* (1-phs.f) .* hasspn(stg);
-    mdl.phs(stg,qtz) = (phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)                                                                                ) .* (1-phs.f) .* hasqtz(stg);
+    mdl.phs(stg,olv) = sum(phs.cs.'.*cal.cmp_mnr(:,[cal.for,cal.fay]),'all') .* (1-phs.f);
+    mdl.phs(stg,opx) = sum(phs.cs.'.*cal.cmp_mnr(:,[cal.ens,cal.hyp]),'all') .* (1-phs.f);
+    mdl.phs(stg,cpx) = sum(phs.cs.'.*cal.cmp_mnr(:,[cal.aug,cal.pig]),'all') .* (1-phs.f);
+    mdl.phs(stg,plg) = sum(phs.cs.'.*cal.cmp_mnr(:,[cal.ant,cal.alb]),'all') .* (1-phs.f);
+    mdl.phs(stg,ilm) = sum(phs.cs.'.*cal.cmp_mnr(:,[cal.ilm        ]),'all') .* (1-phs.f);
+    mdl.phs(stg,qtz) = sum(phs.cs.'.*cal.cmp_mnr(:,[cal.qtz        ]),'all') .* (1-phs.f);
     mdl.phs(stg,mlt) =  phs.f;
 
-    mdl.oxd(stg,olv,:) = (phs.cs(cal.for)*cal.oxd(cal.for,:) + phs.cs(cal.fay)*cal.oxd(cal.fay,:)                                                                                                                                              ) ./ (phs.cs(cal.for)+phs.cs(cal.fay)                                                                                    +TINY) .* hasolv(stg);
-    mdl.oxd(stg,pxn,:) = (phs.cs(cal.opx)*cal.oxd(cal.opx,:) + phs.cs(cal.cpx)*cal.oxd(cal.cpx,:) + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3)*cal.mnr_oxd(cal.mnr_px3,:)                                                                       ) ./ (phs.cs(cal.opx)+phs.cs(cal.cpx)+phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_px3)                                          +TINY) .* haspxn(stg);
-    mdl.oxd(stg,plg,:) = (phs.cs(cal.ant)*cal.oxd(cal.ant,:)                                      + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb)*cal.mnr_oxd(cal.mnr_alb,:) + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_ant)*cal.mnr_oxd(cal.mnr_ant,:)) ./ (phs.cs(cal.ant)                +phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_alb)+phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_ant)+TINY) .* hasplg(stg);
-    mdl.oxd(stg,spn,:) = (                                                                        + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)*cal.mnr_oxd(cal.mnr_spn,:)                                                                       ) ./ (                                phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_spn)                                          +TINY) .* hasspn(stg);
-    mdl.oxd(stg,qtz,:) = (                                                                        + phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)*cal.mnr_oxd(cal.mnr_qtz,:)                                                                       ) ./ (                                phs.cs(cal.eut).*cal.eut_mnr(cal.mnr_qtz)                                          +TINY) .* hasqtz(stg);
-    mdl.oxd(stg,mlt,:) =  phs.cl*cal.oxd;
-    
+    oxd = zeros(nphs,cal.noxd);
+    wgt = zeros(nphs,cal.noxd);
+    for ic = 1:cal.ncmp
+        oxd(olv,:) = oxd(olv,:) + phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.for,cal.fay])*cal.mnr_oxd([cal.for,cal.fay],:);
+        wgt(olv,:) = wgt(olv,:) + sum(phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.for,cal.fay]));
+        oxd(opx,:) = oxd(opx,:) + phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.ens,cal.hyp])*cal.mnr_oxd([cal.ens,cal.hyp],:);
+        wgt(opx,:) = wgt(opx,:) + sum(phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.ens,cal.hyp]));
+        oxd(cpx,:) = oxd(cpx,:) + phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.aug,cal.pig])*cal.mnr_oxd([cal.aug,cal.pig],:);
+        wgt(cpx,:) = wgt(cpx,:) + sum(phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.aug,cal.pig]));
+        oxd(plg,:) = oxd(plg,:) + phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.ant,cal.alb])*cal.mnr_oxd([cal.ant,cal.alb],:);
+        wgt(plg,:) = wgt(plg,:) + sum(phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.ant,cal.alb]));
+        oxd(ilm,:) = oxd(ilm,:) + phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.ilm        ])*cal.mnr_oxd([cal.ilm        ],:);
+        wgt(ilm,:) = wgt(ilm,:) + sum(phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.ilm        ]));
+        oxd(qtz,:) = oxd(qtz,:) + phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.qtz        ])*cal.mnr_oxd([cal.qtz        ],:);
+        wgt(qtz,:) = wgt(qtz,:) + sum(phs.cs(ic).'.*cal.cmp_mnr(ic,[cal.qtz        ]));
+        oxd(mlt,:) = oxd(mlt,:) + phs.cl(ic).'.*cal.cmp_mnr(ic,:)*cal.mnr_oxd(:,:);
+        wgt(mlt,:) = wgt(mlt,:) + sum(phs.cl(ic).'.*cal.cmp_mnr(ic,:));
+    end
+    mdl.oxd(stg,:,:) = oxd./(wgt+TINY);
 end
 
 % calculate solidus and liquidus from the bulk composition
