@@ -159,17 +159,15 @@ else % create 2D plots
     if ~exist('fh2','var'); fh2 = figure(VIS{:});
         colormap(ocean);
         fh = axb + 2*axh + 1*avs + axt;
-        fw = axl + 3*axw + 2*ahs + axr;
+        fw = axl + 2*axw + 1*ahs + axr;
         set(fh2,UN{:},'Position',[2 2 fw fh]);
         set(fh2,'PaperUnits','Centimeters','PaperPosition',[0 0 fw fh],'PaperSize',[fw fh]);
         set(fh2,'Color','w','InvertHardcopy','off');
         set(fh2,'Resize','off');
         ax(21) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+1*axh+1*avs axw axh]);
         ax(22) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+1*axh+1*avs axw axh]);
-        ax(23) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+1*axh+1*avs axw axh]);
-        ax(24) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
-        ax(25) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
-        ax(26) = axes(UN{:},'position',[axl+2*axw+2*ahs axb+0*axh+0*avs axw axh]);
+        ax(23) = axes(UN{:},'position',[axl+0*axw+0*ahs axb+0*axh+0*avs axw axh]);
+        ax(24) = axes(UN{:},'position',[axl+1*axw+1*ahs axb+0*axh+0*avs axw axh]);
     end
 
     if ~exist('fh3','var'); fh3 = figure(VIS{:});
@@ -280,16 +278,10 @@ else % create 2D plots
     set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh2,'CurrentAxes',ax(23));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,3)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{3},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
     set(fh2,'CurrentAxes',ax(24));
     imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,4)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
-    set(fh2,'CurrentAxes',ax(25));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,5)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
-    set(fh2,'CurrentAxes',ax(26));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,c(2:end-1,2:end-1,6)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.cmpStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
     sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
 
     % plot major oxide composition in Fig. 3
@@ -361,32 +353,32 @@ else % create 2D plots
     % plot major oxide composition in Fig. 6
     set(0,'CurrentFigure',fh6)
     set(fh6,'CurrentAxes',ax(61));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,1)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{1}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,1).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{1},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(62));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,2)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{2}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,2).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{2},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh6,'CurrentAxes',ax(63));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,3)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{3}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,3).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{3},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh6,'CurrentAxes',ax(64));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,4)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{4}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,4).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{4},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[]); ylabel('Depth [km]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(65));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,5)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{5}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,5).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{5},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh6,'CurrentAxes',ax(66));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,6)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{6}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,6).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{6},' [wt\%]'],TX{:},FS{:}); set(gca,'XTickLabel',[],'YTickLabel',[]);
     set(fh6,'CurrentAxes',ax(67));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,7)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{7}(5:end),' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,7).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{7},' [wt\%]'],TX{:},FS{:}); ylabel('Depth [km]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(68));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,8)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{8}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,8).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{8},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]); xlabel('Width [km]',TX{:},FS{:});
     set(fh6,'CurrentAxes',ax(69));
-    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,cx_mnr(2:end-1,2:end-1,9)); axis ij equal tight; box on; cb = colorbar;
-    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{9}(5:end),' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
+    imagesc(Xc(2:end-1)./1e3,Zc(2:end-1)./1e3,x(2:end-1,2:end-1).*cx_mnr(2:end-1,2:end-1,9).*100); axis ij equal tight; box on; cb = colorbar;
+    set(cb,TL{:},TS{:}); set(gca,TL{:},TS{:}); title([cal.mnrStr{9},' [wt\%]'],TX{:},FS{:}); set(gca,'YTickLabel',[]);
     sgtitle(['time = ',num2str(time/yr,3),' [yr]'],TX{:},FS{:},'Color','k');
 
     if plot_cv && iter > 0

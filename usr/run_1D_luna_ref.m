@@ -6,9 +6,9 @@ addpath('../src');
 runID    =  '1D_luna_ref';       % run identifier
 opdir    =  '../out';            % output directory
 restart  =  0;                   % restart from file (0: new run; <1: restart from last; >1: restart from specified frame)
-nop      =  10;                 % output frame plotted/saved every 'nop' time steps
+nop      =  500;                 % output frame plotted/saved every 'nop' time steps
 plot_op  =  1;                   % switch on to live plot of results
-save_op  =  0;                   % switch on to save output to file
+save_op  =  1;                   % switch on to save output to file
 plot_cv  =  0;                   % switch on to live plot iterative convergence
 
 % set model domain parameters
@@ -34,8 +34,8 @@ wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative 
 T0       =  1750;                % temperature top layer [deg C]
 T1       =  1750;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
-c0       =  [0.44,0.10,0.06,0.25,0.11,0.04]; % major component top layer
-c1       =  [0.44,0.10,0.06,0.25,0.11,0.04]; % major component base layer
+c0       =  [0.32,0.37,0.29,0.02]; % major component top layer
+c1       =  [0.32,0.37,0.29,0.02]; % major component base layer
 dc       =  [1,-1,1,-1,0,0].*0e-4; % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
@@ -59,7 +59,7 @@ Tbot     =  1950;                % wall temperature [degC] (nan = insulating)
 % set thermo-chemical material parameters
 cP       =  1200;                % heat capacity [J/kg/K]
 kT0      =  4;                   % thermal conductivity [W/m/K]
-calID    = 'luna';               % calibration ID
+calID    = 'luna_4c';               % calibration ID
 
 % set model rheology parameters
 etax0    =  1e16;                % solid reference viscosity [Pas]
@@ -68,8 +68,8 @@ BB       = [ 0.6904, 0.3096; 0.9988, 0.0012; ];  % permission step locations
 CC       = [ 0.5145, 0.1831; 0.6808, 1.8541; ];  % permission step widths
 
 % set model buoyancy parameters
-rhox0    =  [3270,4390,3000,3250,2730,3260];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
-rhom0    =  [2710,3580,2580,2850,2530,2880];  % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhox0    =  [3270,4390,3000,3100,3250,3250,2730,3260,4400,2650];  % crystal phase ref. density [kg/m3] (at T0,cphs0,Ptop)
+rhom0    =  [2710,3580,2580,2700,2850,2850,2530,2880,3800,2300];  % melt phase ref. density [kg/m3] (at T0,cphs0,Ptop)
 aT       =  5e-5;                % thermal expansivity [1/K]
 bPx      =  1e-11;               % solid compressibility [1/Pa]
 bPm      =  3e-11;               % melt compressibility [1/Pa]
@@ -79,9 +79,9 @@ g0       =  1.62;                % gravity [m/s2]
 % set numerical model parameters
 TINT     =  'bd3i';              % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
-CFL      =  0.5;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
+CFL      =  0.25;                 % (physical) time stepping courant number (multiplies stable step) [0,1]
 rtol     =  1e-4;                % outer its relative tolerance
-atol     =  1e-7;                % outer its absolute tolerance
+atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  50;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration
 etacntr  =  1e+5;                % maximum viscosity contrast

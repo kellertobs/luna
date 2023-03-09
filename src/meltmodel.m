@@ -51,7 +51,7 @@ r    =  sum(var.c./cal.K,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-14; % tolerance for Newton residual
+rnorm_tol  =  1e-12; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_T      =  0.1;   % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
@@ -124,7 +124,7 @@ r  =  sum(var.c.*cal.K,2)-1;
 
 rnorm      =  1;     % initialize residual norm for iterations
 n          =  0;     % initialize iteration count
-rnorm_tol  =  1e-14; % tolerance for Newton residual
+rnorm_tol  =  1e-12; % tolerance for Newton residual
 its_tol    =  1e3;   % maximum number of iterations
 eps_T      =  0.1;   % temperature perturbation for finite differencing, degrees
 flag       =  1;     % tells us whether the Newton solver converged
@@ -192,12 +192,12 @@ elseif ~any(var.f(:)>1e-9)
 end
     
 %***  compute residual of unity sum of components
-ff   =  repmat(var.f,1,cal.nc);
+ff   =  repmat(var.f,1,cal.ncmp);
 r    =  sum(var.c./(ff+(1-ff).*cal.K),2) - sum(var.c./(ff./cal.K+(1-ff)),2);
 
 rnorm     =  1;    % initialize residual norm for iterations
 n         =  0;    % initialize iteration count
-rnorm_tol = 1e-14; % tolerance for Newton residual
+rnorm_tol = 1e-12; % tolerance for Newton residual
 its_tol   = 1e3;   % maximum number of iterations
 flag      =  1;    % tells us whether the Newton solver converged
 
@@ -217,7 +217,7 @@ while rnorm > rnorm_tol     % Newton iteration
     
     
     %***  compute residual of unity sum of components
-    ff     =  repmat(var.f,1,cal.nc);
+    ff     =  repmat(var.f,1,cal.ncmp);
     r      =  sum(var.c./(ff+(1-ff).*cal.K),2) - sum(var.c./(ff./cal.K+(1-ff)),2);
     
     %***  get non-linear residual norm

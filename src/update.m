@@ -1,44 +1,19 @@
 %%*****  UPDATE PARAMETERS & AUXILIARY FIELDS  ****************************
 
 % update phase oxide compositions
-c_oxd  = reshape(reshape(c ,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,length(cal.oxdStr));
-cm_oxd = reshape(reshape(cm,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,length(cal.oxdStr));
-cx_oxd = reshape(reshape(cx,Nz*Nx,cal.nc)*cal.oxd,Nz,Nx,length(cal.oxdStr));
+c_oxd  = reshape(reshape(c ,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
+cm_oxd = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
+cx_oxd = reshape(reshape(cx,Nz*Nx,cal.ncmp)*cal.cmp_oxd,Nz,Nx,cal.noxd);
 
 % update phase mineral end-member compositions
-c_mnr(:,:,cal.mnr_for) = squeeze(c(:,:,cal.for)).*100;
-c_mnr(:,:,cal.mnr_fay) = squeeze(c(:,:,cal.fay)).*100;
-c_mnr(:,:,cal.mnr_px1) = squeeze(c(:,:,cal.opx)).*100;
-c_mnr(:,:,cal.mnr_px2) = squeeze(c(:,:,cal.cpx)).*100;
-c_mnr(:,:,cal.mnr_px3) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
-c_mnr(:,:,cal.mnr_ant) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_ant)+c(:,:,cal.ant)).*100;
-c_mnr(:,:,cal.mnr_alb) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
-c_mnr(:,:,cal.mnr_spn) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
-c_mnr(:,:,cal.mnr_qtz) = squeeze(c(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
+c_mnr  = reshape(reshape(c ,Nz*Nx,cal.ncmp)*cal.cmp_mnr,Nz,Nx,cal.nmnr);
+cm_mnr = reshape(reshape(cm,Nz*Nx,cal.ncmp)*cal.cmp_mnr,Nz,Nx,cal.nmnr);
+cx_mnr = reshape(reshape(cx,Nz*Nx,cal.ncmp)*cal.cmp_mnr,Nz,Nx,cal.nmnr);
 
-cx_mnr(:,:,cal.mnr_for) = squeeze(cx(:,:,cal.for)).*100;
-cx_mnr(:,:,cal.mnr_fay) = squeeze(cx(:,:,cal.fay)).*100;
-cx_mnr(:,:,cal.mnr_px1) = squeeze(cx(:,:,cal.opx)).*100;
-cx_mnr(:,:,cal.mnr_px2) = squeeze(cx(:,:,cal.cpx)).*100;
-cx_mnr(:,:,cal.mnr_px3) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
-cx_mnr(:,:,cal.mnr_ant) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_ant)+cx(:,:,cal.ant)).*100;
-cx_mnr(:,:,cal.mnr_alb) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
-cx_mnr(:,:,cal.mnr_spn) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
-cx_mnr(:,:,cal.mnr_qtz) = squeeze(cx(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
-
-cm_mnr(:,:,cal.mnr_for) = squeeze(cm(:,:,cal.for)).*100;
-cm_mnr(:,:,cal.mnr_fay) = squeeze(cm(:,:,cal.fay)).*100;
-cm_mnr(:,:,cal.mnr_px1) = squeeze(cm(:,:,cal.opx)).*100;
-cm_mnr(:,:,cal.mnr_px2) = squeeze(cm(:,:,cal.cpx)).*100;
-cm_mnr(:,:,cal.mnr_px3) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_px3)).*100;
-cm_mnr(:,:,cal.mnr_ant) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_ant)+cm(:,:,cal.ant)).*100;
-cm_mnr(:,:,cal.mnr_alb) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_alb)).*100;
-cm_mnr(:,:,cal.mnr_spn) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_spn)).*100;
-cm_mnr(:,:,cal.mnr_qtz) = squeeze(cm(:,:,cal.eut).*cal.eut_mnr(cal.mnr_qtz)).*100;
 
 % update phase densities
-rhom = squeeze(sum(permute(cm,[3,1,2])./rhom0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
-rhox = squeeze(sum(permute(cx,[3,1,2])./rhox0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
+rhom = squeeze(sum(permute(cm_mnr,[3,1,2])./rhom0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPm.*(Pt-Ptop));
+rhox = squeeze(sum(permute(cx_mnr,[3,1,2])./rhox0.')).^-1 .* (1 - aT.*(T-T0-273.15) + bPx.*(Pt-Ptop));
 
 % convert weight to volume fraction, update bulk density
 rho   = 1./(m./rhom + x./rhox);
@@ -158,9 +133,9 @@ end
 if step>0 && ~restart
     Div_rhoV = + advect(M(inz,inx),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt advection
                + advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % xtal advection
-    F_DivV   = (alpha1*rho(inz,inx) - alpha2*rhoo(inz,inx) - alpha3*rhooo(inz,inx))./dt + (beta1*Div_rhoV + beta2*Div_rhoVo + beta3*Div_rhoVoo);  % get residual of mixture mass conservation
+    F_DivV   = (a1*rho(inz,inx) - a2*rhoo(inz,inx) - a3*rhooo(inz,inx))./dt + (b1*Div_rhoV + b2*Div_rhoVo + b3*Div_rhoVoo);  % get residual of mixture mass conservation
     VolSrc   = Div_V(inz,inx) - F_DivV./rho(inz,inx)/4;  % correct volume source term by scaled residual
 end
 
-UBG    = - 1*mean(mean(VolSrc))./2 .* (L/2-XXu);
-WBG    = - 1*mean(mean(VolSrc))./2 .* (D/2-ZZw);
+UBG    = - mean(mean(VolSrc))./2 .* (L/2-XXu);
+WBG    = - mean(mean(VolSrc))./2 .* (D/2-ZZw);

@@ -1,6 +1,6 @@
 %% *****  THERMO-CHEMICAL EVOLUTION  **************************************
 
-% store previous iteration
+% store previous iterationcal.ncmp
 Si = S; Ci = C; Xi = X;
 
 % update temperature    
@@ -22,7 +22,7 @@ bnd_S = rho(inz,inx).*cP.*bnd_T./T(inz,inx);
 dSdt = advn_S + diff_T + diss_h + bnd_S;                                   % total rate of change
 
 % semi-implicit update of bulk entropy density
-S(inz,inx) = (alpha2*So(inz,inx) + alpha3*Soo(inz,inx) + (beta1*dSdt + beta2*dSdto + beta3*dSdtoo)*dt)/alpha1; % semi-implicit update of bulk entropy density
+S(inz,inx) = (a2*So(inz,inx) + a3*Soo(inz,inx) + (b1*dSdt + b2*dSdto + b3*dSdtoo)*dt)/a1; % semi-implicit update of bulk entropy density
 S([1 end],:) = S([2 end-1],:);                                             % apply zero flux boundary conditions
 S(:,[1 end]) = S(:,[2 end-1]);
 
@@ -33,7 +33,7 @@ T = (T0+273.15) * exp((S - X.*Dsx)./rho./cP + Adbt./cP.*(Pt-Ptop));        % con
 % update major component 
 advn_C = zeros(size(c(inz,inx,:)));
 diff_C = zeros(size(c(inz,inx,:)));
-for i = 2:cal.nc
+for i = 2:cal.ncmp
     advn_C(:,:,i) = - advect(M(inz,inx).*cm(inz,inx,i),Um(inz,:),Wm(:,inx),h,{ADVN,''},[1,2],BCA) ...  % melt advection
                     - advect(X(inz,inx).*cx(inz,inx,i),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);     % xtal advection
 end
@@ -42,20 +42,20 @@ end
 dCdt = advn_C;
 
 % semi-implicit update of major component density
-C(inz,inx,:) = (alpha2*Co(inz,inx,:) + alpha3*Coo(inz,inx,:) + (beta1*dCdt + beta2*dCdto + beta3*dCdtoo)*dt)/alpha1;
+C(inz,inx,:) = (a2*Co(inz,inx,:) + a3*Coo(inz,inx,:) + (b1*dCdt + b2*dCdto + b3*dCdtoo)*dt)/a1;
 C = max(0, C );                                                            % enforce min bound
 C([1 end],:,:) = C([2 end-1],:,:);                                         % boundary conditions
 C(:,[1 end],:) = C(:,[2 end-1],:);
 
 % convert component densities to concentrations
 C(:,:,1) = max(0,min(rho, rho - sum(C(:,:,2:end),3) ));
-for i = 1:cal.nc; c(:,:,i) = C(:,:,i)./rho; end
+for i = 1:cal.ncmp; c(:,:,i) = C(:,:,i)./rho; end
 
 
 %% *****  UPDATE PHASE PROPORTIONS  ***************************************
 
 % update local phase equilibrium
-var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.nc);  % in wt
+var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.ncmp);  % in wt
 var.T = reshape(T(inz,inx),(Nx-2)*(Nz-2),1)-273.15;  % convert to C
 var.P = reshape(Pt(inz,inx),(Nx-2)*(Nz-2),1)/1e9;    % convert to GPa
 var.f = 1-reshape(xq(inz,inx),(Nx-2)*(Nz-2),1);      % in wt
@@ -68,7 +68,7 @@ mq(:,[1 end]) = mq(:,[2 end-1]);
 
 xq = 1-mq;
 
-for i = 2:cal.nc
+for i = 2:cal.ncmp
     cxq(inz,inx,i) = reshape(phs.cs(:,i),(Nz-2),(Nx-2));
     cmq(inz,inx,i) = reshape(phs.cl(:,i),(Nz-2),(Nx-2));
 end
@@ -88,7 +88,7 @@ advn_X = - advect(X(inz,inx),Ux(inz,:),Wx(:,inx),h,{ADVN,''},[1,2],BCA);   % xta
 dXdt   = advn_X + Gx;                                                      % total rate of change
 
 % semi-implicit update of crystal fraction
-X(inz,inx) = (alpha2*Xo(inz,inx) + alpha3*Xoo(inz,inx) + (beta1*dXdt + beta2*dXdto + beta3*dXdtoo)*dt)/alpha1;
+X(inz,inx) = (a2*Xo(inz,inx) + a3*Xoo(inz,inx) + (b1*dXdt + b2*dXdto + b3*dXdtoo)*dt)/a1;
 X = max(0, X );                                                            % enforce min bound
 X([1 end],:) = X([2 end-1],:);                                             % apply boundary conditions
 X(:,[1 end]) = X(:,[2 end-1]);
@@ -105,7 +105,7 @@ sx = sm + Dsx;
 
 % phase compositions
 Kc = cxq./cmq;
-for i = 2:cal.nc
+for i = 2:cal.ncmp
     % update trace element phase compositions
     cm(:,:,i)  = c(:,:,i)./(m + x.*Kc(:,:,i) );
     cx(:,:,i)  = c(:,:,i)./(m./Kc(:,:,i)  + x);

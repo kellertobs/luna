@@ -8,7 +8,7 @@ Kte    = zeros(Nz,Nx,cal.nte);
 for i = 1:cal.nte
     
     % update bulk partitioning coefficients
-    for j=1:cal.nc; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_cmp(i,j) .* c(:,:,j)./100; end
+    for j=1:cal.nmnr; Kte(:,:,i) = Kte(:,:,i) + cal.Kte_cmp(i,j) .* cx_mnr(:,:,j)./100; end
 
     % update trace element phase compositions
     tem(:,:,i) = te(:,:,i)./(m + x.*Kte(:,:,i));
@@ -24,7 +24,7 @@ end
 dTEdt = adv_TE;
 
 % update trace element concentrations
-TE(inz,inx,:) = (alpha2*TEo(inz,inx,:) + alpha3*TEoo(inz,inx,:) + (beta1*dTEdt + beta2*dTEdto + beta3*dTEdtoo)*dt)/alpha1;
+TE(inz,inx,:) = (a2*TEo(inz,inx,:) + a3*TEoo(inz,inx,:) + (b1*dTEdt + b2*dTEdto + b3*dTEdtoo)*dt)/a1;
 TE = max(0, TE );                                                          % enforce min bound
 TE([1 end],:,:) = TE([2 end-1],:,:);                                       % boundary conditions
 TE(:,[1 end],:) = TE(:,[2 end-1],:);
@@ -50,7 +50,7 @@ end
 dIRdt = adv_IR;
 
 % update isotope ratio concentrations
-IR(inz,inx,:) = (alpha2*IRo(inz,inx,:) + alpha3*IRoo(inz,inx,:) + (beta1*dIRdt + beta2*dIRdto + beta3*dIRdtoo)*dt)/alpha1;
+IR(inz,inx,:) = (a2*IRo(inz,inx,:) + a3*IRoo(inz,inx,:) + (b1*dIRdt + b2*dIRdto + b3*dIRdtoo)*dt)/a1;
 IR([1 end],:,:) = IR([2 end-1],:,:);                                       % boundary conditions
 IR(:,[1 end],:) = IR(:,[2 end-1],:);
 

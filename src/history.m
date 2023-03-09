@@ -12,7 +12,7 @@ hist.time(stp) = time;
 % record total mass, heat, component mass in model (assume hy = 1, unit length in third dimension)
 hist.sumM(stp) = sum(sum(rho(2:end-1,2:end-1)*h*h*1));  % [kg]
 hist.sumS(stp) = sum(sum((S(2:end-1,2:end-1)+S0(2:end-1,2:end-1))*h*h*1));  % [J/K]
-for i = 1:cal.nc; hist.sumC(stp,i) = sum(sum(  squeeze(C(2:end-1,2:end-1,i))*h*h*1));  end% [kg]
+for i = 1:cal.ncmp; hist.sumC(stp,i) = sum(sum(  squeeze(C(2:end-1,2:end-1,i))*h*h*1));  end% [kg]
 
 % record expected rates of change by volume change and imposed boundaries layers
 dsumMdt = sum(rho(2,2:end-1).*W(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
@@ -20,14 +20,14 @@ dsumMdt = sum(rho(2,2:end-1).*W(1,2:end-1)*h*1) - sum(rho(end-1,2:end-1).*W(end,
 dsumSdt = sum(sum(bnd_S*h*h*1)) + sum(sum(diss_h*h*h*1))...
         + sum(  S(2,2:end-1).*W(1,2:end-1)*h*1) - sum(  S(end-1,2:end-1).*W(end,2:end-1)*h*1) ...
         + sum(  S(2:end-1,2).*U(2:end-1,1)*h*1) - sum(  S(2:end-1,end-1).*U(2:end-1,end)*h*1);  % [J/K/s]
-for i = 1:cal.nc
+for i = 1:cal.ncmp
     dsumCdt(i) = sum(  C(2,2:end-1,i).*W(1,2:end-1)*h*1) - sum(  C(end-1,2:end-1,i).*W(end,2:end-1)*h*1) ...
                + sum(  C(2:end-1,2,i).*U(2:end-1,1)*h*1) - sum(  C(2:end-1,end-1,i).*U(2:end-1,end)*h*1);  % [kg/s]
 end
 
-if step>=1; hist.DM(stp  ) = (alpha2*hist.DM(stp-1  ) + alpha3*hist.DM(max(1,stp-2)  ) + (beta1*dsumMdt + beta2*dsumMdto + beta3*dsumMdtoo)*dt)/alpha1; else; hist.DM(stp  ) = 0; end  % [kg]
-if step>=1; hist.DS(stp  ) = (alpha2*hist.DS(stp-1  ) + alpha3*hist.DS(max(1,stp-2)  ) + (beta1*dsumSdt + beta2*dsumSdto + beta3*dsumSdtoo)*dt)/alpha1; else; hist.DS(stp  ) = 0; end  % [kg]
-if step>=1; hist.DC(stp,:) = (alpha2*hist.DC(stp-1,:) + alpha3*hist.DC(max(1,stp-2),:) + (beta1*dsumCdt + beta2*dsumCdto + beta3*dsumCdtoo)*dt)/alpha1; else; hist.DC(stp,:) = zeros(1,cal.nc); end  % [kg]
+if step>=1; hist.DM(stp  ) = (a2*hist.DM(stp-1  ) + a3*hist.DM(max(1,stp-2)  ) + (b1*dsumMdt + b2*dsumMdto + b3*dsumMdtoo)*dt)/a1; else; hist.DM(stp  ) = 0; end  % [kg]
+if step>=1; hist.DS(stp  ) = (a2*hist.DS(stp-1  ) + a3*hist.DS(max(1,stp-2)  ) + (b1*dsumSdt + b2*dsumSdto + b3*dsumSdtoo)*dt)/a1; else; hist.DS(stp  ) = 0; end  % [kg]
+if step>=1; hist.DC(stp,:) = (a2*hist.DC(stp-1,:) + a3*hist.DC(max(1,stp-2),:) + (b1*dsumCdt + b2*dsumCdto + b3*dsumCdtoo)*dt)/a1; else; hist.DC(stp,:) = zeros(1,cal.ncmp); end  % [kg]
 
 % record conservation error of mass M, heat S, major component C, volatile component V
 hist.EM(stp)   = (hist.sumM(stp)   - hist.DM(stp))  ./hist.sumM(1)   - 1;  % [kg/kg]
@@ -67,7 +67,7 @@ hist.T(stp,1) = min( T(2:end-1,2:end-1),[],'all');
 hist.T(stp,2) = mean(T(2:end-1,2:end-1)   ,'all');
 hist.T(stp,3) = max( T(2:end-1,2:end-1),[],'all');
 
-for i = 1:cal.nc
+for i = 1:cal.ncmp
     hist.c(stp,1,i) = min( c(2:end-1,2:end-1,i),[],'all');
     hist.c(stp,2,i) = mean(c(2:end-1,2:end-1,i)   ,'all');
     hist.c(stp,3,i) = max( c(2:end-1,2:end-1,i),[],'all');
@@ -76,9 +76,9 @@ for i = 1:cal.nc
     hist.c_oxd(stp,3,i) = max( c_oxd(2:end-1,2:end-1,i),[],'all');
 end
 
-indx = repmat(x>1e-6,1,1,cal.nc);
+indx = repmat(x>1e-6,1,1,cal.ncmp);
 if any(indx(:)>0)
-    for i = 1:cal.nc
+    for i = 1:cal.ncmp
         hist.cx(stp,1,i) = min(min(cx(indx(2:end-1,2:end-1,i))));
         hist.cx(stp,2,i) = sum(sum(cx(2:end-1,2:end-1,i).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
         hist.cx(stp,3,i) = max(max(cx(indx(2:end-1,2:end-1,i))));
@@ -91,16 +91,16 @@ if any(indx(:)>0)
     hist.rhox(stp,2) = sum(sum(rhox(2:end-1,2:end-1).*x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(x(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
     hist.rhox(stp,3) = max(max(rhox(indx(2:end-1,2:end-1,1))));
 else
-    for i = 1:cal.nc
+    for i = 1:cal.ncmp
         hist.cx(stp,1:3,i) = NaN;
         hist.cx_oxd(stp,1:3,i) = NaN;
     end
     hist.rhox(stp,1:3) = NaN;
 end
 
-indm = repmat(m>1e-6,1,1,cal.nc);
+indm = repmat(m>1e-6,1,1,cal.ncmp);
 if any(indm(:)>0)
-    for i = 1:cal.nc
+    for i = 1:cal.ncmp
         hist.cm(stp,1,i) = min(min(cm(indm(2:end-1,2:end-1,i))));
         hist.cm(stp,2,i) = sum(sum(cm(2:end-1,2:end-1,i).*m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1).*rho(2:end-1,2:end-1)));
         hist.cm(stp,3,i) = max(max(cm(indm(2:end-1,2:end-1,i))));
@@ -117,7 +117,7 @@ if any(indm(:)>0)
     hist.etam(stp,2) = sum(sum(etam(2:end-1,2:end-1).*m(2:end-1,2:end-1)))./sum(sum(m(2:end-1,2:end-1)));
     hist.etam(stp,3) = max(max(etam(indm(2:end-1,2:end-1,1))));
 else
-    for i = 1:cal.nc
+    for i = 1:cal.ncmp
         hist.cm(stp,1:3,i) = NaN;
         hist.cm_oxd(stp,1:3,i) = NaN;
     end

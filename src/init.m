@@ -36,11 +36,12 @@ m0  = phs0.f; x0 = 1-m0;
 cm0 = phs0.cl;
 
 % update phase oxide compositions
-oxdm0 = cm0*cal.oxd;
+cm0_oxd = cm0*cal.cmp_oxd;
+cm0_mnr = cm0*cal.cmp_mnr;
 
-wtm([1 2 3 4 6 7 8 11 12]) = [oxdm0,0,0]; % SiO2
+wtm([1 2 3 4 6 7 8 11 12]) = [cm0_oxd,0,0]; % SiO2
 eta0 = grdmodel08(wtm,T0);
-rho0 = sum(cm0./rhom0).^-1;
+rho0 = sum(cm0_mnr./rhom0).^-1;
 
 DrhoT = aT*rho0*abs(Ttop-Tbot);
 Drhoc = 0.1*max(abs(rhom0-rho0)); 
@@ -149,9 +150,9 @@ run(['../cal/cal_',calID,'.m']);
 
 % initialise solution fields
 Tp  =  T0 + (T1-T0) .* (1+erf((ZZ/D-zlay)/wlay_T))/2 + dT.*rp;  if bndinit && ~isnan(Twall); Tp = Tp + (Twall-Tp).*bndshape; end % temperature [C]
-c   =  zeros(Nz,Nx,cal.nc); cxq = c; cmq = c;
+c   =  zeros(Nz,Nx,cal.ncmp); cxq = c; cmq = c;
 c0 = c0./sum(c0);  c1 = c1./sum(c1);
-for i=1:cal.nc
+for i=1:cal.ncmp
     c(:,:,i)   =  c0(i) + (c1(i)-c0(i)) .* (1+erf((ZZ/D-zlay)/wlay_c))/2 + dc(i).*rp;  
     if bndinit && ~isnan(cwall); c(inz,inx,i) = c(inz,inx,i) + (cwall-c(inz,inx,i)).*bndshape; end % major component
 end
@@ -210,7 +211,7 @@ while res > tol
     T([1 end],:) = T([2 end-1],:);
     T(:,[1 end]) = T(:,[2 end-1]);
 
-    var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.nc);  % in wt
+    var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.ncmp);  % in wt
     var.T = reshape(T(inz,inx),(Nx-2)*(Nz-2),1)-273.15;  % convert to C
     var.P = reshape(Pt(inz,inx),(Nx-2)*(Nz-2),1)/1e9;    % convert to GPa
     var.f = 1-reshape(xq(inz,inx),(Nx-2)*(Nz-2),1);      % in wt
@@ -224,7 +225,7 @@ while res > tol
     xq = 1-mq;
     x  = xq;  m = mq;
 
-    for i = 2:cal.nc
+    for i = 2:cal.ncmp
         cxq(inz,inx,i) = reshape(phs.cs(:,i),(Nz-2),(Nx-2));
         cmq(inz,inx,i) = reshape(phs.cl(:,i),(Nz-2),(Nx-2));
     end
@@ -252,7 +253,7 @@ S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - Adbt.*(Pt-Ptop));  So = S;
 S0 = rho.*(cP.*log((T0+273.15)) - Adbt.*(Ptop)); 
 s  = S./rho;
 C  = 0.*c;  Co = C;
-for i = 1:cal.nc; C(:,:,i) = rho.*(m.*cm(:,:,i) + x.*cx(:,:,i)); end
+for i = 1:cal.ncmp; C(:,:,i) = rho.*(m.*cm(:,:,i) + x.*cx(:,:,i)); end
 
 % get phase entropies
 sm = S./rho - x.*Dsx;
@@ -291,7 +292,7 @@ iter    =  0;
 hist    = [];
 dsumMdt = 0; dsumMdto = 0;
 dsumSdt = 0; dsumSdto = 0;
-dsumCdt = zeros(1,cal.nc); dsumCdto = zeros(1,cal.nc);
+dsumCdt = zeros(1,cal.ncmp); dsumCdto = zeros(1,cal.ncmp);
 
 % overwrite fields from file if restarting run
 if restart

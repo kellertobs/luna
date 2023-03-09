@@ -1,5 +1,5 @@
 % get combined residual norm
-resnorm = resnorm_VP + resnorm_TC;
+resnorm = resnorm_VP + resnorm_TC + norm(F_DivV,'fro')./norm(rho(inz,inx)/dt,'fro');
 if iter==1 || resnorm>resnorm0; resnorm0 = resnorm + 1e-32; end  % reset reference residual
 
 % check for solver divergence or failing
