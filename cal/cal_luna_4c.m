@@ -11,7 +11,7 @@ cal.oxdStr =  {'SiO$_2$','TiO$_2$','Al$_2$O$_3$','FeO','MgO','CaO','Na$_2$O'};
 for i = 1:cal.noxd; cal.(cal.oxdStr{i}(1:2)) = i; end
 
 cal.mnrStr  = {'for','fay','ens','hyp','aug','pig','ant','alb','ilm','qtz'};
-for i = 1:length(cal.mnrStr); cal.(cal.mnrStr{i}) = i; end
+for i = 1:cal.nmnr; cal.(cal.mnrStr{i}) = i; end
 
 % set mineral end-member oxide compositions
 cal.mnr_oxd = [  42.7    0.05   0.0    0.0   57.25   0.0    0.0     % forsterite
