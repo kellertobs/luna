@@ -25,17 +25,19 @@ while time <= tend && step <= Nt
     Soo = So; So = S;
     Coo = Co; Co = C;
     Xoo = Xo; Xo = X;
+    Moo = Mo; Mo = M;
+    rhooo = rhoo; rhoo = rho;
     TEoo = TEo; TEo = TE;
     IRoo = IRo; IRo = IR;
     dSdtoo = dSdto; dSdto = dSdt;
     dCdtoo = dCdto; dCdto = dCdt;
     dXdtoo = dXdto; dXdto = dXdt;
+    dMdtoo = dMdto; dMdto = dMdt;
+    drhodtoo = drhodto; drhodto = drhodt;
     dTEdtoo = dTEdto; dTEdto = dTEdt;
     dIRdtoo = dIRdto; dIRdto = dIRdt;
-    rhooo = rhoo; rhoo = rho;
-    Div_rhoVoo = Div_rhoVo; Div_rhoVo = Div_rhoV;
-    Div_Vo = Div_V;
-    dto    = dt;
+    Div_Vo  = Div_V;
+    dto     = dt;
     
     % reset residuals and iteration count
     resnorm  = 1;

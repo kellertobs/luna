@@ -18,15 +18,18 @@ fprintf('\n   run ID: %s \n\n',runID);
 load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 calibrt =  0;                % not in calibrate mode
-TINY    =  1e-12;            % minimum cutoff phase, component fractions
+TINY    =  1e-16;            % minimum cutoff phase, component fractions
 BCA     =  {'',''};          % boundary condition on advection (top/bot, sides)
+BCD     =  {'',''};          % boundary condition on advection (top/bot, sides)
 bnchm   =  0;                % not a benchmark run
 
 Dsx     = -cal.dS;           % use entropy change of crystallisation set in cal
 
 % calculate dimensionless numbers characterising the system dynamics
+wtm    = [c0*cal.cmp_oxd,0,0]; % 8 major elements + H2O
+rhom0  = DensityX(wtm,T0,Ptop/1e8);
 var0.c = c0;          % in wt
-var0.T = T0;          % convert to C
+var0.T = T0.*exp(aT./rhom0./cP.*Ptop);  % in C
 var0.P = Ptop/1e9;    % convert to GPa
 var0.f = 1;           % in wt
 
@@ -34,30 +37,43 @@ var0.f = 1;           % in wt
 
 m0  = phs0.f; x0 = 1-m0;
 cm0 = phs0.cl;
+cx0 = phs0.cs;
 
 % update phase oxide compositions
 cm0_oxd = cm0*cal.cmp_oxd;
+cx0_oxd = cx0*cal.cmp_oxd;
 cm0_mnr = cm0*cal.cmp_mnr;
+cx0_mnr = cx0*cal.cmp_mnr;
 
-wtm([1 2 3 4 6 7 8 11 12]) = [cm0_oxd,0,0]; % SiO2
-eta0 = grdmodel08(wtm,T0);
-rho0 = sum(cm0_mnr./rhom0).^-1;
+cm1_oxd = (0.9.*cm0_oxd + 0.1.*cal.cmp_oxd(1,:));
+cm2_oxd = (0.9.*cm0_oxd + 0.1.*cal.cmp_oxd(4,:));
 
-DrhoT = aT*rho0*abs(Ttop-Tbot);
-Drhoc = 0.1*max(abs(rhom0-rho0)); 
-Drhox = 0.1*mean(abs(rhox0-rhom0));
-Drho0 = DrhoT + Drhoc + Drhox;
+wtm    = [cm0_oxd,0,0]; % 8 major elements + H2O
+etam0  = Giordano08(wtm,T0);
+rhom0  = DensityX(wtm,T0,Ptop/1e8);
+Drhox0 = abs(sum(cx0_mnr./rhox0).^-1 - rhom0);
 
-uT    = DrhoT*g0*(D/10)^2/eta0/etareg;
-uc    = Drhoc*g0*(D/10)^2/eta0/etareg;
-ux    = Drhox*g0*(D/10)^2/eta0/etareg;
-u0    = Drho0*g0*(D/10)^2/eta0/etareg;
+wtm    = [cm1_oxd,0,0];
+rhom1  = DensityX(wtm,T0,Ptop/1e8);
 
-wx0   = mean(abs(rhox0-rhom0))*g0*d0^2/eta0;
+wtm    = [cm2_oxd,0,0];
+rhom2  = DensityX(wtm,T0,Ptop/1e8);
 
-ud0   = kT0/rho0/cP/(D/10);
+DrhoT  = rhom0.*aT*max([abs(Ttop-Tbot)/10,abs(T0-T1),T0/100]);
+Drhoc  = abs(rhom1-rhom2);
+Drhox  = 0.1*Drhox0;
+Drho0  = DrhoT + Drhoc + Drhox;
 
-uwT   = dw/tau_T; 
+uT    = DrhoT*g0*(D/10)^2/etam0/etareg;
+uc    = Drhoc*g0*(D/10)^2/etam0/etareg;
+ux    = Drhox*g0*(D/10)^2/etam0/etareg;
+u0    = Drho0*g0*(D/10)^2/etam0/etareg;
+
+wx0   = Drhox0*g0*d0^2/etam0;
+
+ud0   = kT0/rhom0/cP/(D/10);
+
+uwT   = bnd_w/tau_T; 
 
 RaT   = uT/ud0;
 Rac   = uc/ud0;
@@ -68,8 +84,8 @@ Rux   = wx0/u0;
 
 RwT   = uwT/u0;
 
-Re    = u0*rho0*(D/10)/eta0/etareg;
-Rex   = wx0*rho0*d0/eta0;
+Re    = u0*rhom0*(D/10)/etam0/etareg;
+Rex   = wx0*rhom0*d0/etam0;
 
 fprintf('    crystal Re: %1.3e \n'  ,Rex);
 fprintf('     system Re: %1.3e \n\n',Re );
@@ -87,11 +103,13 @@ fprintf('    thermal Rw: %1.3e \n\n',RwT);
 % get coordinate arrays
 Xc        = -h/2:h:L+h/2;
 Zc        = -h/2:h:D+h/2;
-[XX,ZZ]   = meshgrid(Xc,Zc);
 Xf        = (Xc(1:end-1)+Xc(2:end))./2;
 Zf        = (Zc(1:end-1)+Zc(2:end))./2;
 [XXu,ZZu] = meshgrid(Xf,Zc);
 [XXw,ZZw] = meshgrid(Xc,Zf);
+Xc        = Xc(2:end-1);
+Zc        = Zc(2:end-1);
+[XX,ZZ]   = meshgrid(Xc,Zc);
 
 Nx = length(Xc);
 Nz = length(Zc);
@@ -101,49 +119,41 @@ inx = 2:Nx-1;
 
 % get smoothed initialisation field
 rng(seed);
-rp = randn(Nz,Nx);
+smth = smth*Nx*Nz*1e-4;
+rp   = randn(Nz,Nx);
 for i = 1:round(smth)
-    rp(2:end-1,2:end-1) = rp(2:end-1,2:end-1) + diff(rp(:,2:end-1),2,1)./8 + diff(rp(2:end-1,:),2,2)./8;
-    rp = rp - mean(mean(rp(2:end-1,2:end-1)));
-    rp([1 end],:) = 0;
-    rp(:,[1 end]) = 0;
+    rp = rp + diffus(rp,1/8*ones(size(rp)),1,[1,2],BCD);
+    rp = rp - mean(mean(rp));
 end
 rp = rp./max(abs(rp(:)));
 
-% get mapping arrays
-NP =  Nz   * Nx   ;
-NW = (Nz-1)* Nx   ;
-NU =  Nz   *(Nx-1);
-MapP = reshape(1:NP,Nz  ,Nx  );
-MapW = reshape(1:NW,Nz-1,Nx  );
-MapU = reshape(1:NU,Nz  ,Nx-1) + NW;
 
+% get mapping arrays
+NP = (Nz+2) * (Nx+2);
+NW = (Nz+1) * (Nx+2);
+NU = (Nz+2) * (Nx+1);
+MapP = reshape(1:NP,Nz+2,Nx+2);
+MapW = reshape(1:NW,Nz+1,Nx+2);
+MapU = reshape(1:NU,Nz+2,Nx+1) + NW;
+
+% set up shape functions for transient boundary layers
+topshape = zeros(size(ZZ));
+botshape = zeros(size(ZZ));
 switch bndmode
     case 0  % none
-        topshape = zeros(size(ZZ(inz,inx)));
-        botshape = zeros(size(ZZ(inz,inx)));
     case 1  % top only
-        topshape = exp( ( -ZZ(inz,inx)+h/2)/dw);
-        botshape = zeros(size(ZZ(inz,inx)));
+        topshape = exp( ( -ZZ+h/2)/bnd_w);
     case 2  % bot only
-        topshape = zeros(size(ZZ(inz,inx)));
-        botshape = exp(-(D-ZZ(inz,inx)-h/2)/dw);
+        botshape = exp(-(D-ZZ-h/2)/bnd_w);
     case 3  % top/bot only
-        topshape = exp( ( -ZZ(inz,inx)+h/2)/dw);
-        botshape = exp(-(D-ZZ(inz,inx)-h/2)/dw);
+        topshape = exp( ( -ZZ+h/2)/bnd_w);
+        botshape = exp(-(D-ZZ-h/2)/bnd_w);
 end
-topshape = max(0,min(1,topshape));
-botshape = max(0,min(1,botshape));
 
-% set all boundaries to free slip
-sds = -1;
-top = -1;
-bot = -1;
-%                              sds = -1;      % free slip sides for other types
-% if bndmode==1 || bndmode>=3; top = +1;      % no slip top for 'top only(1)', 'top/bot(3)', 'all sides(4)'
-% else;                        top = -1; end  % free slip for other types
-% if bndmode>=2;               bot = +1;      % no slip bot for 'bot only(2)', 'top/bot(3)', 'all sides(4)'
-% else;                        bot = -1; end  % free slip for other types
+% set velocity boundaries
+sds =  0;  % hindered slip
+top = -1;  % free slip
+bot = -1;  % free slip
 
 % load calibration
 run(['../cal/cal_',calID,'.m']);
@@ -168,9 +178,9 @@ for i = 1:length(ir0)
     if any(bndinit(:)) && ~isnan(irwall(i)); ir(inz,inx,i)  = ir(inz,inx,i) + (irwall(i)-ir(inz,inx,i)).*bndshape; end 
 end
 
-U   =  zeros(size((XX(:,1:end-1)+XX(:,2:end))));  Ui = U;  res_U = 0.*U;
-W   =  zeros(size((XX(1:end-1,:)+XX(2:end,:))));  Wi = W;  res_W = 0.*W; wf = 0.*W; wc = 0.*W;
-P   =  zeros(size(XX));  Pi = P;  res_P = 0.*P;  meanQ = 0;  Vel = 0.*P;
+U   =  zeros(Nz+2,Nx+1);  UBG = U; Ui = U;
+W   =  zeros(Nz+1,Nx+2);  WBG = W; Wi = W; wx = 0.*W; wm = 0.*W;
+P   =  zeros(Nz+2,Nx+2);  Vel = 0.*Tp;
 SOL = [W(:);U(:);P(:)];
 
 % initialise auxiliary fields
@@ -178,64 +188,53 @@ Wx  = W;  Ux  = U;
 Wm  = W;  Um  = U;
 
 eIIref =  1e-6;  
-Div_V  =  0.*P;  Div_rhoV = 0.*P(inz,inx);  Div_rhoVo = Div_rhoV;
-exx    =  0.*P;  ezz = 0.*P;  exz = zeros(Nz-1,Nx-1);  eII = 0.*P;  
-txx    =  0.*P;  tzz = 0.*P;  txz = zeros(Nz-1,Nx-1);  tII = 0.*P; 
-VolSrc =  0.*P(inz,inx);  MassErr = 0;  drhodt = 0.*P;  drhodto = 0.*P;
+Div_V  =  0.*Tp;  advn_rho = 0.*Tp;  drhodt = 0.*Tp;  drhodto = drhodt;
+exx    =  0.*Tp;  ezz = 0.*Tp;  exz = zeros(Nz-1,Nx-1);  eII = 0.*Tp;  
+txx    =  0.*Tp;  tzz = 0.*Tp;  txz = zeros(Nz-1,Nx-1);  tII = 0.*Tp; 
+VolSrc =  0.*Tp;  MassErr = 0;
 
 rho    =  rhom0(1).*ones(size(Tp));
-rhoref =  mean(rho(inz,inx),'all');
-Pt     =  Ptop + rhoref.*g0.*(ZZ+h/2).*1.05;
+rhoref =  mean(rho,'all');
+Pt     = Ptop + rhoref.*g0.*ZZ;
 mq  =  ones(size(Tp));  m = mq;
 xq  = zeros(size(Tp));  x = xq;
 
 % get volume fractions and bulk density
 step   = 0;
 res    = 1;  tol = 1e-12;
-cal.Tliq = reshape(Tp(inz,inx),[],1);
+cal.Tliq = reshape(Tp,[],1);
 while res > tol
     Pti = Pt;
     
-    rhoref =  mean(rho(inz,inx),'all');
-    rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
-    Adbt   =  aT./rhoref;
-    Pt( 2:end, :) = repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
-    Pt            = Pt - Pt(2,:)/2 + Ptop;
-    Pt([1 end],:) = Pt([2 end-1],:);
-    Pt(:,[1 end]) = Pt(:,[2 end-1]);
-    if Nz<=10; Pt = Ptop.*ones(size(Tp)); end
+    rhoref = mean(rho,'all');
+    Adbt   = aT./rhoref;
+    if Nz==1; Pt = Ptop.*ones(size(Tp)); else
+        rhofz  = (rho(1:end-1,:)+rho(2:end,:))/2;
+        Pt(1,:)     = repmat(mean(rhofz(1,:),2).*g0.*h/2,1,Nx) + Ptop;
+        Pt(2:end,:) = Pt(1,:) + repmat(cumsum(mean(rhofz,2).*g0.*h),1,Nx);
+    end
 
     T  = (Tp+273.15).*exp(Adbt./cP.*Pt);
 
-    T(inz,inx)   = max(T(inz,inx),reshape(cal.Tliq+273.15,(Nz-2),(Nx-2)));
-    T([1 end],:) = T([2 end-1],:);
-    T(:,[1 end]) = T(:,[2 end-1]);
+%     T   = max(T,reshape(cal.Tliq+273.15,Nz,Nx));
 
-    var.c = reshape(c(inz,inx,:),(Nx-2)*(Nz-2),cal.ncmp);  % in wt
-    var.T = reshape(T(inz,inx),(Nx-2)*(Nz-2),1)-273.15;  % convert to C
-    var.P = reshape(Pt(inz,inx),(Nx-2)*(Nz-2),1)/1e9;    % convert to GPa
-    var.f = 1-reshape(xq(inz,inx),(Nx-2)*(Nz-2),1);      % in wt
+    var.c = reshape(c,Nx*Nz,cal.ncmp);  % in wt
+    var.T = reshape(T,Nx*Nz,1)-273.15;  % convert to C
+    var.P = reshape(Pt,Nx*Nz,1)/1e9;    % convert to GPa
+    var.f = 1-reshape(xq,Nx*Nz,1);      % in wt
     
-    [phs,cal]     =  meltmodel(var,cal,'E');
+    [phs,cal] =  meltmodel(var,cal,'E');
     
-    mq(inz,inx)   = max(0,min(1,reshape(phs.f,(Nz-2),(Nx-2))));
-    mq([1 end],:) = mq([2 end-1],:);
-    mq(:,[1 end]) = mq(:,[2 end-1]);
+    mq   = max(0,min(1,reshape(phs.f,Nz,Nx)));
 
     xq = 1-mq;
     x  = xq;  m = mq;
 
-    for i = 2:cal.ncmp
-        cxq(inz,inx,i) = reshape(phs.cs(:,i),(Nz-2),(Nx-2));
-        cmq(inz,inx,i) = reshape(phs.cl(:,i),(Nz-2),(Nx-2));
-    end
-    cmq(:,:,1) = 1 - sum(cmq(:,:,2:end),3);
-    cxq(:,:,1) = 1 - sum(cxq(:,:,2:end),3);
+    cxq = reshape(phs.cs,Nz,Nx,cal.ncmp);
+    cmq = reshape(phs.cl,Nz,Nx,cal.ncmp);
 
-    cxq([1 end],:,:) = cxq([2 end-1],:,:);
-    cxq(:,[1 end],:) = cxq(:,[2 end-1],:);
-    cmq([1 end],:,:) = cmq([2 end-1],:,:);
-    cmq(:,[1 end],:) = cmq(:,[2 end-1],:);
+    cmq = cmq./sum(cmq,3);
+    cxq = cxq./sum(cxq,3);
 
     cx = cxq;  cm = cmq;
 
@@ -248,7 +247,7 @@ dto   = dt;
 Pto   = Pt;
   
 % get bulk enthalpy, silica, volatile content densities
-X  = rho.*x;  Xo = X;  M = rho-X;
+X  = rho.*x;  Xo = X;  M = rho-X;  Mo = M;  RHO = M+X;
 S  = rho.*(cP.*log(T/(T0+273.15)) + x.*Dsx - Adbt.*(Pt-Ptop));  So = S;
 S0 = rho.*(cP.*log((T0+273.15)) - Adbt.*(Ptop)); 
 s  = S./rho;
@@ -277,14 +276,15 @@ end
 IRo = IR;
 
 % initialise reaction/decay rates
-Gx = 0.*x(inz,inx); 
+Gx = 0.*x;  Gm = 0.*m;
 
 % initialise auxiliary variables 
-dSdt   = 0.*T(inz,inx); dSdto = dSdt; bnd_S = 0.*T(inz,inx); diss_h = 0.*T(inz,inx); 
-dCdt   = 0.*c(inz,inx); dCdto = dCdt;
-dXdt   = 0.*x(inz,inx); dXdto = dXdt;
-dTEdt  = 0.*te(inz,inx); dTEdto = dTEdt;
-dIRdt  = 0.*ir(inz,inx); dIRdto = dIRdt;
+dSdt   = 0.*T; dSdto = dSdt; bnd_S = 0.*T; diss_h = 0.*T; 
+dCdt   = 0.*c; dCdto = dCdt;
+dXdt   = 0.*x; dXdto = dXdt;
+dMdt   = 0.*m; dMdto = dMdt;
+dTEdt  = 0.*te; dTEdto = dTEdt;
+dIRdt  = 0.*ir; dIRdto = dIRdt;
 
 % initialise timing and iterative parameters
 time    =  0;

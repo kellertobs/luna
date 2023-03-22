@@ -1,5 +1,9 @@
-% get combined residual norm
-resnorm = resnorm_VP + resnorm_TC + norm(F_DivV,'fro')./norm(rho(inz,inx)/dt,'fro');
+% get residual of thermochemical equations
+resnorm    = norm(res_S  (:))./(norm(S  (:)/dt)+TINY) ...
+           + norm(res_C  (:))./(norm(C  (:)/dt)+TINY) ...
+           + norm(res_X  (:))./(norm(X  (:)/dt)+TINY) ...
+           + norm(res_rho(:))./(norm(rho(:)/dt)+TINY);
+
 if iter==1 || resnorm>resnorm0; resnorm0 = resnorm + 1e-32; end  % reset reference residual
 
 % check for solver divergence or failing
@@ -17,6 +21,6 @@ end
 % plot convergence of outer iterations
 if plot_cv
     figure(100); if iter==1; clf; else; hold on; end
-    plot(iter,log10(resnorm_TC),'b.',iter,log10(resnorm_VP),'r.',iter,log10(resnorm),'k.','MarkerSize',15,'LineWidth',1.5); box on; axis tight;
+    plot(iter,log10(resnorm),'k.','MarkerSize',15,'LineWidth',1.5); box on; axis tight;
     drawnow;
 end
