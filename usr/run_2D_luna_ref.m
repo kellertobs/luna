@@ -33,10 +33,10 @@ wlay_T   =  4*h/D;               % thickness of smooth layer boundary (relative 
 wlay_c   =  2*h/D;               % thickness of smooth layer boundary (relative to domain depth D)
 T0       =  1740;                % temperature top layer [deg C]
 T1       =  1740;                % temperature base layer [deg C]
-dT       =  0;                   % amplitude of random noise [deg C]
+dT       =  1;                   % amplitude of random noise [deg C]
 c0       =  [0.36,0.31,0.32,0.01]; % major component top layer
 c1       =  [0.36,0.31,0.32,0.01]; % major component base layer
-dc       =  [10,10,-10,-10].*1e-4; % amplitude of random noise [wt SiO2]
+dc       =  [1,1,-1,-1].*1e-3;   % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
@@ -77,10 +77,10 @@ d0       =  1e-4;                % crystal size [m]
 g0       =  1.62;                % gravity [m/s2]
 
 % set numerical model parameters
-TINT     =  'bd2im';             % time integration scheme ('bwei','cnsi','bd3i','bd3s')
+TINT     =  'bd2si';             % time integration scheme ('bwei','cnsi','bd3i','bd3s')
 ADVN     =  'weno5';             % advection scheme ('centr','upw1','quick','fromm','weno3','weno5','tvdim')
 CFL      =  0.50;                % (physical) time stepping courant number (multiplies stable step) [0,1]
-rtol     =  1e-4;                % outer its relative tolerance
+rtol     =  1e-5;                % outer its relative tolerance
 atol     =  1e-8;                % outer its absolute tolerance
 maxit    =  20;                  % maximum outer its
 lambda   =  0.50;                % iterative lag parameter equilibration

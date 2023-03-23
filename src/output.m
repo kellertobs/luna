@@ -110,9 +110,9 @@ elseif Nx <= 10  % create 1D plots
     plot(Gx./rho*yr*100.*(chi>1e-9),Zc.'./1e3,CL{[1,4]},LW{:}); axis ij tight; box on; hold on;
     title('$\Gamma_x/\bar{\rho}$ [wt/yr]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,4)
-    plot(-( mu([1,1:end],:)+ mu([1:end,end],:))/2.*wm(:,2:end-1)*hr,Zf.'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
-    plot(-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1)*hr,Zf.'./1e3,CL{[1,4]},LW{:});
-    plot(-                                         W (:,2:end-1)*hr,Zf.'./1e3,CL{[1,2]},LW{:});
+    plot(-( mu([1,1:end],:)+ mu([1:end,end],:))/2.*wm(:,2:end-1)*hr,Zw.'./1e3,CL{[1,3]},LW{:}); axis ij tight; box on; hold on;
+    plot(-(chi([1,1:end],:)+chi([1:end,end],:))/2.*wx(:,2:end-1)*hr,Zw.'./1e3,CL{[1,4]},LW{:});
+    plot(-                                         W (:,2:end-1)*hr,Zw.'./1e3,CL{[1,2]},LW{:});
     title('$W$, $w_\Delta^x$ [m/hr]',TX{:},FS{:}); set(gca,TL{:},TS{:}); set(gca,'YTickLabel',[]);
     subplot(1,5,5)
     plot(P(2:end-1,2:end-1),Zc.'./1e3,CL{[1,2]},LW{:}); axis ij tight; box on;

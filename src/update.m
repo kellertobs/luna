@@ -57,8 +57,8 @@ thtv = squeeze(prod(Mv.^Xf,2));
 % get effective viscosity
 eta    = squeeze(sum(ff.*kv.*thtv,1)); if Nx==1; eta = eta.'; end
 eta    = (etamax.^-0.5 + (etareg*eta).^-0.5).^-2;
-etaco  = (eta([1,1:end],[1  ,1:end]).*eta([1:end,end],[1  ,1:end]) ...
-       .* eta([1,1:end],[1:end,end]).*eta([1:end,end],[1:end,end])).^0.25;
+etaco  = (eta([1,1:end],[end,1:end]).*eta([1:end,end],[end,1:end]) ...
+       .* eta([1,1:end],[1:end,1  ]).*eta([1:end,end],[1:end,1  ])).^0.25;
 
 % get segregation coefficients
 dd   = permute(cat(3,d0*ones(size(mu)),d0*(1-mu)),[3,1,2]);
@@ -75,7 +75,7 @@ end
 kW  = Vel/10*h/10;                                                         % convection fluctuation diffusivity
 kwx = abs((rhox-rho).*g0.*Ksgr_x*d0*10);                                   % segregation fluctuation diffusivity
 kx  = chi.*mu.*(kwx + kW + mink);                                          % solid fraction diffusion 
-kT  = kT0 + mu.*rho.*cP.*(chi.*kwx + kW + mink);                % heat diffusion
+kT  = kT0 + mu.*rho.*cP.*(chi.*kwx + kW + mink);                           % heat diffusion
 ks  = kT./T;                                                               % entropy diffusion
 
 % update velocity divergence

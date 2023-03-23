@@ -19,8 +19,8 @@ load ocean;                  % load custom colormap
 run(['../cal/cal_',calID]);  % load melt model calibration
 calibrt =  0;                % not in calibrate mode
 TINY    =  1e-16;            % minimum cutoff phase, component fractions
-BCA     =  {'',''};          % boundary condition on advection (top/bot, sides)
-BCD     =  {'',''};          % boundary condition on advection (top/bot, sides)
+BCA     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
+BCD     =  {'','periodic'};  % boundary condition on advection (top/bot, sides)
 bnchm   =  0;                % not a benchmark run
 
 Dsx     = -cal.dS;           % use entropy change of crystallisation set in cal
@@ -45,8 +45,8 @@ cx0_oxd = cx0*cal.cmp_oxd;
 cm0_mnr = cm0*cal.cmp_mnr;
 cx0_mnr = cx0*cal.cmp_mnr;
 
-cm1_oxd = (0.9.*cm0_oxd + 0.1.*cal.cmp_oxd(1,:));
-cm2_oxd = (0.9.*cm0_oxd + 0.1.*cal.cmp_oxd(4,:));
+cm1_oxd = (0.99.*cm0_oxd + 0.01.*cal.cmp_oxd(1,:));
+cm2_oxd = (0.99.*cm0_oxd + 0.01.*cal.cmp_oxd(4,:));
 
 wtm    = [cm0_oxd,0,0]; % 8 major elements + H2O
 etam0  = Giordano08(wtm,T0);
@@ -59,9 +59,9 @@ rhom1  = DensityX(wtm,T0,Ptop/1e8);
 wtm    = [cm2_oxd,0,0];
 rhom2  = DensityX(wtm,T0,Ptop/1e8);
 
-DrhoT  = rhom0.*aT*max([abs(Ttop-Tbot)/10,abs(T0-T1),T0/100]);
+DrhoT  = rhom0.*aT*max([abs(Ttop-Tbot)/100,abs(T0-T1),T0/100]);
 Drhoc  = abs(rhom1-rhom2);
-Drhox  = 0.1*Drhox0;
+Drhox  = 0.01*Drhox0;
 Drho0  = DrhoT + Drhoc + Drhox;
 
 uT    = DrhoT*g0*(D/10)^2/etam0/etareg;
@@ -71,7 +71,8 @@ u0    = Drho0*g0*(D/10)^2/etam0/etareg;
 
 wx0   = Drhox0*g0*d0^2/etam0;
 
-ud0   = kT0/rhom0/cP/(D/10);
+kW0   = u0/10*h/10;
+ud0   = (kT0+rhom0.*cP.*(kW0 + mink))/rhom0/cP/(D/10);
 
 uwT   = bnd_w/tau_T; 
 
@@ -103,10 +104,10 @@ fprintf('    thermal Rw: %1.3e \n\n',RwT);
 % get coordinate arrays
 Xc        = -h/2:h:L+h/2;
 Zc        = -h/2:h:D+h/2;
-Xf        = (Xc(1:end-1)+Xc(2:end))./2;
-Zf        = (Zc(1:end-1)+Zc(2:end))./2;
-[XXu,ZZu] = meshgrid(Xf,Zc);
-[XXw,ZZw] = meshgrid(Xc,Zf);
+Xu        = (Xc(1:end-1)+Xc(2:end))./2;
+Zw        = (Zc(1:end-1)+Zc(2:end))./2;
+[XXu,ZZu] = meshgrid(Xu,Zc);
+[XXw,ZZw] = meshgrid(Xc,Zw);
 Xc        = Xc(2:end-1);
 Zc        = Zc(2:end-1);
 [XX,ZZ]   = meshgrid(Xc,Zc);

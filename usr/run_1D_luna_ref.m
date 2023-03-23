@@ -36,7 +36,7 @@ T1       =  1740;                % temperature base layer [deg C]
 dT       =  0;                   % amplitude of random noise [deg C]
 c0       =  [0.36,0.31,0.32,0.01]; % major component top layer
 c1       =  [0.36,0.31,0.32,0.01]; % major component base layer
-dc       =  [10,1,-10,-1].*0e-4; % amplitude of random noise [wt SiO2]
+dc       =  [1,1,-1,-1].*0e-3;   % amplitude of random noise [wt SiO2]
 
 % set model trace and isotope geochemistry parameters
 te0      =  [1,1,1,1];           % trace elements top layer [wt ppm]
