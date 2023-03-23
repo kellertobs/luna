@@ -21,7 +21,7 @@ h        =  D/N;                 % grid spacing (equal in both dimensions, do no
 Nt       =  1e4;                 % number of time steps to take
 hr       =  3600;                % conversion seconds to hours
 yr       =  24*365.25*hr;        % conversion seconds to years
-tend     =  10*yr;               % end time for simulation [s]
+tend     =  1000*yr;             % end time for simulation [s]
 dt       =  yr/100;              % initial time step [s]
 dtmax    =  yr;                  % maximum time step [s]
 

@@ -307,26 +307,25 @@ if restart
         name = [opdir,'/',runID,'/',runID,'_hist'];
         load(name,'hist');
 
-        M   = rho-F-X;
-        xq  = x; fq = f;
+        xq  = x;
         SOL = [W(:);U(:);P(:)];
 
         So = S;
         Co = C;
-        Vo = V;
         Xo = X;
-        Fo = F;
+        Mo = M;
+        rhoo = rho;
         TEo = TE;
         IRo = IR;
         dSdto = dSdt;
         dCdto = dCdt;
-        dVdto = dVdt;
         dXdto = dXdt;
-        dFdto = dFdt;
+        dMdto = dMdt;
+        drhodto = drhodt;
         dTEdto = dTEdt;
         dIRdto = dIRdt;
-        rhoo = rho;
-        Div_rhoVo = Div_rhoV;
+        Div_Vo = Div_V;
+        dto    = dt;
 
         update; output; restart = 0;
 
