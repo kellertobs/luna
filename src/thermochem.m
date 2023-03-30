@@ -114,12 +114,12 @@ sm = (S - X.*Dsx)./RHO;
 sx = sm + Dsx;
 
 % update major component phase composition
-Kc  = cxq./cmq;
+Kc  = (cxq+TINY)./(cmq+TINY);
 res = 1; tol = 1e-9;
 while res>tol
     Kci = Kc;
     cm  = c./(m + x.*Kc); cm = cm./sum(cm,3);
     cx  = c./(m./Kc + x); cx = cx./sum(cx,3);
-    Kc  = cx./cm;
+    Kc  = (cx+TINY)./(cm+TINY);
     res = norm(Kci-Kc,'fro')./norm(Kc,'fro');
 end
