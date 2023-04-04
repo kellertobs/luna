@@ -115,7 +115,7 @@ sx = sm + Dsx;
 
 % update major component phase composition
 Kc  = (cxq+TINY)./(cmq+TINY);
-res = 1; tol = 1e-9;
+res = 1; tol = 1e-12;
 while res>tol
     Kci = Kc;
     cm  = c./(m + x.*Kc); cm = cm./sum(cm,3);
